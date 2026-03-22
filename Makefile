@@ -1,13 +1,24 @@
-.PHONY: init ingest features predict dashboard test lint all clean
+.PHONY: init ingest features predict dashboard test lint all clean scrape query
 
 PYTHON ?= python
 DB ?= horsegpt.db
+TRACK ?= SAR
+DATE ?= $(shell date +%Y-%m-%d)
 
 init:
 	$(PYTHON) scripts/init_db.py
 
 ingest:
 	$(PYTHON) -m src.data.ingest --db $(DB) --input data/bris/
+
+ingest-scraped:
+	$(PYTHON) -c "from src.data.scrapers.ingest_scraped import ingest_scraped_directory; from pathlib import Path; ingest_scraped_directory('sqlite:///$(DB)', Path('data/scraped'))"
+
+scrape:
+	$(PYTHON) -m src.nlp.cli --scrape $(TRACK) $(DATE) --db sqlite:///$(DB)
+
+query:
+	$(PYTHON) -m src.nlp.cli --db sqlite:///$(DB) $(ARGS)
 
 features:
 	$(PYTHON) -m src.features.pipeline --db $(DB)
