@@ -1,0 +1,64 @@
+# Track metadata for HorseGPT v3.14
+# Codes follow BRIS/Equibase convention
+
+tracks:
+  AQU:
+    name: Aqueduct
+    state: NY
+    surfaces: [dirt, turf, inner_turf]
+  BEL:
+    name: Belmont Park
+    state: NY
+    surfaces: [dirt, turf, inner_turf]
+  SAR:
+    name: Saratoga
+    state: NY
+    surfaces: [dirt, turf, inner_turf]
+  CD:
+    name: Churchill Downs
+    state: KY
+    surfaces: [dirt, turf]
+  KEE:
+    name: Keeneland
+    state: KY
+    surfaces: [dirt, turf]
+  GP:
+    name: Gulfstream Park
+    state: FL
+    surfaces: [dirt, turf]
+  SA:
+    name: Santa Anita
+    state: CA
+    surfaces: [dirt, turf]
+  DMR:
+    name: Del Mar
+    state: CA
+    surfaces: [dirt, turf, synthetic]
+  PIM:
+    name: Pimlico
+    state: MD
+    surfaces: [dirt, turf]
+  LRL:
+    name: Laurel Park
+    state: MD
+    surfaces: [dirt, turf]
+  OP:
+    name: Oaklawn Park
+    state: AR
+    surfaces: [dirt]
+  TAM:
+    name: Tampa Bay Downs
+    state: FL
+    surfaces: [dirt, turf]
+  FG:
+    name: Fair Grounds
+    state: LA
+    surfaces: [dirt, turf]
+  WO:
+    name: Woodbine
+    state: "ON"
+    surfaces: [synthetic, turf]
+  PRX:
+    name: Parx Racing
+    state: PA
+    surfaces: [dirt, turf]
