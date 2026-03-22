@@ -33,16 +33,29 @@ def delta_r_squared(
 ) -> float:
     """ΔR² over public odds — Benter's key metric.
 
-    Measures how much additional information the model provides
-    beyond what the market already prices in. Even ΔR² = 0.0178
-    was sufficient for massive profitability.
-    """
-    ss_market = np.sum((y_true - market_probs) ** 2)
-    ss_model = np.sum((y_true - model_probs) ** 2)
+    Uses McFadden's pseudo-R² based on log-likelihood, not sum of squares.
+    The original used SS which is not a proper scoring rule for binary
+    outcomes and does not correspond to Benter's published values.
 
-    if ss_market == 0:
+    ΔR² = (LL_model - LL_market) / |LL_null|
+
+    Even ΔR² = 0.0178 was sufficient for massive profitability.
+    """
+    eps = 1e-15
+    model_probs = np.clip(model_probs, eps, 1 - eps)
+    market_probs = np.clip(market_probs, eps, 1 - eps)
+
+    # Log-likelihood: for binary y, only winners contribute to LL
+    ll_model = np.sum(y_true * np.log(model_probs) + (1 - y_true) * np.log(1 - model_probs))
+    ll_market = np.sum(y_true * np.log(market_probs) + (1 - y_true) * np.log(1 - market_probs))
+
+    # Null model: predict base rate for everyone
+    base_rate = np.clip(y_true.mean(), eps, 1 - eps)
+    ll_null = len(y_true) * (base_rate * np.log(base_rate) + (1 - base_rate) * np.log(1 - base_rate))
+
+    if abs(ll_null) < eps:
         return 0.0
-    return float(1 - ss_model / ss_market)
+    return float((ll_model - ll_market) / abs(ll_null))
 
 
 def simulated_roi(

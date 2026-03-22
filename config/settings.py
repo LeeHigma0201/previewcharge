@@ -20,6 +20,8 @@ class ModelConfig:
     walk_forward_min_days: int = 180
     kelly_fraction: float = 0.25
     min_overlay_ev: float = 1.10  # 10% edge minimum for longshot bets
+    win_pool_takeout: float = 0.17  # NA typical win pool takeout (15-22%)
+    exotic_pool_takeout: float = 0.22  # NA typical exotic pool takeout
 
 
 @dataclass

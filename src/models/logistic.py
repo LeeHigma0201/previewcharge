@@ -20,16 +20,15 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy.special import expit, logit
-from sklearn.linear_model import LogisticRegression
+from scipy.special import logit, softmax
+import statsmodels.api as sm
+from statsmodels.genmod.families import Binomial
 
 from src.models.base import BaseModel
 
 
 def odds_to_implied_prob(odds: np.ndarray) -> np.ndarray:
     """Convert decimal odds to implied probabilities."""
-    # Decimal odds: payout = stake * (odds + 1)
-    # Implied probability = 1 / (odds + 1)
     return 1.0 / (odds + 1.0)
 
 
@@ -42,27 +41,30 @@ def normalize_probs(probs: np.ndarray) -> np.ndarray:
 
 
 class BenterLogisticModel(BaseModel):
-    """Logistic regression with public odds as a FIXED offset.
+    """Conditional logit with public odds as a FIXED offset.
 
-    The key insight: instead of predicting win probability from scratch,
-    we start with the market's estimate (public odds) and only learn
-    the residual — where the market is wrong.
+    Implements Benter's (1994) formulation exactly:
+        logit(p_i) = logit(q_i) + β·x_i
 
-    The odds logit is a true offset (coefficient fixed at 1.0), NOT a
-    learned feature. Regularization would shrink it toward 0, discarding
-    the market baseline that Benter's entire method depends on.
+    where q_i is the market-implied probability. The offset logit(q_i)
+    has coefficient fixed at 1.0 — the GLM offset parameter ensures it
+    enters the log-likelihood during training without being regularized.
+
+    No class_weight balancing: the odds offset handles the base rate,
+    and balanced weights destroy probability calibration that Kelly
+    sizing depends on.
     """
 
-    def __init__(self, C: float = 1.0, max_iter: int = 1000):
-        self.C = C
+    def __init__(self, alpha: float = 1.0, max_iter: int = 100):
+        self.alpha = alpha  # L2 regularization strength
         self.max_iter = max_iter
-        self.model: LogisticRegression | None = None
+        self._params: np.ndarray | None = None
         self.feature_names: list[str] = []
 
-    def _compute_offset(self, odds: np.ndarray | None) -> np.ndarray | None:
+    def _compute_offset(self, odds: np.ndarray | None) -> np.ndarray:
         """Compute fixed logit offset from market odds."""
         if odds is None:
-            return None
+            return np.zeros(1)
         implied_probs = odds_to_implied_prob(odds)
         implied_probs = np.clip(implied_probs, 0.01, 0.99)
         return logit(implied_probs)
@@ -73,62 +75,59 @@ class BenterLogisticModel(BaseModel):
         y: np.ndarray,
         odds: np.ndarray | None = None,
     ) -> None:
-        """Train the Benter logistic model.
-
-        The odds offset is a TRUE offset with coefficient fixed at 1.0.
-        We subtract it from the sample weights' effect by using it during
-        prediction only — the model learns purely the residual signal.
-        """
+        """Train with GLM offset — the offset enters the log-likelihood
+        during optimization, so coefficients are estimated correctly."""
         self.feature_names = list(X.columns)
+        X_train = sm.add_constant(X.fillna(0).values.astype(float))
+        offset = self._compute_offset(odds) if odds is not None else np.zeros(len(y))
 
-        # Train on features ONLY — no odds column. The model learns the
-        # residual beyond market odds, not the odds themselves.
-        X_train = X.copy().fillna(0)
-
-        self.model = LogisticRegression(
-            C=self.C,
-            max_iter=self.max_iter,
-            solver="lbfgs",
-            class_weight="balanced",
+        model = sm.GLM(
+            y.astype(float),
+            X_train,
+            family=Binomial(),
+            offset=offset,
         )
-        self.model.fit(X_train, y)
+        result = model.fit_regularized(
+            alpha=self.alpha,
+            L1_wt=0.0,  # pure L2
+            maxiter=self.max_iter,
+        )
+        self._params = result.params
 
     def predict_proba(
         self, X: pd.DataFrame, odds: np.ndarray | None = None
     ) -> np.ndarray:
-        """Predict win probabilities for a race field.
+        """Predict using conditional logit with softmax normalization.
 
-        Combines the model's learned residual with the market odds offset:
-            logit(p) = logit(p_market) + β·X
-        The offset coefficient is fixed at 1.0 — not learned, not regularized.
+        Softmax is the correct normalization for a discrete-choice model:
+            p_i = exp(v_i) / Σ_j exp(v_j)
+        where v_i = logit(q_i) + β·x_i.
 
-        Returns normalized probabilities that sum to 1.0.
+        Sigmoid-then-rescale compresses the distribution toward uniformity
+        because sigmoid saturates; softmax preserves the full dynamic range.
         """
-        if self.model is None:
+        if self._params is None:
             raise RuntimeError("Model not trained. Call fit() first.")
 
         X_pred = X[self.feature_names].copy() if self.feature_names else X.copy()
-        X_pred = X_pred.fillna(0)
+        X_pred = sm.add_constant(X_pred.fillna(0).values.astype(float))
 
-        # Get raw log-odds residual from the model (features only)
-        raw_logits = self.model.decision_function(X_pred)
+        # Linear predictor: β·x (residual signal from features)
+        raw_logits = X_pred @ self._params
 
         # Add market odds as fixed offset (coefficient = 1.0)
-        offset = self._compute_offset(odds)
-        if offset is not None:
-            raw_logits = raw_logits + offset
+        offset = self._compute_offset(odds) if odds is not None else np.zeros(len(X))
+        v = raw_logits + offset
 
-        # Convert log-odds to probabilities
-        raw_probs = expit(raw_logits)
-
-        # Normalize across the field to sum to 1.0
-        return normalize_probs(raw_probs)
+        # Softmax normalization (correct for conditional logit / discrete choice)
+        return softmax(v)
 
     def get_coefficients(self) -> pd.Series:
         """Return feature coefficients for interpretability."""
-        if self.model is None:
+        if self._params is None:
             raise RuntimeError("Model not trained.")
-        return pd.Series(self.model.coef_[0], index=self.feature_names[: len(self.model.coef_[0])])
+        names = ["const"] + self.feature_names
+        return pd.Series(self._params, index=names[: len(self._params)])
 
     def save(self, path: Path) -> None:
         with open(path, "wb") as f:

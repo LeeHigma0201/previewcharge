@@ -53,6 +53,7 @@ def identify_longshot_candidates(
     market_odds: np.ndarray,
     min_odds: float = 5.0,
     min_overlay_ev: float = 1.10,
+    takeout: float = 0.17,
 ) -> list[LongshotCandidate]:
     """Layer 2: Flag horses where model sees more value than the market.
 
@@ -78,15 +79,15 @@ def identify_longshot_candidates(
         if overlay < min_overlay_ev:
             continue
 
-        ev = model_probs[i] * (market_odds[i] + 1.0)
+        ev = model_probs[i] * (market_odds[i] + 1.0) * (1.0 - takeout)
         overlay_pct = (overlay - 1.0) * 100
 
-        # Kelly criterion: f* = (bp - q) / b
-        # b = odds, p = model prob, q = 1 - p
-        b = market_odds[i]
+        # Kelly criterion adjusted for track takeout:
+        # f* = ((1-τ)·b·p - q) / ((1-τ)·b)
+        net_b = market_odds[i] * (1.0 - takeout)
         p = model_probs[i]
         q = 1 - p
-        kelly = (b * p - q) / b if b > 0 else 0
+        kelly = (net_b * p - q) / net_b if net_b > 0 else 0
         kelly = max(0, kelly)
 
         candidates.append(LongshotCandidate(

@@ -1,24 +1,35 @@
 """Ensemble model combining multiple HorseGPT models.
 
-Phase 1: Weighted averaging (0.7 LightGBM + 0.3 logistic).
+Phase 1: Weighted averaging in LOG-ODDS space (0.7 LightGBM + 0.3 logistic).
 Phase 3: Stacking meta-learner (logistic regression on model outputs).
+
+Log-odds averaging preserves the multiplicative structure of odds ratios.
+Linear averaging in probability space compresses longshot signals because
+small probabilities are compressed relative to log-odds — a 4x overlay
+detected by one model gets diluted to ~2x after linear averaging.
 """
 
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from scipy.special import logit, softmax
 
 from src.models.base import BaseModel
 
 
 class WeightedEnsemble(BaseModel):
-    """Combine multiple models via weighted averaging."""
+    """Combine multiple models via weighted averaging in log-odds space.
+
+    Uses the logarithmic opinion pool:
+        logit(p_ens) = Σ w_m · logit(p_m)
+    This is the coherent Bayesian combination for models operating in
+    log-odds space, and preserves longshot overlay signals.
+    """
 
     def __init__(self, models: dict[str, BaseModel], weights: dict[str, float]):
         self.models = models
         self.weights = weights
-        # Normalize weights
         total = sum(weights.values())
         self.weights = {k: v / total for k, v in weights.items()}
 
@@ -30,16 +41,14 @@ class WeightedEnsemble(BaseModel):
     def predict_proba(
         self, X: pd.DataFrame, odds: np.ndarray | None = None
     ) -> np.ndarray:
-        combined = np.zeros(len(X))
+        combined_logits = np.zeros(len(X))
         for name, model in self.models.items():
             probs = model.predict_proba(X, odds)
-            combined += self.weights.get(name, 0.0) * probs
+            probs = np.clip(probs, 1e-6, 1 - 1e-6)
+            combined_logits += self.weights.get(name, 0.0) * logit(probs)
 
-        # Normalize to sum to 1.0
-        total = combined.sum()
-        if total > 0:
-            combined /= total
-        return combined
+        # Softmax normalization (correct for discrete choice)
+        return softmax(combined_logits)
 
 
 class StackingEnsemble(BaseModel):

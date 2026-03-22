@@ -19,35 +19,40 @@ def kelly_fraction(
     win_prob: float,
     odds: float,
     fraction: float = 0.25,
+    takeout: float = 0.0,
 ) -> float:
-    """Calculate fractional Kelly stake.
+    """Calculate fractional Kelly stake, adjusted for track takeout.
 
-    Full Kelly: f* = (bp - q) / b
-    where b = net odds, p = win prob, q = 1 - p.
+    Full Kelly: f* = ((1-τ)·b·p - q) / ((1-τ)·b)
+    where b = net odds, p = win prob, q = 1 - p, τ = track takeout.
 
-    We use fractional Kelly (default 25%) for safety.
+    Without takeout adjustment (τ=0.15-0.22 in North American racing),
+    Kelly stakes are systematically too large and EV is overstated.
 
     Args:
         win_prob: Model's estimated win probability.
         odds: Decimal odds (e.g. 10.0 for 10/1).
         fraction: Kelly fraction (0.25 = quarter Kelly).
+        takeout: Track takeout rate (0.17 = 17% typical win pool).
 
     Returns:
         Recommended stake as fraction of bankroll.
     """
-    b = odds
+    net_b = odds * (1.0 - takeout)
     p = win_prob
     q = 1.0 - p
-    full_kelly = (b * p - q) / b if b > 0 else 0.0
+    full_kelly = (net_b * p - q) / net_b if net_b > 0 else 0.0
     return max(0.0, full_kelly * fraction)
 
 
-def expected_value(win_prob: float, odds: float) -> float:
-    """Calculate expected value of a $1 bet.
+def expected_value(win_prob: float, odds: float, takeout: float = 0.0) -> float:
+    """Calculate expected value of a $1 bet, net of track takeout.
 
-    EV > 1.0 means positive expectation.
+    EV > 1.0 means positive expectation. Without takeout adjustment,
+    EV is overstated by 15-22% for North American tracks.
     """
-    return win_prob * (odds + 1.0)
+    net_payout = (odds + 1.0) * (1.0 - takeout)
+    return win_prob * net_payout
 
 
 def calculate_exotic_ev(
