@@ -42,6 +42,8 @@ def walk_forward_cv(
     """
     if "race_date" not in feature_df.columns:
         raise ValueError("feature_df must have 'race_date' column")
+    if "race_id" not in feature_df.columns:
+        raise ValueError("feature_df must have 'race_id' column")
 
     df = feature_df.sort_values("race_date")
     min_date = df["race_date"].min()
@@ -70,12 +72,17 @@ def walk_forward_cv(
 
         model.fit(X_train, y_train, odds_train)
 
-        # Test — predict per race
-        X_test = test_df[feature_cols]
+        # Test — predict per race (must normalize within each race, not across all)
         y_test = (test_df["finish_position"] == 1).astype(int).values
         odds_test = test_df["final_odds"].values if "final_odds" in test_df.columns else None
 
-        y_pred = model.predict_proba(X_test, odds_test)
+        y_pred = np.zeros(len(test_df))
+        for race_id, group in test_df.groupby("race_id"):
+            idx = group.index
+            X_race = group[feature_cols]
+            odds_race = group["final_odds"].values if "final_odds" in group.columns else None
+            race_probs = model.predict_proba(X_race, odds_race)
+            y_pred[test_df.index.get_indexer(idx)] = race_probs
 
         # Metrics
         bs = brier_score(y_test, y_pred)

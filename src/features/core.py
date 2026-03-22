@@ -148,9 +148,13 @@ def compute_jockey_trainer_features(
 ) -> dict[str, float | None]:
     """Jockey and trainer statistics (10 features).
 
-    Computed from all entries in the database for the given jockey/trainer.
+    Computed from prior entries only (before this race's date) to prevent
+    lookahead bias. Without the date filter, future results leak into features.
     """
     features: dict[str, float | None] = {}
+
+    # Get the race date for this entry to filter out future data
+    race_date = entry.race.race_date if entry.race else None
 
     for role, prefix in [("jockey", "jockey"), ("trainer", "trainer")]:
         name = getattr(entry, role)
@@ -159,21 +163,26 @@ def compute_jockey_trainer_features(
                 features[f"{prefix}_{suffix}"] = None
             continue
 
-        all_entries = session.query(Entry).filter(getattr(Entry, role) == name).all()
-        total = len(all_entries)
+        query = session.query(Entry).filter(getattr(Entry, role) == name)
+        # Only use entries from races BEFORE the current race date
+        if race_date is not None:
+            query = query.join(Race).filter(Race.race_date < race_date)
+        prior_entries = query.all()
+
+        total = len(prior_entries)
         if total == 0:
             for suffix in ["win_pct", "roi", "starts", "top3_pct", "avg_odds"]:
                 features[f"{prefix}_{suffix}"] = None
             continue
 
-        wins = sum(1 for e in all_entries if e.finish_position == 1)
-        top3 = sum(1 for e in all_entries if e.finish_position is not None and e.finish_position <= 3)
+        wins = sum(1 for e in prior_entries if e.finish_position == 1)
+        top3 = sum(1 for e in prior_entries if e.finish_position is not None and e.finish_position <= 3)
 
         # ROI based on win payoffs
-        payoffs = [e.win_payoff for e in all_entries if e.finish_position == 1 and e.win_payoff]
+        payoffs = [e.win_payoff for e in prior_entries if e.finish_position == 1 and e.win_payoff]
         roi = (sum(payoffs) - total * 2.0) / (total * 2.0) if total > 0 else None
 
-        avg_odds_list = [e.final_odds for e in all_entries if e.final_odds is not None]
+        avg_odds_list = [e.final_odds for e in prior_entries if e.final_odds is not None]
 
         features[f"{prefix}_win_pct"] = float(wins / total) if total > 0 else None
         features[f"{prefix}_roi"] = roi

@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
+from scipy.stats import norm
 
 
 @dataclass
@@ -53,9 +54,12 @@ def henery_simulate(
     win_probs = np.clip(win_probs, 1e-6, 1.0)
     win_probs = win_probs / win_probs.sum()
 
-    # Convert win probs to ability scores via logit transform
-    # Higher ability = lower "finishing time" = better
-    abilities = np.log(win_probs / (1 - win_probs + 1e-10))
+    # Convert win probs to ability scores via probit (inverse normal CDF).
+    # Henery (1981) assumes normally-distributed finishing times, so the
+    # correct transform is Φ⁻¹(p), not logit. Logit has heavier tails
+    # (~1.7x scale factor) which overestimates separation between horses
+    # at the extremes, distorting exotic bet pricing.
+    abilities = norm.ppf(win_probs)
 
     # Henery model: simulate normally distributed "finishing times"
     # time_i = -ability_i + noise_i, noise ~ N(0, 1)
@@ -116,8 +120,11 @@ def discounted_harville(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Discounted Harville model (Ziemba et al.) for cross-validation.
 
-    Applies empirically calibrated discount factors to correct Harville's
-    overestimation of favorites in top-3 finishes.
+    Standard Harville assumes conditional independence of finish positions
+    given abilities (exponential model). This overestimates favorites in
+    place/show. The discount factors (Stern 1990, Lo & Bacon-Shone 1994)
+    dampen the favorite bias by raising probabilities to a power < 1
+    when computing conditional probabilities.
 
     Returns:
         Tuple of (place_probs, show_probs).
@@ -126,19 +133,49 @@ def discounted_harville(
     place_probs = np.zeros(n)
     show_probs = np.zeros(n)
 
+    # Place probability: P(i finishes top 2) = sum over all possible winners j
+    # P(j wins) * P(i second | j wins)
+    # where P(i second | j wins) = p_i^d / sum_{k != j} p_k^d
     for i in range(n):
-        # Harville place probability (adjusted)
-        place_prob = win_probs[i]
         for j in range(n):
-            if j != i:
-                remaining = 1.0 - win_probs[j]
-                if remaining > 0:
-                    place_prob += win_probs[j] * (win_probs[i] ** discount_place) / remaining
-        place_probs[i] = min(place_prob, 1.0)
+            if j == i:
+                # If i wins, i is automatically in top 2
+                place_probs[i] += win_probs[j]
+            else:
+                # P(j wins) * P(i places | j won)
+                denom = sum(win_probs[k] ** discount_place for k in range(n) if k != j)
+                if denom > 0:
+                    place_probs[i] += win_probs[j] * (win_probs[i] ** discount_place) / denom
 
-    # Normalize
+    # Show probability: P(i finishes top 3) = sum over all (winner, second) pairs
+    for i in range(n):
+        for j in range(n):
+            # j wins
+            denom_2nd = sum(win_probs[k] ** discount_place for k in range(n) if k != j)
+            if denom_2nd <= 0:
+                continue
+            for m in range(n):
+                if m == j:
+                    continue
+                # m finishes second given j won
+                p_m_second = win_probs[j] * (win_probs[m] ** discount_place) / denom_2nd
+
+                if i == j or i == m:
+                    # i is already in top 2
+                    show_probs[i] += p_m_second
+                else:
+                    # P(i third | j won, m second)
+                    denom_3rd = sum(
+                        win_probs[k] ** discount_show for k in range(n) if k != j and k != m
+                    )
+                    if denom_3rd > 0:
+                        show_probs[i] += p_m_second * (win_probs[i] ** discount_show) / denom_3rd
+
+    # Normalize to correct number of placers
     if place_probs.sum() > 0:
-        place_probs = place_probs / place_probs.sum() * 2.0  # 2 horses place
+        place_probs = place_probs / place_probs.sum() * min(2.0, n)
+    if show_probs.sum() > 0:
+        show_probs = show_probs / show_probs.sum() * min(3.0, n)
 
     return place_probs, show_probs
 
