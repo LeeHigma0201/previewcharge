@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.63",
+    "@ai-sdk/google": "^3.0.53",
     "@ai-sdk/react": "^3.0.136",
     "ai": "^6.0.134",
     "next": "16.2.1",
