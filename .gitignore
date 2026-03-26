@@ -57,3 +57,4 @@ Thumbs.db
 # Ruff / mypy
 .ruff_cache/
 .mypy_cache/
+.vercel
