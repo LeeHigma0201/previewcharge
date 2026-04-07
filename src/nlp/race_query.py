@@ -39,16 +39,20 @@ class ParsedRaceQuery:
 from src.data.scrapers.equibase import TRACK_ALIASES
 
 # Additional aliases for named races
+# NOTE: Some venues change year to year. The BigRaceCalendar (config/big_races.yaml)
+# is the source of truth for current-year locations. These are fallback defaults.
 NAMED_RACES: dict[str, tuple[str, int | None]] = {
     "kentucky derby": ("CD", None),
-    "preakness": ("PIM", None),
-    "belmont stakes": ("BEL", None),
+    "kentucky oaks": ("CD", None),
+    "preakness": ("LRL", None),  # 2026: Laurel Park (Pimlico reconstruction)
+    "belmont stakes": ("SAR", None),  # 2026: Saratoga (3rd consecutive year)
     "breeders cup": ("SA", None),  # varies yearly
     "travers": ("SAR", None),
     "whitney": ("SAR", None),
     "haskell": ("MTH", None),
-    "met mile": ("BEL", None),
-    "metropolitan": ("BEL", None),
+    "met mile": ("SAR", None),  # 2026: at Saratoga for Belmont Festival
+    "metropolitan": ("SAR", None),  # 2026: at Saratoga for Belmont Festival
+    "manhattan": ("SAR", None),  # 2026: Belmont Festival
     "jockey club gold cup": ("BEL", None),
     "woodward": ("SAR", None),
     "pacific classic": ("DMR", None),
@@ -60,7 +64,34 @@ NAMED_RACES: dict[str, tuple[str, int | None]] = {
     "blue grass": ("KEE", None),
     "santa anita derby": ("SA", None),
     "cigar mile": ("AQU", None),
+    "lexington stakes": ("KEE", None),
+    "stephen foster": ("CD", None),
+    "fleur de lis": ("CD", None),
+    "woody stephens": ("SAR", None),  # 2026: Belmont Festival
+    "jaipur": ("SAR", None),  # 2026: Belmont Festival
+    "just a game": ("SAR", None),  # 2026: Belmont Festival
+    "acorn": ("AQU", None),
+    "mother goose": ("AQU", None),
+    "suburban": ("AQU", None),
+    "pat day mile": ("CD", None),
+    "turf classic": ("CD", None),
+    "dinner party": ("LRL", None),  # 2026: Preakness Day at Laurel
 }
+
+# Try to use BigRaceCalendar for dynamic resolution (overrides static mappings)
+_calendar = None
+
+
+def _get_calendar():
+    """Lazy-load the BigRaceCalendar for named race resolution."""
+    global _calendar
+    if _calendar is None:
+        try:
+            from src.races.calendar import BigRaceCalendar
+            _calendar = BigRaceCalendar()
+        except Exception:
+            pass
+    return _calendar
 
 # Date keywords
 DATE_KEYWORDS: dict[str, int] = {
@@ -167,7 +198,14 @@ def _extract_track(text: str) -> tuple[str | None, str | None]:
     """
     text_lower = text.lower().strip()
 
-    # Check for named races first (longest match)
+    # Check BigRaceCalendar first for dynamic resolution (current year)
+    cal = _get_calendar()
+    if cal is not None:
+        race = cal.resolve_named_race(text_lower)
+        if race is not None:
+            return race.track_code, race.name.lower()
+
+    # Check for named races (longest match, static fallback)
     for name, (code, _) in sorted(NAMED_RACES.items(), key=lambda x: -len(x[0])):
         if name in text_lower:
             return code, name

@@ -31,10 +31,31 @@ class FeatureConfig:
 
 
 @dataclass
+class ExoticConfig:
+    """Configuration for the big race exotic betting engine."""
+
+    default_bankroll: float = 1000.0
+    superfecta_base_cost: float = 0.10  # $0.10 supers
+    trifecta_base_cost: float = 1.0  # $1 trifectas
+    exacta_base_cost: float = 2.0  # $2 exactas
+    bankroll_allocation: dict[str, float] = field(
+        default_factory=lambda: {
+            "trifecta": 0.40,
+            "exacta": 0.25,
+            "superfecta": 0.20,
+            "win_place": 0.15,
+        }
+    )
+    big_race_mc_iterations: int = 200_000  # higher sim count for big races
+    superfecta_prob_threshold: float = 0.0005  # prune combos below this
+
+
+@dataclass
 class Settings:
     db: DatabaseConfig = field(default_factory=DatabaseConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
     features: FeatureConfig = field(default_factory=FeatureConfig)
+    exotic: ExoticConfig = field(default_factory=ExoticConfig)
     data_dir: Path = Path("data/bris")
     tracks: dict = field(default_factory=dict)
 

@@ -1,0 +1,369 @@
+# HorseGPT v3.14 — Big Race Calendar 2026
+# Curated list of major stakes races for exotic betting algorithm
+#
+# Categories: triple_crown, derby_prep, championship, breeders_cup_prep
+# Status: upcoming, field_set, predictions_ready, complete
+# Distance in yards: 1m=1760, 1 1/16m=1870, 1 1/8m=1980, 1 3/16m=2090, 1 1/4m=2200
+#                    6f=1320, 7f=1540, 1 1/2m=2640
+
+big_races:
+
+  # ═══════════════════════════════════════════════════════════════
+  # DERBY TRAIL — Final Preps
+  # ═══════════════════════════════════════════════════════════════
+
+  - name: "Lexington Stakes"
+    slug: "lexington-stakes-2026"
+    grade: "G3"
+    category: "derby_prep"
+    track_code: "KEE"
+    date: "2026-04-11"
+    race_number: null
+    distance_yards: 1870      # 1 1/16 miles
+    surface: "D"
+    purse: 400000
+    conditions: "3yo"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: 20
+    notes: "Last Derby prep. Points: 20-10-6-4-2."
+
+  # ═══════════════════════════════════════════════════════════════
+  # KENTUCKY DERBY WEEK — Churchill Downs
+  # ═══════════════════════════════════════════════════════════════
+
+  - name: "Kentucky Oaks"
+    slug: "kentucky-oaks-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "CD"
+    date: "2026-05-01"
+    race_number: null
+    distance_yards: 1980      # 1 1/8 miles
+    surface: "D"
+    purse: 1500000
+    conditions: "3yo fillies"
+    exotic_pools: [exacta, trifecta, superfecta, pick3, pick4]
+    status: "upcoming"
+    derby_points: null
+    notes: "Premier 3yo filly race. Oaks Day undercard also features G2/G3 stakes."
+
+  - name: "La Troienne Stakes"
+    slug: "la-troienne-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "CD"
+    date: "2026-05-01"
+    race_number: null
+    distance_yards: 1870      # 1 1/16 miles
+    surface: "D"
+    purse: 500000
+    conditions: "F&M 4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Oaks Day undercard. Older fillies and mares."
+
+  - name: "Kentucky Derby"
+    slug: "kentucky-derby-2026"
+    grade: "G1"
+    category: "triple_crown"
+    track_code: "CD"
+    date: "2026-05-02"
+    race_number: null
+    distance_yards: 2200      # 1 1/4 miles
+    surface: "D"
+    purse: 3000000
+    conditions: "3yo"
+    exotic_pools: [exacta, trifecta, superfecta, pick3, pick4, pick6]
+    status: "upcoming"
+    derby_points: null
+    notes: "152nd Kentucky Derby. 20-horse max field. Largest exotic pools of the year."
+
+  - name: "Churchill Downs Turf Classic"
+    slug: "turf-classic-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "CD"
+    date: "2026-05-02"
+    race_number: null
+    distance_yards: 1980      # 1 1/8 miles
+    surface: "T"
+    purse: 750000
+    conditions: "4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Derby Day turf feature."
+
+  - name: "Pat Day Mile"
+    slug: "pat-day-mile-2026"
+    grade: "G2"
+    category: "championship"
+    track_code: "CD"
+    date: "2026-05-02"
+    race_number: null
+    distance_yards: 1760      # 1 mile
+    surface: "D"
+    purse: 500000
+    conditions: "3yo"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Derby Day undercard. 3yo non-Derby runners."
+
+  # ═══════════════════════════════════════════════════════════════
+  # PREAKNESS STAKES — Laurel Park (first time)
+  # ═══════════════════════════════════════════════════════════════
+
+  - name: "Preakness Stakes"
+    slug: "preakness-stakes-2026"
+    grade: "G1"
+    category: "triple_crown"
+    track_code: "LRL"
+    date: "2026-05-16"
+    race_number: null
+    distance_yards: 2090      # 1 3/16 miles
+    surface: "D"
+    purse: 1750000
+    conditions: "3yo"
+    exotic_pools: [exacta, trifecta, superfecta, pick3, pick4]
+    status: "upcoming"
+    derby_points: null
+    notes: "151st Preakness. First ever at Laurel Park (Pimlico reconstruction). Track: 1 1/16m oval."
+
+  - name: "Dinner Party Stakes"
+    slug: "dinner-party-2026"
+    grade: "G3"
+    category: "championship"
+    track_code: "LRL"
+    date: "2026-05-16"
+    race_number: null
+    distance_yards: 1980      # 1 1/8 miles
+    surface: "T"
+    purse: 250000
+    conditions: "4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Preakness Day undercard. Oldest stakes in Mid-Atlantic."
+
+  # ═══════════════════════════════════════════════════════════════
+  # LATE MAY / EARLY JUNE — Build-up to Belmont Festival
+  # ═══════════════════════════════════════════════════════════════
+
+  - name: "Acorn Stakes"
+    slug: "acorn-stakes-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "AQU"
+    date: "2026-05-23"
+    race_number: null
+    distance_yards: 1760      # 1 mile
+    surface: "D"
+    purse: 500000
+    conditions: "3yo fillies"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Top 3yo filly race in New York."
+
+  - name: "Pennine Ridge Stakes"
+    slug: "pennine-ridge-2026"
+    grade: "G2"
+    category: "championship"
+    track_code: "AQU"
+    date: "2026-05-23"
+    race_number: null
+    distance_yards: 1980      # 1 1/8 miles
+    surface: "T"
+    purse: 400000
+    conditions: "3yo"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "3yo turf route."
+
+  # ═══════════════════════════════════════════════════════════════
+  # BELMONT STAKES RACING FESTIVAL — Saratoga (June 3-7)
+  # ═══════════════════════════════════════════════════════════════
+
+  - name: "Belmont Stakes"
+    slug: "belmont-stakes-2026"
+    grade: "G1"
+    category: "triple_crown"
+    track_code: "SAR"
+    date: "2026-06-06"
+    race_number: null
+    distance_yards: 2200      # 1 1/4 miles (at Saratoga, not 1 1/2m)
+    surface: "D"
+    purse: 2000000
+    conditions: "3yo"
+    exotic_pools: [exacta, trifecta, superfecta, pick3, pick4, pick6]
+    status: "upcoming"
+    derby_points: null
+    notes: "158th Belmont. Third consecutive year at Saratoga. 1 1/4m (not traditional 1 1/2m)."
+
+  - name: "Metropolitan Handicap"
+    slug: "met-handicap-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "SAR"
+    date: "2026-06-06"
+    race_number: null
+    distance_yards: 1760      # 1 mile
+    surface: "D"
+    purse: 1000000
+    conditions: "3yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Belmont Day. Premiere one-turn mile. Breeders Cup Dirt Mile/Classic prep."
+
+  - name: "Manhattan Stakes"
+    slug: "manhattan-stakes-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "SAR"
+    date: "2026-06-06"
+    race_number: null
+    distance_yards: 2200      # 1 1/4 miles
+    surface: "T"
+    purse: 1000000
+    conditions: "4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Belmont Day. Championship turf route."
+
+  - name: "Woody Stephens Stakes"
+    slug: "woody-stephens-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "SAR"
+    date: "2026-06-06"
+    race_number: null
+    distance_yards: 1540      # 7 furlongs
+    surface: "D"
+    purse: 500000
+    conditions: "3yo"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Belmont Day. 3yo sprint. Breeders Cup Sprint prep."
+
+  - name: "Jaipur Stakes"
+    slug: "jaipur-stakes-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "SAR"
+    date: "2026-06-06"
+    race_number: null
+    distance_yards: 1320      # 6 furlongs
+    surface: "T"
+    purse: 500000
+    conditions: "4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Belmont Day. Turf sprint championship."
+
+  - name: "Just a Game Stakes"
+    slug: "just-a-game-2026"
+    grade: "G1"
+    category: "championship"
+    track_code: "SAR"
+    date: "2026-06-06"
+    race_number: null
+    distance_yards: 1760      # 1 mile
+    surface: "T"
+    purse: 500000
+    conditions: "F&M 4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Belmont Day. F&M turf mile. Breeders Cup F&M Turf prep."
+
+  - name: "True North Stakes"
+    slug: "true-north-2026"
+    grade: "G3"
+    category: "championship"
+    track_code: "SAR"
+    date: "2026-06-06"
+    race_number: null
+    distance_yards: 1320      # 6 furlongs
+    surface: "D"
+    purse: 400000
+    conditions: "4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Belmont Day. Dirt sprint for older horses."
+
+  # ═══════════════════════════════════════════════════════════════
+  # SUMMER CHAMPIONSHIP — Churchill & Beyond
+  # ═══════════════════════════════════════════════════════════════
+
+  - name: "Stephen Foster Stakes"
+    slug: "stephen-foster-2026"
+    grade: "G2"
+    category: "championship"
+    track_code: "CD"
+    date: "2026-06-27"
+    race_number: null
+    distance_yards: 1980      # 1 1/8 miles
+    surface: "D"
+    purse: 750000
+    conditions: "3yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Churchill summer feature. Breeders Cup Classic prep."
+
+  - name: "Fleur de Lis Stakes"
+    slug: "fleur-de-lis-2026"
+    grade: "G2"
+    category: "championship"
+    track_code: "CD"
+    date: "2026-06-27"
+    race_number: null
+    distance_yards: 1980      # 1 1/8 miles
+    surface: "D"
+    purse: 500000
+    conditions: "F&M 4yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Churchill summer. Older fillies and mares."
+
+  - name: "Mother Goose Stakes"
+    slug: "mother-goose-2026"
+    grade: "G2"
+    category: "championship"
+    track_code: "AQU"
+    date: "2026-06-14"
+    race_number: null
+    distance_yards: 1980      # 1 1/8 miles
+    surface: "D"
+    purse: 400000
+    conditions: "3yo fillies"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "3yo filly classic distance test."
+
+  - name: "Suburban Stakes"
+    slug: "suburban-stakes-2026"
+    grade: "G2"
+    category: "championship"
+    track_code: "AQU"
+    date: "2026-06-28"
+    race_number: null
+    distance_yards: 2200      # 1 1/4 miles
+    surface: "D"
+    purse: 500000
+    conditions: "3yo+"
+    exotic_pools: [exacta, trifecta, superfecta]
+    status: "upcoming"
+    derby_points: null
+    notes: "Historic older horse classic distance race."

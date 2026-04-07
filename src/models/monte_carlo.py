@@ -30,12 +30,15 @@ class SimulationResult:
     exacta_probs: np.ndarray  # P(horse i wins, horse j places) — shape (n, n)
     trifecta_probs: np.ndarray  # P(i, j, k) — shape (n, n, n)
     finish_matrix: np.ndarray  # P(horse i finishes in position j) — shape (n, n)
+    superfecta_probs: dict[tuple[int, int, int, int], float] | None = None  # sparse P(i,j,k,l)
 
 
 def henery_simulate(
     win_probs: np.ndarray,
     n_simulations: int = 100_000,
     seed: int | None = None,
+    superfecta: bool = False,
+    superfecta_threshold: float = 0.0005,
 ) -> SimulationResult:
     """Run Monte Carlo simulation using the Henery (normal) model.
 
@@ -103,6 +106,35 @@ def henery_simulate(
                     continue
                 trifecta_probs[i, j, k] = np.mean(mask_ij & (thirds == k))
 
+    # Superfecta: sparse dict of (i,j,k,l) -> probability
+    # Only computed when requested. Threshold-prunes using trifecta probs
+    # to avoid the full O(n^4) loop.
+    super_probs = None
+    if superfecta and n_horses >= 4:
+        super_probs = {}
+        fourths = rankings[:, 3]
+        for i in range(n_horses):
+            mask_i = winners == i
+            for j in range(n_horses):
+                if j == i:
+                    continue
+                mask_ij = mask_i & (runners_up == j)
+                for k in range(n_horses):
+                    if k == i or k == j:
+                        continue
+                    # Prune: skip trifecta combos below threshold
+                    if trifecta_probs[i, j, k] < superfecta_threshold:
+                        continue
+                    mask_ijk = mask_ij & (thirds == k)
+                    if not mask_ijk.any():
+                        continue
+                    for l in range(n_horses):
+                        if l == i or l == j or l == k:
+                            continue
+                        prob = float(np.mean(mask_ijk & (fourths == l)))
+                        if prob > 0:
+                            super_probs[(i, j, k, l)] = prob
+
     return SimulationResult(
         win_probs=win_probs_sim,
         place_probs=place_probs,
@@ -110,6 +142,7 @@ def henery_simulate(
         exacta_probs=exacta_probs,
         trifecta_probs=trifecta_probs,
         finish_matrix=finish_matrix,
+        superfecta_probs=super_probs,
     )
 
 
@@ -207,6 +240,8 @@ def find_value_exotics(
         elif len(combo) == 3:
             i, j, k = combo
             prob = sim.trifecta_probs[i, j, k]
+        elif len(combo) == 4 and sim.superfecta_probs is not None:
+            prob = sim.superfecta_probs.get(combo, 0.0)
         else:
             continue
 
