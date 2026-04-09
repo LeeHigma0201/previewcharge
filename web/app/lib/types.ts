@@ -22,6 +22,8 @@ export interface HorseEntry {
   isClassRaise?: boolean;
   daysSinceLast?: number;
   equipmentChange?: boolean;
+  lastFinishPosition?: number;
+  weight?: number;
 }
 
 export interface RaceInfo {

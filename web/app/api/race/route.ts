@@ -72,31 +72,66 @@ RULES:
 HTML CONTENT:
 {html}`;
 
-// Gemini prompt: enrich with past performance data via web search
-const ENRICH_PROMPT = `TODAY IS {today}. Find REAL past performance data for these horses racing at {track_name} Race {race_number} on {date}.
+// Gemini prompt: focused enrichment — search for specific, verifiable data
+const ENRICH_PROMPT = `TODAY IS {today}. I need REAL past performance data for horses in {race_label}.
+
+For each horse below, search equibase.com, drf.com, bloodhorse.com, or timeform.com for their ACTUAL race record.
 
 HORSES:
 {horse_list}
 
-For EACH horse, search the web for their actual racing record. Return a JSON array:
+For EACH horse, find and return:
+
+1. **running_style** — Look at their last 3 races. Where did they run at the first call?
+   - If they led or were within 1 length of the lead: "E" (early speed)
+   - If they were 1-3 lengths off the lead: "EP" (early presser)
+   - If they were 3-6 lengths back: "P" (stalker/presser)
+   - If they were 6-10 lengths back: "S" (sustained closer)
+   - If they were 10+ lengths back: "C" (deep closer)
+
+2. **last_3_beyer** — Their 3 most recent Beyer Speed Figures. These are published by Daily Racing Form. Search "[horse name] beyer speed figure" or check their DRF past performances.
+
+3. **wins** and **starts** — Career totals. Search "[horse name] equibase" for their career record.
+
+4. **days_since_last** — Days between their last race date and {today}.
+
+5. **last_race_class** — The race type of their last start (e.g. "MSW", "CLM 25000", "ALW", "STK")
+
+6. **current_race_class** — This race is a {race_type} with purse {purse}
+
+7. **is_class_drop** — true if last_race_class was higher than current_race_class
+
+8. **last_finish_position** — What position they finished in their last race (1, 2, 3, etc.)
+
+9. **weight** — Weight assigned for this race (from the entries)
+
+10. **jockey_current_meet_wins** and **jockey_current_meet_starts** — The jockey's record at this meet
+
+11. **trainer_current_meet_wins** and **trainer_current_meet_starts** — The trainer's record at this meet
+
+Return a JSON array with one object per horse:
 [
   {
     "name": "Horse Name",
-    "running_style": "E/EP/P/S/C based on their actual race history",
+    "running_style": "P",
     "last_3_beyer": [82, 79, 85],
     "wins": 3,
     "starts": 12,
+    "days_since_last": 21,
+    "is_class_drop": false,
+    "last_finish_position": 3,
     "jockey_win_pct": 0.18,
     "trainer_win_pct": 0.22,
-    "days_since_last": 21,
-    "is_class_drop": false
+    "weight": 122
   }
 ]
 
-RULES:
-- Use REAL data only. If you cannot find a stat, use null.
-- running_style: E=front runner, EP=presses pace, P=stalker, S=sustained rally, C=deep closer
-- Return ONLY valid JSON, no markdown, no explanation`;
+CRITICAL RULES:
+- Search for EACH horse individually. Do not guess or estimate.
+- If you genuinely cannot find a specific stat after searching, use null.
+- Beyer figures are published by Daily Racing Form — they are real numbers, not estimates.
+- Running style must be determined from actual race charts, not guessed from the name.
+- Return ONLY valid JSON. No markdown, no explanation.`;
 
 function parseQuery(query: string): { trackCode: string; raceNumber: number; date: string } | null {
   const q = query.toLowerCase().trim();
@@ -267,13 +302,16 @@ export async function POST(request: NextRequest) {
 
     // --- Step 3: Enrich with past performance data via Gemini search ---
     try {
-      const horseList = horses.map((h, i) => `${i + 1}. ${h.name} (Jockey: ${h.jockey}, Trainer: ${h.trainer})`).join("\n");
+      const horseList = horses.map((h, i) =>
+        `${i + 1}. ${h.name} (Jockey: ${h.jockey}, Trainer: ${h.trainer}, ML: ${h.morning_line_odds})`
+      ).join("\n");
 
+      const raceLabel = `${raceData.track_name ?? trackCode} Race ${raceNumber} on ${isoDate}`;
       const enrichPrompt = ENRICH_PROMPT
         .replaceAll("{today}", isoDate)
-        .replaceAll("{track_name}", String(raceData.track_name ?? trackCode))
-        .replaceAll("{race_number}", String(raceNumber))
-        .replaceAll("{date}", isoDate)
+        .replaceAll("{race_label}", raceLabel)
+        .replaceAll("{race_type}", String(raceData.race_type ?? "ALW"))
+        .replaceAll("{purse}", String(raceData.purse ?? 0))
         .replaceAll("{horse_list}", horseList);
 
       const enrichResponse = await ai.models.generateContent({

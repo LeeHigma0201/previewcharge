@@ -264,7 +264,7 @@ function classScores(entries: HorseEntry[]): number[] {
   });
 }
 
-// Score 4: FORM CYCLE — rest, improvement trend, equipment
+// Score 4: FORM CYCLE — rest, improvement trend, equipment, last finish
 function formScores(entries: HorseEntry[]): number[] {
   return entries.map((e) => {
     let score = 0;
@@ -281,8 +281,17 @@ function formScores(entries: HorseEntry[]): number[] {
       if (e.daysSinceLast > 60) score -= 0.5;
       if (e.daysSinceLast < 7) score -= 0.6;
     }
+    // Last finish position — recent winner/placer is in better form
+    if (e.lastFinishPosition) {
+      if (e.lastFinishPosition === 1) score += 0.5;
+      else if (e.lastFinishPosition <= 3) score += 0.2;
+      else if (e.lastFinishPosition >= 8) score -= 0.3;
+    }
     // Equipment change
     if (e.equipmentChange) score += 0.3;
+    // Weight — heavier weight is a penalty (1 lb ≈ 1 length at a mile)
+    if (e.weight && e.weight > 124) score -= (e.weight - 122) * 0.05;
+    if (e.weight && e.weight < 118) score += (122 - e.weight) * 0.03;
     return score;
   });
 }

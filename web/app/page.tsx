@@ -77,6 +77,8 @@ export default function Home() {
           isClassRaise: Boolean(h.is_class_raise),
           daysSinceLast: Number(h.days_since_last ?? 21),
           equipmentChange: Boolean(h.equipment_change),
+          lastFinishPosition: h.last_finish_position ? Number(h.last_finish_position) : undefined,
+          weight: h.weight ? Number(h.weight) : undefined,
         }),
       );
 
