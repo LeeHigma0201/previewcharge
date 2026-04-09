@@ -241,19 +241,22 @@ export default function Home() {
                   </div>
                 </div>
                 {ov && (
-                  <div className="shrink-0 w-24 text-center">
+                  <div className="shrink-0 text-right">
                     {ov.isOverlay ? (
-                      <span className="inline-block px-3 py-1 rounded-lg bg-green-600 text-white text-sm font-bold">
-                        +{ov.overlayPct}% VALUE
-                      </span>
-                    ) : ov.overlayPct < -20 ? (
-                      <span className="inline-block px-3 py-1 rounded-lg bg-red-100 text-red-700 text-sm font-bold">
-                        {ov.overlayPct}%
-                      </span>
+                      <div>
+                        <span className="inline-block px-3 py-1 rounded-lg bg-green-600 text-white text-sm font-bold">
+                          VALUE
+                        </span>
+                        <div className="text-xs text-green-700 mt-1">
+                          Model: {(ov.modelProb * 100).toFixed(1)}%<br/>
+                          Market: {(ov.marketProb * 100).toFixed(1)}%
+                        </div>
+                      </div>
                     ) : (
-                      <span className="text-sm text-gray-400">
-                        {ov.overlayPct > 0 ? "+" : ""}{ov.overlayPct}%
-                      </span>
+                      <div className="text-xs text-gray-400">
+                        Model: {(ov.modelProb * 100).toFixed(1)}%<br/>
+                        Market: {(ov.marketProb * 100).toFixed(1)}%
+                      </div>
                     )}
                   </div>
                 )}

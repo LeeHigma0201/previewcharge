@@ -60,9 +60,13 @@ Return ONLY a JSON object:
 }
 
 RULES:
-- Extract EVERY horse in Race {race_number}. Do not skip any.
+- Extract EVERY horse in Race {race_number} that is STILL ENTERED (not scratched)
+- EXCLUDE any horse marked as scratched, withdrawn, or with strikethrough text
+- If a horse's name has "SCR", "(S)", strikethrough, or is listed under "Scratches" — DO NOT include it
 - morning_line_odds must be decimal: "5-2" = 2.5, "8-1" = 8.0, "3-1" = 3.0, "even" = 1.0, "6-5" = 1.2
-- Copy names, jockeys, trainers EXACTLY from the HTML — no changes
+- Copy names, jockeys, trainers EXACTLY from the HTML — do not invent or change any names
+- Only include horses that appear in this specific race's section of the HTML
+- If you are not certain a horse is in Race {race_number}, do not include it
 - Return ONLY valid JSON, no markdown, no explanation
 
 HTML CONTENT:
@@ -231,10 +235,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const horses = raceData.horses as Record<string, unknown>[];
+    let horses = raceData.horses as Record<string, unknown>[];
     if (!horses || horses.length === 0) {
       return NextResponse.json({ error: `No horses found in Race ${raceNumber} at ${trackCode}` }, { status: 404 });
     }
+
+    // --- VALIDATION: reject hallucinated horses ---
+    // Every horse name Gemini returns MUST appear in the raw HTML source.
+    // If a name isn't in the HTML, Gemini made it up — remove it.
+    const htmlLower = html.toLowerCase();
+    const beforeCount = horses.length;
+    horses = horses.filter((h) => {
+      const name = String(h.name ?? "").toLowerCase().trim();
+      if (!name || name.length < 2) return false;
+      // Check if this horse name appears in the actual HTML
+      return htmlLower.includes(name);
+    });
+
+    if (horses.length === 0) {
+      return NextResponse.json(
+        { error: `Validation failed: none of the parsed horses were found in the source HTML. Gemini may have parsed the wrong race.` },
+        { status: 422 },
+      );
+    }
+
+    // Report if any were removed
+    if (horses.length < beforeCount) {
+      raceData._validation = `${beforeCount - horses.length} horse(s) removed — not found in source HTML`;
+    }
+    raceData.horses = horses;
 
     // --- Step 3: Enrich with past performance data via Gemini search ---
     try {
