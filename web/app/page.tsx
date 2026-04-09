@@ -15,6 +15,21 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [race, setRace] = useState<RaceInfo | null>(null);
   const [result, setResult] = useState<SimulationResult | null>(null);
+  const [todayTracks, setTodayTracks] = useState<{ code: string; name: string }[] | null>(null);
+  const [loadingTracks, setLoadingTracks] = useState(false);
+
+  async function findTodayRaces() {
+    setLoadingTracks(true);
+    try {
+      const res = await fetch("/api/today");
+      const data = await res.json();
+      setTodayTracks(data.tracks ?? []);
+    } catch {
+      setTodayTracks([]);
+    } finally {
+      setLoadingTracks(false);
+    }
+  }
 
   async function handleRun() {
     if (!query.trim()) return;
@@ -107,6 +122,33 @@ export default function Home() {
         >
           {loading ? "Researching..." : "Run Model"}
         </button>
+      </div>
+
+      {/* Today's Tracks */}
+      <div className="mb-6">
+        <button
+          onClick={findTodayRaces}
+          disabled={loadingTracks}
+          className="text-sm px-4 py-2 rounded bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 transition-colors disabled:opacity-50"
+        >
+          {loadingTracks ? "Searching tracks..." : "Find Today's Races"}
+        </button>
+        {todayTracks && todayTracks.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {todayTracks.map((t) => (
+              <button
+                key={t.code}
+                onClick={() => setQuery(`${t.name} Race 1 today`)}
+                className="px-3 py-1.5 text-sm rounded bg-zinc-800 border border-zinc-700 hover:bg-blue-900/50 hover:border-blue-600 transition-colors"
+              >
+                {t.name} ({t.code})
+              </button>
+            ))}
+          </div>
+        )}
+        {todayTracks && todayTracks.length === 0 && (
+          <p className="mt-2 text-sm text-zinc-500">No tracks found with entries today.</p>
+        )}
       </div>
 
       {error && (
