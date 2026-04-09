@@ -401,6 +401,7 @@ function estimatePayoff(prob: number): number {
 
 export function runSimulation(
   entries: HorseEntry[],
+  simCountOverride?: number,
 ): SimulationResult {
   const n = entries.length;
 
@@ -434,10 +435,15 @@ export function runSimulation(
   const marginOfError = Math.max(rarestProb * 0.3, 0.0005); // 30% relative margin or 0.05% absolute
   const minSims = Math.ceil((3.84 * rarestProb * (1 - rarestProb)) / (marginOfError ** 2));
 
-  // Clamp between 10K and 300K — never waste compute, never starve accuracy
-  const BATCH_SIZE = Math.min(Math.max(Math.ceil(minSims / 3), 10000), 50000);
-  const MAX_BATCHES = Math.min(Math.ceil(minSims / BATCH_SIZE) + 2, 8);
-  const CONVERGENCE_THRESHOLD = 0.003; // 0.3% change between batches = converged
+  // If user set a specific sim count, use it directly. Otherwise auto-compute.
+  const useFixedCount = simCountOverride && simCountOverride > 0;
+  const BATCH_SIZE = useFixedCount
+    ? Math.min(simCountOverride, 50000)
+    : Math.min(Math.max(Math.ceil(minSims / 3), 10000), 50000);
+  const MAX_BATCHES = useFixedCount
+    ? Math.ceil(simCountOverride / BATCH_SIZE)
+    : Math.min(Math.ceil(minSims / BATCH_SIZE) + 2, 8);
+  const CONVERGENCE_THRESHOLD = useFixedCount ? 0 : 0.003; // fixed count = no early stop
 
   const finishCounts: number[][] = Array.from({ length: n }, () =>
     new Array(n).fill(0),

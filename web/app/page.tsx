@@ -24,6 +24,9 @@ export default function Home() {
   // Step 2: Race number
   const [selectedRaceNum, setSelectedRaceNum] = useState<number | null>(null);
 
+  // Monte Carlo sim count — 0 = auto (convergence-based)
+  const [simCount, setSimCount] = useState(0);
+
   // Auto-load today's tracks on mount
   useEffect(() => {
     setLoadingTracks(true);
@@ -139,7 +142,7 @@ export default function Home() {
 
     setRace(raceInfo);
     setDataSource("tvg");
-    setResult(runSimulation(entries));
+    setResult(runSimulation(entries, simCount || undefined));
   }
 
   // Keep old chart upload for backward compat
@@ -297,7 +300,7 @@ export default function Home() {
 
     setRace((prev) => prev ? { ...prev, entries } : null);
     setDataSource(tvgUploaded.size > 0 ? "tvg" : "search");
-    setResult(runSimulation(entries));
+    setResult(runSimulation(entries, simCount || undefined));
   }
 
   function saveResult() {
@@ -462,6 +465,46 @@ export default function Home() {
 
           {/* STEP 3: Run the model */}
           <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">Step 3 — Run Model</div>
+
+          {/* Monte Carlo Simulation Slider */}
+          <div className="mb-4 p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-bold text-base">Monte Carlo Simulations</span>
+              <span className="font-mono text-lg font-black text-blue-600">
+                {simCount === 0 ? "Auto" : simCount.toLocaleString()}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={500000}
+              step={10000}
+              value={simCount}
+              onChange={(e) => setSimCount(Number(e.target.value))}
+              className="w-full h-3 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              style={{ background: `linear-gradient(to right, #2563eb ${(simCount / 500000) * 100}%, #e5e7eb ${(simCount / 500000) * 100}%)` }}
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>Auto (convergence)</span>
+              <span>50K</span>
+              <span>100K</span>
+              <span>250K</span>
+              <span>500K</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {simCount === 0
+                ? "Auto mode: runs batches until probabilities converge (recommended)"
+                : simCount <= 50000
+                  ? "Fast — good for quick estimates"
+                  : simCount <= 150000
+                    ? "Balanced — solid exacta/trifecta accuracy"
+                    : simCount <= 300000
+                      ? "High precision — accurate superfecta combos"
+                      : "Maximum — highest accuracy for all exotic types"
+              }
+            </p>
+          </div>
+
           <button
             onClick={handleRunModel}
             disabled={loading}
