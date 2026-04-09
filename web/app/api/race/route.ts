@@ -234,12 +234,14 @@ export async function POST(request: NextRequest) {
     let _dataSource = "equibase_html";
 
     // --- Part A: Try fetching actual Equibase entries HTML ---
+    // Note: Equibase uses Imperva bot protection which blocks many server IPs.
+    // We try anyway since it works from some regions, but always fall back.
     try {
       const equibaseUrl = `${EQUIBASE_BASE}/static/entry/${trackCode}/${dateCompact}.html`;
       const htmlRes = await fetch(equibaseUrl, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; HorseGPT/3.14; research)",
-          Accept: "text/html",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          Accept: "text/html,application/xhtml+xml",
         },
         signal: AbortSignal.timeout(8000),
       });
@@ -249,7 +251,14 @@ export async function POST(request: NextRequest) {
         // Truncate to avoid token limits — keep first 80K chars which covers entries
         if (html.length > 80000) html = html.substring(0, 80000);
 
-        if (html.length > 3000 && html.toLowerCase().includes("race")) {
+        // Verify this is real entry data, not a bot-protection challenge page
+        const isRealEntryPage = html.length > 5000
+          && html.toLowerCase().includes("race")
+          && !html.toLowerCase().includes("incapsula")
+          && !html.toLowerCase().includes("captcha")
+          && !html.toLowerCase().includes("challenge-platform");
+
+        if (isRealEntryPage) {
           const parsePrompt = PARSE_HTML_PROMPT
             .replaceAll("{race_number}", String(raceNumber))
             .replaceAll("{date}", isoDate)
@@ -278,17 +287,24 @@ export async function POST(request: NextRequest) {
       _dataSource = "gemini_search";
       const searchPrompt = `TODAY IS ${isoDate}. I need the entries for ${trackCode} Race ${raceNumber} on ${isoDate}.
 
-Search for this race on equibase.com, drf.com, or tvg.com.
+Search for this race. Try these searches:
+- "${trackCode} race ${raceNumber} entries ${isoDate}"
+- "equibase ${trackCode} entries today"
+- "Keeneland entries April 9 2026" (substitute actual track name)
+- "tvg ${trackCode} race card"
+- "drf ${trackCode} entries"
 
-Return a JSON object with ALL entered horses (exclude scratches):
+From the search results, provide the entries for this specific race.
+
+You MUST return a JSON object. If you can find ANY information about this race — even partial — include it:
 {
   "track_code": "${trackCode}",
   "track_name": "Full track name",
   "race_number": ${raceNumber},
   "race_date": "${isoDate}",
-  "distance": "distance text",
-  "surface": "Dirt or Turf or Synthetic",
-  "race_type": "race type",
+  "distance": "distance if known, or empty string",
+  "surface": "Dirt or Turf or Synthetic if known, or empty string",
+  "race_type": "race type if known, or empty string",
   "purse": 0,
   "condition": "",
   "horses": [
@@ -297,19 +313,22 @@ Return a JSON object with ALL entered horses (exclude scratches):
       "program_number": "1",
       "post_position": 1,
       "morning_line_odds": 5.0,
-      "jockey": "Jockey Name",
-      "trainer": "Trainer Name",
+      "jockey": "Jockey Name or empty string",
+      "trainer": "Trainer Name or empty string",
       "weight": 122
     }
   ]
 }
 
 RULES:
-- Extract EVERY horse still entered — do NOT skip any
-- morning_line_odds: "5-2" = 2.5, "8-1" = 8.0, "even" = 1.0
+- Include ALL horses you can find for this race — do NOT skip any
+- Do NOT include scratched horses
+- morning_line_odds: "5-2" = 2.5, "8-1" = 8.0, "even" = 1.0, unknown = 5.0
 - Copy names EXACTLY from the source — do not invent names
-- If you cannot find this race, return {"error": "No entries found"}
-- Return ONLY valid JSON, no markdown`;
+- If you know names but not jockeys/odds, still include the horse with defaults
+- It is BETTER to return partial data than no data
+- If you truly cannot find ANY horses, return {"error": "Could not find entries for ${trackCode} Race ${raceNumber} on ${isoDate}"}
+- Return ONLY valid JSON, no markdown, no explanation`;
 
       const searchResponse = await ai.models.generateContent({
         model: GEMINI_MODEL,
