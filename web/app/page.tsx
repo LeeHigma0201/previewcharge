@@ -183,12 +183,19 @@ export default function Home() {
     finally { setLoadingTracks(false); }
   }
 
-  async function handleRun() {
+  // Step 1: Select a race via Gemini search — gets base entries + scratches
+  // Does NOT run the model yet — waits for optional TVG screenshot enrichment
+  const [geminiEntries, setGeminiEntries] = useState<Record<string, unknown>[]>([]);
+
+  async function handleSelectRace() {
     if (!query.trim()) return;
     setLoading(true);
     setError(null);
     setRace(null);
     setResult(null);
+    setGeminiEntries([]);
+    setTvgData({ summary: null, snapshot: null, speed: null, pace: null, jockey: null });
+    setTvgUploaded(new Set());
     setShowResults(false);
     setActualFinish(["", "", "", ""]);
     try {
@@ -200,34 +207,8 @@ export default function Home() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      const entries: HorseEntry[] = (data.horses ?? []).map(
-        (h: Record<string, unknown>) => ({
-          pp: Number(h.post_position ?? 0),
-          program: String(h.program_number ?? ""),
-          name: String(h.name ?? "Unknown"),
-          jockey: String(h.jockey ?? ""),
-          trainer: String(h.trainer ?? ""),
-          mlOdds: Number(h.morning_line_odds ?? 5.0),
-          style: String(h.running_style ?? "P"),
-          speed: ((h.last_3_beyer as number[]) ?? [])[0] ?? 80,
-          e1Pace: 80, latePace: 80,
-          wins: Number(h.wins ?? 0),
-          starts: Number(h.starts ?? 0),
-          last3Beyer: (h.last_3_beyer as number[]) ?? [],
-          jockeyWinPct: Number(h.jockey_win_pct ?? 0),
-          trainerWinPct: Number(h.trainer_win_pct ?? 0),
-          distanceWins: Number(h.distance_wins ?? 0),
-          distanceStarts: Number(h.distance_starts ?? 0),
-          surfaceWins: Number(h.surface_wins ?? 0),
-          surfaceStarts: Number(h.surface_starts ?? 0),
-          isClassDrop: Boolean(h.is_class_drop),
-          isClassRaise: Boolean(h.is_class_raise),
-          daysSinceLast: Number(h.days_since_last ?? 21),
-          equipmentChange: Boolean(h.equipment_change),
-          lastFinishPosition: h.last_finish_position ? Number(h.last_finish_position) : undefined,
-          weight: h.weight ? Number(h.weight) : undefined,
-        }),
-      );
+      const horses = data.horses as Record<string, unknown>[];
+      setGeminiEntries(horses);
 
       const raceInfo: RaceInfo = {
         track: String(data.track_code ?? ""),
@@ -239,14 +220,71 @@ export default function Home() {
         raceType: String(data.race_type ?? ""),
         purse: Number(data.purse ?? 0),
         condition: String(data.condition ?? ""),
-        entries,
+        entries: [],
       };
       setRace(raceInfo);
       setDataSource("search");
-      setResult(runSimulation(entries));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally { setLoading(false); }
+  }
+
+  // Step 3: Run the model — merges Gemini base data + TVG screenshot data
+  function handleRunModel() {
+    if (!race || geminiEntries.length === 0) return;
+
+    const snapshotData = tvgData.snapshot as Record<string, unknown>[] | null;
+    const speedData = tvgData.speed as Record<string, unknown>[] | null;
+    const paceData = tvgData.pace as Record<string, unknown>[] | null;
+    const jockeyData = tvgData.jockey as Record<string, unknown>[] | null;
+    // Summary TVG can override gemini names/odds if uploaded
+    const summaryData = tvgData.summary as { horses?: Record<string, unknown>[] } | null;
+
+    const entries: HorseEntry[] = geminiEntries.map((h) => {
+      const prog = String(h.program_number ?? "");
+      const name = String(h.name ?? "").toLowerCase();
+
+      // Match TVG data by program number first, then name
+      const findMatch = (arr: Record<string, unknown>[] | null) =>
+        arr?.find((x) => String(x.program_number) === prog || String(x.name ?? "").toLowerCase() === name);
+
+      const summ = findMatch(summaryData?.horses ?? null);
+      const snap = findMatch(snapshotData);
+      const spd = findMatch(speedData);
+      const pac = findMatch(paceData);
+      const jky = findMatch(jockeyData);
+
+      // TVG speed figures override Gemini
+      const speedFigs = (spd?.speed_figures as number[]) ?? (h.last_3_beyer as number[]) ?? [];
+
+      return {
+        pp: Number(h.post_position ?? h.program_number ?? 0),
+        program: prog,
+        name: String(summ?.name ?? h.name ?? ""),
+        jockey: String(jky?.jockey ?? h.jockey ?? ""),
+        trainer: String(jky?.trainer ?? h.trainer ?? ""),
+        mlOdds: Number(summ?.morning_line_odds ?? h.morning_line_odds ?? 5.0),
+        style: String(pac?.running_style ?? h.running_style ?? "P"),
+        speed: speedFigs[0] ?? 0,
+        e1Pace: Number(pac?.early_pace ?? 80),
+        latePace: Number(pac?.late_pace ?? 80),
+        last3Beyer: speedFigs.slice(0, 3),
+        wins: Number(summ?.wins ?? h.wins ?? 0),
+        starts: Number(summ?.starts ?? h.starts ?? 0),
+        jockeyWinPct: Number(jky?.jockey_win_pct ?? h.jockey_win_pct ?? 0),
+        trainerWinPct: Number(jky?.trainer_win_pct ?? h.trainer_win_pct ?? 0),
+        lastFinishPosition: Number(snap?.last_finish_position ?? h.last_finish_position ?? 0) || undefined,
+        daysSinceLast: Number(snap?.days_since_last ?? h.days_since_last ?? 0) || undefined,
+        isClassDrop: Boolean(spd?.is_class_drop ?? h.is_class_drop),
+        isClassRaise: Boolean(h.is_class_raise),
+        weight: Number(summ?.weight ?? h.weight ?? 122),
+        equipmentChange: Boolean(h.equipment_change),
+      };
+    });
+
+    setRace((prev) => prev ? { ...prev, entries } : null);
+    setDataSource(tvgUploaded.size > 0 ? "tvg" : "search");
+    setResult(runSimulation(entries));
   }
 
   function saveResult() {
@@ -276,20 +314,21 @@ export default function Home() {
         7-layer probability model &middot; 500K Monte Carlo simulations
       </p>
 
-      {/* Search */}
+      {/* STEP 1: Select a race */}
+      <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">Step 1 — Select Race</div>
       <div className="flex gap-3 mb-4">
         <input
           type="text" value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleRun()}
+          onKeyDown={(e) => e.key === "Enter" && handleSelectRace()}
           placeholder="Keeneland Race 5 today"
           className="flex-1 px-5 py-4 text-xl rounded-xl border-2 border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:border-blue-500"
         />
         <button
-          onClick={handleRun} disabled={loading || !query.trim()}
+          onClick={handleSelectRace} disabled={loading || !query.trim()}
           className="px-8 py-4 rounded-xl bg-blue-600 text-white font-bold text-xl hover:bg-blue-700 disabled:opacity-40 transition-colors"
         >
-          {loading ? "Running..." : "Run"}
+          {loading ? "Searching..." : "Find Race"}
         </button>
       </div>
 
@@ -314,61 +353,91 @@ export default function Home() {
         )}
       </div>
 
-      {/* TVG Screenshots — 5 categories */}
-      <div className="mb-8 p-6 rounded-xl border-2 border-gray-200 bg-gray-50">
-        <h3 className="text-xl font-black mb-1">TVG Past Performances</h3>
-        <p className="text-sm text-gray-500 mb-4">
-          Upload screenshots from TVG for each category. Summary is required. Others add more signal to the model.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-4">
-          {([
-            { key: "summary" as CatKey, label: "Summary", desc: "Horse names, odds, jockeys", required: true },
-            { key: "snapshot" as CatKey, label: "Snapshot", desc: "Quick overview, ratings", required: false },
-            { key: "speed" as CatKey, label: "Speed & Class", desc: "Speed figures, class levels", required: false },
-            { key: "pace" as CatKey, label: "Pace", desc: "Running styles, early speed", required: false },
-            { key: "jockey" as CatKey, label: "Jockey/Trainer", desc: "Win %, meet stats", required: false },
-          ]).map(({ key, label, desc, required }) => (
-            <label key={key}
-              className={`flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-                tvgUploaded.has(key)
-                  ? "bg-green-50 border-green-400"
-                  : tvgLoading === key
-                    ? "bg-blue-50 border-blue-300"
-                    : "bg-white border-gray-200 hover:border-blue-400"
-              }`}>
-              <div className="text-base font-bold">{label}</div>
-              <div className="text-xs text-gray-500 text-center mt-1">{desc}</div>
-              {required && !tvgUploaded.has(key) && (
-                <div className="text-xs text-red-500 font-semibold mt-1">Required</div>
-              )}
-              {tvgUploaded.has(key) && (
-                <div className="text-xs text-green-700 font-bold mt-1">Uploaded</div>
-              )}
-              {tvgLoading === key && (
-                <div className="text-xs text-blue-600 font-bold mt-1">Parsing...</div>
-              )}
-              <input type="file" accept="image/*,.pdf" className="hidden"
-                disabled={tvgLoading !== null}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) uploadTvgScreenshot(f, key);
-                }} />
-            </label>
-          ))}
-        </div>
-        <div className="flex items-center gap-4">
+      {/* Show race found + Step 2 only after race is selected */}
+      {race && geminiEntries.length > 0 && !result && (
+        <>
+          {/* Race found */}
+          <div className="mb-6 p-5 rounded-xl bg-blue-50 border-2 border-blue-200">
+            <h2 className="text-2xl font-black">
+              {race.trackName || race.track} — Race {race.raceNumber}
+            </h2>
+            <p className="text-base text-gray-600">
+              {race.date} &middot; {race.distance} &middot; {race.surface} &middot; {race.raceType} &middot; ${race.purse.toLocaleString()}
+            </p>
+            <p className="text-base font-semibold text-blue-700 mt-2">
+              {geminiEntries.length} horses found (scratches removed)
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {geminiEntries.map((h) => (
+                <span key={String(h.program_number)} className="px-3 py-1 rounded-lg bg-white border text-sm font-medium">
+                  #{String(h.program_number)} {String(h.name)}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* STEP 2: Upload TVG screenshots */}
+          <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">Step 2 — Add TVG Data (optional)</div>
+          <div className="mb-6 p-6 rounded-xl border-2 border-gray-200 bg-gray-50">
+            <p className="text-sm text-gray-500 mb-4">
+              Upload screenshots from TVG past performances to add real data. Each screenshot adds more signal. Skip this step to run with Gemini data only.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-4">
+              {([
+                { key: "summary" as CatKey, label: "Summary", desc: "Overrides names, odds", required: false },
+                { key: "snapshot" as CatKey, label: "Snapshot", desc: "Ratings, last finish", required: false },
+                { key: "speed" as CatKey, label: "Speed & Class", desc: "Speed figures (35% weight)", required: false },
+                { key: "pace" as CatKey, label: "Pace", desc: "Running style (20% weight)", required: false },
+                { key: "jockey" as CatKey, label: "Jockey/Trainer", desc: "Win %, stats (10% weight)", required: false },
+              ]).map(({ key, label, desc }) => (
+                <label key={key}
+                  className={`flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+                    tvgUploaded.has(key)
+                      ? "bg-green-50 border-green-400"
+                      : tvgLoading === key
+                        ? "bg-blue-50 border-blue-300"
+                        : "bg-white border-gray-200 hover:border-blue-400"
+                  }`}>
+                  <div className="text-base font-bold">{label}</div>
+                  <div className="text-xs text-gray-500 text-center mt-1">{desc}</div>
+                  {tvgUploaded.has(key) && (
+                    <div className="text-xs text-green-700 font-bold mt-1">Uploaded</div>
+                  )}
+                  {tvgLoading === key && (
+                    <div className="text-xs text-blue-600 font-bold mt-1">Parsing...</div>
+                  )}
+                  <input type="file" accept="image/*,.pdf" className="hidden"
+                    disabled={tvgLoading !== null}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) uploadTvgScreenshot(f, key);
+                    }} />
+                </label>
+              ))}
+            </div>
+            {tvgUploaded.size > 0 && (
+              <p className="text-sm text-green-700 font-semibold mb-3">
+                {tvgUploaded.size} screenshot(s) parsed — data will be merged with Gemini results
+              </p>
+            )}
+          </div>
+
+          {/* STEP 3: Run the model */}
+          <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">Step 3 — Run Model</div>
           <button
-            onClick={runFromTvg}
-            disabled={!tvgUploaded.has("summary") || loading}
-            className="px-8 py-3 rounded-xl bg-green-600 text-white font-bold text-lg hover:bg-green-700 disabled:opacity-40 transition-colors"
+            onClick={handleRunModel}
+            disabled={loading}
+            className="w-full mb-8 px-8 py-5 rounded-xl bg-green-600 text-white font-black text-2xl hover:bg-green-700 disabled:opacity-40 transition-colors"
           >
-            Run Model from TVG Data
+            Run Exotic Bet Model
+            {tvgUploaded.size > 0 && (
+              <span className="block text-base font-normal mt-1">
+                Gemini + {tvgUploaded.size} TVG screenshot(s)
+              </span>
+            )}
           </button>
-          <span className="text-sm text-gray-500">
-            {tvgUploaded.size}/5 categories uploaded
-          </span>
-        </div>
-      </div>
+        </>
+      )}
 
       {error && (
         <div className="mb-8 p-5 rounded-xl bg-red-50 border-2 border-red-300 text-red-800 text-lg">
