@@ -1,396 +1,252 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
-import { useChat } from "@ai-sdk/react";
-import { sampleRace, getSimulationResults, getPaceScenario } from "./lib/data";
+import { useState } from "react";
+import type {
+  HorseEntry,
+  RaceInfo,
+  SimulationResult,
+  RankedExoticList,
+} from "./lib/types";
+import { runSimulation } from "./lib/data";
 
-type Tab = "chat" | "card" | "predictions" | "pace";
+export default function Home() {
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [race, setRace] = useState<RaceInfo | null>(null);
+  const [result, setResult] = useState<SimulationResult | null>(null);
 
-const styleColors: Record<string, string> = {
-  E: "bg-red-500/20 text-red-400 border-red-500/30",
-  EP: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  P: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  S: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  C: "bg-green-500/20 text-green-400 border-green-500/30",
-};
+  async function handleRun() {
+    if (!query.trim()) return;
+    setLoading(true);
+    setError(null);
+    setRace(null);
+    setResult(null);
 
-function Badge({ style }: { style: string }) {
+    try {
+      const res = await fetch("/api/race", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: query.trim() }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      const entries: HorseEntry[] = (data.horses ?? []).map(
+        (h: Record<string, unknown>) => ({
+          pp: Number(h.post_position ?? 0),
+          program: String(h.program_number ?? ""),
+          name: String(h.name ?? "Unknown"),
+          jockey: String(h.jockey ?? ""),
+          trainer: String(h.trainer ?? ""),
+          mlOdds: Number(h.morning_line_odds ?? 5.0),
+          style: String(h.running_style ?? "P"),
+          speed: ((h.last_3_beyer as number[]) ?? [])[0] ?? 80,
+          e1Pace: 80,
+          latePace: 80,
+          wins: Number(h.wins ?? 0),
+          starts: Number(h.starts ?? 0),
+          last3Beyer: (h.last_3_beyer as number[]) ?? [],
+          jockeyWinPct: Number(h.jockey_win_pct ?? 0),
+          trainerWinPct: Number(h.trainer_win_pct ?? 0),
+          distanceWins: Number(h.distance_wins ?? 0),
+          distanceStarts: Number(h.distance_starts ?? 0),
+          surfaceWins: Number(h.surface_wins ?? 0),
+          surfaceStarts: Number(h.surface_starts ?? 0),
+          isClassDrop: Boolean(h.is_class_drop),
+          isClassRaise: Boolean(h.is_class_raise),
+          daysSinceLast: Number(h.days_since_last ?? 21),
+          equipmentChange: Boolean(h.equipment_change),
+        }),
+      );
+
+      const raceInfo: RaceInfo = {
+        track: String(data.track_code ?? ""),
+        trackName: String(data.track_name ?? ""),
+        date: String(data.race_date ?? ""),
+        raceNumber: Number(data.race_number ?? 0),
+        distance: String(data.distance ?? ""),
+        surface: String(data.surface ?? ""),
+        raceType: String(data.race_type ?? ""),
+        purse: Number(data.purse ?? 0),
+        condition: String(data.condition ?? ""),
+        entries,
+      };
+
+      setRace(raceInfo);
+      const sim = runSimulation(entries, 100000);
+      setResult(sim);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${styleColors[style] ?? "bg-zinc-700 text-zinc-300"}`}
-    >
+    <main className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-1">HorseGPT Exotic Bet Engine</h1>
+      <p className="text-zinc-400 mb-6 text-sm">
+        6-layer model: ML odds + pace scenario + Beyer trend + connections +
+        class/form + Henery Monte Carlo (100K sims)
+      </p>
+
+      <div className="flex gap-3 mb-8">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleRun()}
+          placeholder="e.g. Churchill Downs Race 5 today, Belmont R8 June 14"
+          className="flex-1 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={handleRun}
+          disabled={loading || !query.trim()}
+          className="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
+        >
+          {loading ? "Researching..." : "Run Model"}
+        </button>
+      </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-red-900/50 border border-red-700 text-red-200">
+          {error}
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-12 text-zinc-400">
+          <div className="text-lg mb-2">Gemini is researching the race card...</div>
+          <div className="text-sm">Then running 100,000 Monte Carlo simulations with 6 probability layers</div>
+        </div>
+      )}
+
+      {race && result && (
+        <>
+          <div className="mb-6 p-4 rounded-lg bg-zinc-800/50 border border-zinc-700">
+            <h2 className="text-xl font-bold">
+              {race.trackName || race.track} — Race {race.raceNumber}
+            </h2>
+            <p className="text-zinc-400 text-sm">
+              {race.date} | {race.distance} | {race.surface} | {race.raceType} | ${race.purse.toLocaleString()} | {race.condition}
+            </p>
+            <p className="text-zinc-500 text-xs mt-1">
+              Pace: {result.paceScenario.scenario} — {result.paceScenario.description}
+            </p>
+          </div>
+
+          <Section title="Win Probabilities (6-Layer Adjusted)">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-zinc-400 border-b border-zinc-700">
+                  <th className="text-left py-2">#</th>
+                  <th className="text-left py-2">Horse</th>
+                  <th className="text-left py-2">ML</th>
+                  <th className="text-left py-2">Style</th>
+                  <th className="text-right py-2">Win %</th>
+                  <th className="text-right py-2">Place %</th>
+                  <th className="text-right py-2">Show %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {result.predictions.map((p) => (
+                  <tr key={p.program} className="border-b border-zinc-800 hover:bg-zinc-800/50">
+                    <td className="py-2 font-mono">{p.program}</td>
+                    <td className="py-2 font-semibold">{p.name}</td>
+                    <td className="py-2 text-zinc-400">{p.mlOdds.toFixed(1)}</td>
+                    <td className="py-2"><StyleBadge style={p.style} /></td>
+                    <td className="py-2 text-right font-mono font-bold text-green-400">{p.winPct.toFixed(1)}%</td>
+                    <td className="py-2 text-right font-mono text-zinc-300">{p.placePct.toFixed(1)}%</td>
+                    <td className="py-2 text-right font-mono text-zinc-400">{p.showPct.toFixed(1)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Section>
+
+          <ExoticTable title="Exacta — $2.00 per combo" list={result.exactas} />
+          <ExoticTable title="Trifecta — $1.00 per combo" list={result.trifectas} />
+          <ExoticTable title="Superfecta — $0.10 per combo" list={result.superfectas} />
+        </>
+      )}
+    </main>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-8">
+      <h3 className="text-lg font-bold mb-3 text-zinc-200">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function StyleBadge({ style }: { style: string }) {
+  const colors: Record<string, string> = {
+    E: "bg-red-900/50 text-red-300",
+    EP: "bg-orange-900/50 text-orange-300",
+    P: "bg-yellow-900/50 text-yellow-300",
+    S: "bg-blue-900/50 text-blue-300",
+    C: "bg-purple-900/50 text-purple-300",
+  };
+  return (
+    <span className={`px-2 py-0.5 rounded text-xs font-mono ${colors[style] ?? "bg-zinc-700 text-zinc-300"}`}>
       {style}
     </span>
   );
 }
 
-const SUGGESTIONS = [
-  "Analyze Saratoga race 5 — who benefits from the pace scenario?",
-  "What are the top exacta and trifecta combinations for today's card at Churchill Downs?",
-  "Explain the Benter odds-offset model and how it finds value",
-  "I have an 8-horse field with 3 early speed types. How does that change the race?",
-  "Compare lone speed vs speed duel scenarios — when do closers win?",
-  "What should I look for in a class dropper at Keeneland?",
-];
-
-function getMessageText(m: { parts?: Array<{ type: string; text?: string }>; content?: string }): string {
-  if (m.parts) {
-    return m.parts.filter((p) => p.type === "text").map((p) => p.text ?? "").join("");
-  }
-  return typeof m.content === "string" ? m.content : "";
-}
-
-function ChatTab() {
-  const { messages, sendMessage, status, error } = useChat();
-  const [input, setInput] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isStreaming = status === "streaming" || status === "submitted";
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, status]);
-
-  const handleSend = () => {
-    if (!input.trim() || isStreaming) return;
-    sendMessage({ text: input });
-    setInput("");
-  };
-
-  const handleSuggestion = (text: string) => {
-    setInput(text);
-  };
-
+function ExoticTable({ title, list }: { title: string; list: RankedExoticList }) {
+  if (!list.combos.length) return null;
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)]">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4">
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">Ask HorseGPT anything</h2>
-              <p className="text-zinc-400 max-w-lg">
-                Type a race query like &quot;Saratoga race 5 today&quot; or ask about
-                handicapping strategy, pace scenarios, exotic bets, or any track.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl w-full">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => handleSuggestion(s)}
-                  className="text-left p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-800 hover:border-zinc-700 transition-colors"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-3xl rounded-lg px-4 py-3 ${
-                m.role === "user"
-                  ? "bg-emerald-600/20 border border-emerald-600/30 text-zinc-100"
-                  : "bg-zinc-900 border border-zinc-800 text-zinc-200"
-              }`}
-            >
-              {m.role === "assistant" && (
-                <div className="text-xs text-emerald-400 font-semibold mb-1">
-                  HorseGPT
-                </div>
-              )}
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                {getMessageText(m)}
-              </div>
-            </div>
-          </div>
-        ))}
-        {isStreaming && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex justify-start">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3">
-              <div className="text-xs text-emerald-400 font-semibold mb-1">
-                HorseGPT
-              </div>
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:0.1s]" />
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-              </div>
-            </div>
-          </div>
-        )}
-        {error && (
-          <div className="mx-auto max-w-2xl p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
-            <strong>Error:</strong> {error.message}
-            {error.message.includes("API key") && (
-              <p className="mt-2 text-zinc-400">
-                Add your <code className="bg-zinc-800 px-1 rounded">ANTHROPIC_API_KEY</code> to{" "}
-                Vercel Environment Variables (Project Settings &rarr; Environment Variables).
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="flex gap-3 pt-4 border-t border-zinc-800">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder="Ask about any race, track, horse, or handicapping strategy..."
-          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-        />
-        <button
-          type="button"
-          onClick={handleSend}
-          disabled={isStreaming || !input.trim()}
-          className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white font-medium rounded-lg text-sm transition-colors"
-        >
-          {isStreaming ? "..." : "Send"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function RaceCard() {
-  const race = sampleRace;
-  return (
-    <div>
-      <div className="mb-4 p-4 rounded-lg bg-zinc-900 border border-zinc-800">
-        <div className="flex flex-wrap gap-4 text-sm">
-          {[
-            ["Track", race.track], ["Race", `R${race.raceNumber}`], ["Type", race.raceType],
-            ["Distance", race.distance], ["Surface", race.surface],
-            ["Purse", `$${race.purse.toLocaleString()}`], ["Condition", race.condition],
-          ].map(([label, value]) => (
-            <div key={label}>
-              <span className="text-zinc-500">{label}</span>
-              <p className="font-semibold text-lg">{value}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-      <p className="text-xs text-zinc-500 mb-3">Sample race from test fixtures (SAR R5, 8-horse ALW field)</p>
+    <Section title={title}>
+      <p className="text-zinc-500 text-xs mb-3">
+        {list.totalAboveCutoff} combos above probability cutoff | Cost: ${list.costAboveCutoff.toFixed(2)}
+      </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-zinc-800 text-zinc-400">
-              {["PP", "Horse", "Jockey", "Trainer", "ML", "Style", "Speed", "E1", "LP"].map((h) => (
-                <th key={h} className="py-3 px-3 text-left">{h}</th>
-              ))}
+            <tr className="text-zinc-400 border-b border-zinc-700">
+              <th className="text-left py-2 w-12">#</th>
+              <th className="text-left py-2">Finish Order</th>
+              <th className="text-right py-2">Probability</th>
+              <th className="text-right py-2">Est. Payoff</th>
+              <th className="text-right py-2">Cost</th>
+              <th className="text-center py-2">Bet</th>
             </tr>
           </thead>
           <tbody>
-            {race.entries.map((e) => (
-              <tr key={e.pp} className="border-b border-zinc-800/50 hover:bg-zinc-900/50 transition-colors">
-                <td className="py-3 px-3 font-mono text-zinc-400">{e.pp}</td>
-                <td className="py-3 px-3 font-semibold">{e.name}</td>
-                <td className="py-3 px-3 text-zinc-300">{e.jockey}</td>
-                <td className="py-3 px-3 text-zinc-300">{e.trainer}</td>
-                <td className="py-3 px-3 font-mono">{e.mlOdds}/1</td>
-                <td className="py-3 px-3"><Badge style={e.style} /></td>
-                <td className="py-3 px-3 text-center font-mono">{e.speed}</td>
-                <td className="py-3 px-3 text-center font-mono">{e.e1Pace}</td>
-                <td className="py-3 px-3 text-center font-mono">{e.latePace}</td>
+            {list.combos.map((c) => (
+              <tr key={c.rank} className={`border-b border-zinc-800 ${c.aboveCutoff ? "hover:bg-zinc-800/50" : "opacity-40"}`}>
+                <td className="py-2 font-mono text-zinc-500">{c.rank}</td>
+                <td className="py-2">
+                  {c.programs.map((p, i) => (
+                    <span key={i}>
+                      {i > 0 && <span className="text-zinc-600 mx-1">/</span>}
+                      <span className="font-mono text-zinc-300">#{p}</span>{" "}
+                      <span className="text-zinc-400">{c.names[i]}</span>
+                    </span>
+                  ))}
+                </td>
+                <td className="py-2 text-right font-mono font-bold text-green-400">
+                  {(c.probability * 100).toFixed(c.probability < 0.01 ? 3 : 2)}%
+                </td>
+                <td className="py-2 text-right font-mono text-zinc-300">
+                  ${c.estimatedPayoff.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </td>
+                <td className="py-2 text-right font-mono text-zinc-500">${c.unitCost.toFixed(2)}</td>
+                <td className="py-2 text-center">
+                  {c.aboveCutoff && (
+                    <span className="px-2 py-0.5 rounded bg-green-900/50 text-green-300 text-xs font-bold">BET</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
-  );
-}
-
-function Predictions() {
-  const results = useMemo(() => getSimulationResults(sampleRace.entries), []);
-  return (
-    <div className="space-y-8">
-      <div>
-        <h3 className="text-lg font-semibold mb-1">Win / Place / Show</h3>
-        <p className="text-xs text-zinc-500 mb-3">Henery normal model, 100K Monte Carlo sims with probit transform</p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400">
-                {["Horse", "ML", "Style", "Win %", "Place %", "Show %", ""].map((h) => (
-                  <th key={h} className="py-3 px-3 text-left">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {results.predictions.map((p) => (
-                <tr key={p.name} className="border-b border-zinc-800/50 hover:bg-zinc-900/50">
-                  <td className="py-3 px-3 font-semibold">{p.name}</td>
-                  <td className="py-3 px-3 font-mono">{p.mlOdds}/1</td>
-                  <td className="py-3 px-3"><Badge style={p.style} /></td>
-                  <td className="py-3 px-3 font-mono font-semibold">{p.winPct.toFixed(1)}%</td>
-                  <td className="py-3 px-3 font-mono text-zinc-300">{p.placePct.toFixed(1)}%</td>
-                  <td className="py-3 px-3 font-mono text-zinc-400">{p.showPct.toFixed(1)}%</td>
-                  <td className="py-3 px-3 w-32">
-                    <div className="w-full bg-zinc-800 rounded-full h-2.5">
-                      <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: `${Math.min(p.winPct * 2.5, 100)}%` }} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <h3 className="text-lg font-semibold mb-3">Top 10 Exactas</h3>
-          <table className="w-full text-sm">
-            <thead><tr className="border-b border-zinc-800 text-zinc-400"><th className="py-2 px-3 text-left">1st</th><th className="py-2 px-3 text-left">2nd</th><th className="py-2 px-3 text-right">Prob %</th></tr></thead>
-            <tbody>{results.exactas.map((e, i) => (
-              <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td className="py-2 px-3">{e.first}</td><td className="py-2 px-3 text-zinc-300">{e.second}</td><td className="py-2 px-3 text-right font-mono">{e.prob.toFixed(2)}%</td></tr>
-            ))}</tbody>
-          </table>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3">Top 10 Trifectas</h3>
-          <table className="w-full text-sm">
-            <thead><tr className="border-b border-zinc-800 text-zinc-400"><th className="py-2 px-3 text-left">1st</th><th className="py-2 px-3 text-left">2nd</th><th className="py-2 px-3 text-left">3rd</th><th className="py-2 px-3 text-right">Prob %</th></tr></thead>
-            <tbody>{results.trifectas.map((t, i) => (
-              <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-900/50"><td className="py-2 px-3">{t.first}</td><td className="py-2 px-3 text-zinc-300">{t.second}</td><td className="py-2 px-3 text-zinc-400">{t.third}</td><td className="py-2 px-3 text-right font-mono">{t.prob.toFixed(3)}%</td></tr>
-            ))}</tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PaceAnalysis() {
-  const pace = useMemo(() => getPaceScenario(sampleRace.entries), []);
-  const scenarioColor: Record<string, string> = {
-    "Speed Duel": "text-red-400", "Contested Pace": "text-orange-400",
-    "Lone Speed": "text-emerald-400", "No Speed": "text-blue-400",
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="p-6 rounded-lg bg-zinc-900 border border-zinc-800">
-        <h3 className={`text-2xl font-bold mb-2 ${scenarioColor[pace.scenario] ?? "text-zinc-100"}`}>{pace.scenario}</h3>
-        <p className="text-zinc-400 mb-4">{pace.description}</p>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center p-3 rounded bg-red-500/10 border border-red-500/20">
-            <div className="text-2xl font-bold text-red-400">{pace.earlyCount}</div>
-            <div className="text-xs text-zinc-400 mt-1">Early Speed</div>
-          </div>
-          <div className="text-center p-3 rounded bg-yellow-500/10 border border-yellow-500/20">
-            <div className="text-2xl font-bold text-yellow-400">{pace.presserCount}</div>
-            <div className="text-xs text-zinc-400 mt-1">Pressers</div>
-          </div>
-          <div className="text-center p-3 rounded bg-green-500/10 border border-green-500/20">
-            <div className="text-2xl font-bold text-green-400">{pace.closerCount}</div>
-            <div className="text-xs text-zinc-400 mt-1">Closers</div>
-          </div>
-        </div>
-      </div>
-      <h3 className="text-lg font-semibold">Pace Impact by Horse</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-zinc-800 text-zinc-400">
-            {["PP", "Horse", "Style", "E1", "LP", "Impact", "Analysis"].map((h) => (
-              <th key={h} className="py-3 px-3 text-left">{h}</th>
-            ))}
-          </tr></thead>
-          <tbody>
-            {sampleRace.entries.map((e) => {
-              const isSpeed = ["E", "EP"].includes(e.style);
-              const isCloser = ["S", "C"].includes(e.style);
-              const benefit = pace.earlyCount >= 3 ? (isCloser ? "positive" : isSpeed ? "negative" : "neutral")
-                : (pace.earlyCount === 1 && isSpeed ? "positive" : "neutral");
-              const icon = benefit === "positive" ? "+" : benefit === "negative" ? "-" : "=";
-              const color = benefit === "positive" ? "text-emerald-400" : benefit === "negative" ? "text-red-400" : "text-zinc-400";
-              let analysis = "";
-              if (isSpeed && pace.earlyCount >= 3) analysis = "Speed duel. Likely to tire.";
-              else if (isSpeed && pace.earlyCount === 1) analysis = "Lone speed. Can control pace.";
-              else if (isSpeed && pace.earlyCount === 2) analysis = "Contested. Will duel with one other.";
-              else if (isCloser && pace.earlyCount >= 3) analysis = "Speed collapse likely. Prime closer.";
-              else if (isCloser && pace.earlyCount <= 1) analysis = "Soft pace. May not get setup.";
-              else analysis = "Tactical. Can adjust to pace flow.";
-              return (
-                <tr key={e.pp} className="border-b border-zinc-800/50 hover:bg-zinc-900/50">
-                  <td className="py-3 px-3 font-mono text-zinc-400">{e.pp}</td>
-                  <td className="py-3 px-3 font-semibold">{e.name}</td>
-                  <td className="py-3 px-3"><Badge style={e.style} /></td>
-                  <td className="py-3 px-3 text-center font-mono">{e.e1Pace}</td>
-                  <td className="py-3 px-3 text-center font-mono">{e.latePace}</td>
-                  <td className={`py-3 px-3 text-center text-lg font-bold ${color}`}>{icon}</td>
-                  <td className="py-3 px-3 text-zinc-400 text-xs">{analysis}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-export default function Home() {
-  const [tab, setTab] = useState<Tab>("chat");
-
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "chat", label: "Ask HorseGPT" },
-    { id: "card", label: "Race Card" },
-    { id: "predictions", label: "Predictions" },
-    { id: "pace", label: "Pace Analysis" },
-  ];
-
-  return (
-    <div className="flex-1 flex flex-col">
-      <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">HorseGPT v3.14</h1>
-            <p className="text-xs text-zinc-400">
-              Multi-model handicapping &middot; 60+ tracks &middot; Benter + LightGBM + Monte Carlo
-            </p>
-          </div>
-          <div className="text-right text-xs text-zinc-500 hidden sm:block">
-            <div>Benter Odds-Offset Logistic</div>
-            <div>Henery Monte Carlo (Probit)</div>
-          </div>
-        </div>
-      </header>
-
-      <nav className="border-b border-zinc-800 bg-zinc-950">
-        <div className="max-w-7xl mx-auto px-4 flex gap-1">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
-                tab === t.id
-                  ? "border-emerald-500 text-emerald-400"
-                  : "border-transparent text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-        {tab === "chat" && <ChatTab />}
-        {tab === "card" && <RaceCard />}
-        {tab === "predictions" && <Predictions />}
-        {tab === "pace" && <PaceAnalysis />}
-      </main>
-
-      <footer className="border-t border-zinc-800 py-3 text-center text-xs text-zinc-500">
-        HorseGPT v3.14 &middot; 60+ tracks &middot; Benter Odds-Offset + LightGBM Ensemble &middot; Henery Monte Carlo
-      </footer>
-    </div>
+    </Section>
   );
 }

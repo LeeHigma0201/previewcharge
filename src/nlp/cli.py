@@ -30,6 +30,15 @@ def main() -> None:
     parser.add_argument("--scrape", nargs=2, metavar=("TRACK", "DATE"),
                         help="Scrape data first: --scrape SAR 2026-03-22")
     parser.add_argument("--horse", type=str, help="Look up a horse by name")
+    parser.add_argument("--exotic", action="store_true",
+                        help="Generate single-race exotic bet plan")
+    parser.add_argument("--dd", action="store_true", help="Daily Double starting from queried race")
+    parser.add_argument("--pick3", action="store_true", help="Pick 3 starting from queried race")
+    parser.add_argument("--pick4", action="store_true", help="Pick 4 starting from queried race")
+    parser.add_argument("--pick5", action="store_true", help="Pick 5 starting from queried race")
+    parser.add_argument("--pick6", action="store_true", help="Pick 6 starting from queried race")
+    parser.add_argument("--bankroll", type=float, default=200.0,
+                        help="Bankroll in dollars (default: 200)")
     args = parser.parse_args()
 
     settings = Settings(db=DatabaseConfig(url=args.db))
@@ -52,6 +61,23 @@ def main() -> None:
         else:
             parser.print_help()
             sys.exit(1)
+
+        # Check for exotic bet modes
+        multi_race_type = None
+        if args.dd:
+            multi_race_type = "dd"
+        elif args.pick3:
+            multi_race_type = "pick3"
+        elif args.pick4:
+            multi_race_type = "pick4"
+        elif args.pick5:
+            multi_race_type = "pick5"
+        elif args.pick6:
+            multi_race_type = "pick6"
+
+        if args.exotic or multi_race_type:
+            _do_exotic(query_text, session, args.bankroll, multi_race_type)
+            return
 
         from src.nlp.prompt_builder import build_loaded_prompt
 
@@ -79,6 +105,69 @@ def main() -> None:
 
     finally:
         session.close()
+
+
+def _do_exotic(query_text: str, session, bankroll: float, multi_race_type: str | None) -> None:
+    """Run exotic bet engine from a natural language query."""
+    from src.nlp.race_query import parse_race_query
+    from src.data.models import Race
+
+    parsed = parse_race_query(query_text)
+    if not parsed.track_code or not parsed.race_number:
+        print(f"Could not parse race from: {query_text}")
+        return
+
+    race = (
+        session.query(Race)
+        .filter_by(
+            track_code=parsed.track_code,
+            race_date=parsed.race_date,
+            race_number=parsed.race_number,
+        )
+        .first()
+    )
+    if race is None:
+        print(f"Race not found: {parsed.track_code} R{parsed.race_number} {parsed.race_date}")
+        return
+
+    entries = sorted(race.entries, key=lambda e: e.post_position)
+
+    if multi_race_type:
+        # Multi-race exotic
+        from src.betting.exotic_engine import format_multi_race_slip, generate_multi_race_plan
+
+        num_legs = {"dd": 2, "pick3": 3, "pick4": 4, "pick5": 5, "pick6": 6}
+        n_legs = num_legs[multi_race_type]
+
+        races = []
+        entries_per_race = []
+        for i in range(n_legs):
+            r = (
+                session.query(Race)
+                .filter_by(
+                    track_code=parsed.track_code,
+                    race_date=parsed.race_date,
+                    race_number=parsed.race_number + i,
+                )
+                .first()
+            )
+            if r is None:
+                print(f"Race {parsed.race_number + i} not found.")
+                return
+            races.append(r)
+            entries_per_race.append(sorted(r.entries, key=lambda e: e.post_position))
+
+        plan = generate_multi_race_plan(
+            races, entries_per_race, session,
+            bet_type=multi_race_type, bankroll=bankroll,
+        )
+        print(format_multi_race_slip(plan))
+    else:
+        # Single-race exotic
+        from src.betting.exotic_engine import format_bet_slip, generate_bet_plan
+
+        plan = generate_bet_plan(race, entries, session, bankroll=bankroll)
+        print(format_bet_slip(plan))
 
 
 def _do_scrape(track: str, race_date: date, session) -> None:

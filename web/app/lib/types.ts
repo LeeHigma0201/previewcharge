@@ -9,10 +9,24 @@ export interface HorseEntry {
   speed: number;
   e1Pace: number;
   latePace: number;
+  wins?: number;
+  starts?: number;
+  last3Beyer?: number[];
+  jockeyWinPct?: number;
+  trainerWinPct?: number;
+  distanceWins?: number;
+  distanceStarts?: number;
+  surfaceWins?: number;
+  surfaceStarts?: number;
+  isClassDrop?: boolean;
+  isClassRaise?: boolean;
+  daysSinceLast?: number;
+  equipmentChange?: boolean;
 }
 
 export interface RaceInfo {
   track: string;
+  trackName?: string;
   date: string;
   raceNumber: number;
   distance: string;
@@ -25,11 +39,31 @@ export interface RaceInfo {
 
 export interface PredictionRow {
   name: string;
+  program: string;
   mlOdds: number;
   winPct: number;
   placePct: number;
   showPct: number;
   style: string;
+  adjustedProb: number;
+}
+
+export interface ExoticCombo {
+  rank: number;
+  programs: string[];
+  names: string[];
+  probability: number;
+  estimatedPayoff: number;
+  unitCost: number;
+  aboveCutoff: boolean;
+}
+
+export interface RankedExoticList {
+  betType: string;
+  unitCost: number;
+  combos: ExoticCombo[];
+  totalAboveCutoff: number;
+  costAboveCutoff: number;
 }
 
 export interface ExactaRow {
@@ -51,4 +85,12 @@ export interface PaceScenario {
   presserCount: number;
   closerCount: number;
   description: string;
+}
+
+export interface SimulationResult {
+  predictions: PredictionRow[];
+  exactas: RankedExoticList;
+  trifectas: RankedExoticList;
+  superfectas: RankedExoticList;
+  paceScenario: PaceScenario;
 }

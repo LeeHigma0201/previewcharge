@@ -25,10 +25,13 @@ st.markdown("**Multi-model horse racing handicapping tool**")
 st.sidebar.title("Navigation")
 page = st.sidebar.radio(
     "Select page:",
-    ["Race Card", "Predictions", "Pace Analysis", "Backtesting"],
+    ["Exotic Bets", "Race Card", "Predictions", "Pace Analysis", "Backtesting"],
 )
 
-if page == "Race Card":
+if page == "Exotic Bets":
+    from dashboard.pages.exotic_bets import render
+    render()
+elif page == "Race Card":
     from dashboard.pages.race_card import render
     render()
 elif page == "Predictions":

@@ -2,37 +2,17 @@ import type {
   RaceInfo,
   HorseEntry,
   PredictionRow,
-  ExactaRow,
-  TrifectaRow,
+  ExoticCombo,
+  RankedExoticList,
   PaceScenario,
+  SimulationResult,
 } from "./types";
 
-// Sample race from conftest.py — Saratoga R5, ALW, 6f Dirt
-export const sampleRace: RaceInfo = {
-  track: "SAR",
-  date: "2023-08-15",
-  raceNumber: 5,
-  distance: "6f (1320y)",
-  surface: "Dirt",
-  raceType: "ALW",
-  purse: 100000,
-  condition: "Fast",
-  entries: [
-    { pp: 1, program: "1", name: "Speed Demon", jockey: "I. Ortiz Jr.", trainer: "C. Brown", mlOdds: 3.0, style: "E", speed: 90, e1Pace: 95, latePace: 85 },
-    { pp: 2, program: "2", name: "Stalker Sam", jockey: "J. Rosario", trainer: "T. Pletcher", mlOdds: 5.0, style: "P", speed: 85, e1Pace: 80, latePace: 90 },
-    { pp: 3, program: "3", name: "Closer Carl", jockey: "L. Saez", trainer: "B. Cox", mlOdds: 8.0, style: "C", speed: 88, e1Pace: 75, latePace: 95 },
-    { pp: 4, program: "4", name: "Early Bird", jockey: "J. Castellano", trainer: "W. Mott", mlOdds: 4.0, style: "EP", speed: 87, e1Pace: 92, latePace: 83 },
-    { pp: 5, program: "5", name: "Pace Setter", jockey: "M. Franco", trainer: "S. Asmussen", mlOdds: 6.0, style: "E", speed: 82, e1Pace: 93, latePace: 78 },
-    { pp: 6, program: "6", name: "Mid Pack", jockey: "T. Gaffalione", trainer: "M. Maker", mlOdds: 10.0, style: "P", speed: 80, e1Pace: 82, latePace: 82 },
-    { pp: 7, program: "7", name: "Long Shot", jockey: "D. Davis", trainer: "L. Rice", mlOdds: 20.0, style: "S", speed: 78, e1Pace: 78, latePace: 88 },
-    { pp: 8, program: "8", name: "Dark Horse", jockey: "J. Alvarado", trainer: "R. Dutrow", mlOdds: 15.0, style: "C", speed: 83, e1Pace: 72, latePace: 92 },
-  ],
-};
+// ---------------------------------------------------------------------------
+// Probit (inverse normal CDF) — same as Python's norm.ppf
+// ---------------------------------------------------------------------------
 
-// Henery normal model simulation (pre-computed for the sample race)
-// Uses probit transform as implemented in our monte_carlo.py
 function probit(p: number): number {
-  // Rational approximation of inverse normal CDF
   const a = [
     -3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2,
     1.383577518672690e2, -3.066479806614716e1, 2.506628277459239e0,
@@ -79,132 +59,17 @@ function probit(p: number): number {
   }
 }
 
-function simulateHenery(
-  entries: HorseEntry[],
-  nSims: number = 100000
-): {
-  predictions: PredictionRow[];
-  exactas: ExactaRow[];
-  trifectas: TrifectaRow[];
-} {
-  const n = entries.length;
-
-  // Convert ML odds to implied probabilities, then normalize
-  let probs = entries.map((e) => 1.0 / (e.mlOdds + 1.0));
-  const total = probs.reduce((a, b) => a + b, 0);
-  probs = probs.map((p) => Math.max(p / total, 1e-6));
-
-  // Probit transform for abilities
-  const abilities = probs.map((p) => probit(p));
-
-  // Simulate
-  const finishCounts = Array.from({ length: n }, () =>
-    Array.from({ length: n }, () => 0)
-  );
-  const exactaCounts = Array.from({ length: n }, () =>
-    Array.from({ length: n }, () => 0)
-  );
-  const trifectaCounts = Array.from({ length: n }, () =>
-    Array.from({ length: n }, () => Array.from({ length: n }, () => 0))
-  );
-
-  // Seeded pseudo-random (mulberry32)
-  let seed = 42;
-  function random(): number {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  }
-
-  // Box-Muller
-  function randn(): number {
-    const u1 = random();
-    const u2 = random();
-    return Math.sqrt(-2 * Math.log(u1 + 1e-15)) * Math.cos(2 * Math.PI * u2);
-  }
-
-  for (let sim = 0; sim < nSims; sim++) {
-    // Generate finishing times
-    const times: [number, number][] = [];
-    for (let i = 0; i < n; i++) {
-      times.push([-abilities[i] + randn(), i]);
-    }
-    // Sort by time (lower = better)
-    times.sort((a, b) => a[0] - b[0]);
-
-    const ranking = times.map((t) => t[1]);
-    for (let pos = 0; pos < n; pos++) {
-      finishCounts[ranking[pos]][pos]++;
-    }
-    exactaCounts[ranking[0]][ranking[1]]++;
-    trifectaCounts[ranking[0]][ranking[1]][ranking[2]]++;
-  }
-
-  const predictions: PredictionRow[] = entries.map((e, i) => ({
-    name: e.name,
-    mlOdds: e.mlOdds,
-    style: e.style,
-    winPct: (finishCounts[i][0] / nSims) * 100,
-    placePct:
-      ((finishCounts[i][0] + finishCounts[i][1]) / nSims) * 100,
-    showPct:
-      ((finishCounts[i][0] + finishCounts[i][1] + finishCounts[i][2]) / nSims) *
-      100,
-  }));
-
-  // Top exactas
-  const exactaList: ExactaRow[] = [];
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (i !== j && exactaCounts[i][j] > 0) {
-        exactaList.push({
-          first: entries[i].name,
-          second: entries[j].name,
-          prob: (exactaCounts[i][j] / nSims) * 100,
-        });
-      }
-    }
-  }
-  exactaList.sort((a, b) => b.prob - a.prob);
-
-  // Top trifectas
-  const trifectaList: TrifectaRow[] = [];
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (j === i) continue;
-      for (let k = 0; k < n; k++) {
-        if (k === i || k === j) continue;
-        if (trifectaCounts[i][j][k] > 0) {
-          trifectaList.push({
-            first: entries[i].name,
-            second: entries[j].name,
-            third: entries[k].name,
-            prob: (trifectaCounts[i][j][k] / nSims) * 100,
-          });
-        }
-      }
-    }
-  }
-  trifectaList.sort((a, b) => b.prob - a.prob);
-
-  return {
-    predictions: predictions.sort((a, b) => b.winPct - a.winPct),
-    exactas: exactaList.slice(0, 10),
-    trifectas: trifectaList.slice(0, 10),
-  };
-}
+// ---------------------------------------------------------------------------
+// Pace scenario analysis — adjusts raw probabilities
+// ---------------------------------------------------------------------------
 
 export function getPaceScenario(entries: HorseEntry[]): PaceScenario {
   const earlyCount = entries.filter((e) =>
-    ["E", "EP"].includes(e.style)
+    ["E", "EP"].includes(e.style),
   ).length;
-  const presserCount = entries.filter((e) =>
-    ["P"].includes(e.style)
-  ).length;
+  const presserCount = entries.filter((e) => e.style === "P").length;
   const closerCount = entries.filter((e) =>
-    ["S", "C"].includes(e.style)
+    ["S", "C"].includes(e.style),
   ).length;
 
   let scenario: string;
@@ -212,24 +77,315 @@ export function getPaceScenario(entries: HorseEntry[]): PaceScenario {
   if (earlyCount >= 3) {
     scenario = "Speed Duel";
     description =
-      "3+ early speed types will contest the early pace. Expect a hot pace that benefits closers and stalkers. Speed horses likely to tire.";
+      "3+ early speed types contest the pace. Hot pace benefits closers/stalkers.";
   } else if (earlyCount === 2) {
     scenario = "Contested Pace";
     description =
-      "Two speed types will push each other early. Moderate pace advantage for closers, but not a meltdown scenario.";
+      "Two speed types push each other. Moderate closer advantage.";
   } else if (earlyCount === 1) {
     scenario = "Lone Speed";
     description =
-      "Single early speed horse can control the pace unchallenged. Historically wins at ~35%. Strong advantage for the speed horse.";
+      "Single speed horse controls pace unchallenged. ~35% win rate historically.";
   } else {
     scenario = "No Speed";
     description =
-      "No committed early speed. Race likely to develop slowly with a sprint finish. Tactical speed from stalkers will be key.";
+      "No committed speed. Slow pace, sprint finish. Tactical speed is key.";
   }
 
   return { scenario, earlyCount, presserCount, closerCount, description };
 }
 
-export function getSimulationResults(entries: HorseEntry[]) {
-  return simulateHenery(entries, 100000);
+function paceAdjustments(entries: HorseEntry[]): number[] {
+  const pace = getPaceScenario(entries);
+  return entries.map((e) => {
+    if (pace.scenario === "Speed Duel") {
+      if (["E", "EP"].includes(e.style)) return 0.80;
+      if (["S", "C"].includes(e.style)) return 1.25;
+      if (e.style === "P") return 1.10;
+    } else if (pace.scenario === "Lone Speed") {
+      if (["E", "EP"].includes(e.style)) {
+        const otherSpeed = entries.filter(
+          (x) => x.name !== e.name && ["E", "EP"].includes(x.style),
+        ).length;
+        if (otherSpeed === 0) return 1.30;
+      }
+      if (["S", "C"].includes(e.style)) return 0.85;
+    } else if (pace.scenario === "Contested Pace") {
+      if (["S", "C"].includes(e.style)) return 1.10;
+      if (["E", "EP"].includes(e.style)) return 0.90;
+    }
+    return 1.0;
+  });
+}
+
+function beyerTrendAdjustments(entries: HorseEntry[]): number[] {
+  return entries.map((e) => {
+    if (!e.last3Beyer || e.last3Beyer.length < 2) return 1.0;
+    const recent = e.last3Beyer[0];
+    const avg =
+      e.last3Beyer.reduce((a, b) => a + b, 0) / e.last3Beyer.length;
+    if (recent > avg + 3) return 1.10; // Improving form
+    if (recent < avg - 3) return 0.90; // Declining form
+    return 1.0;
+  });
+}
+
+// Layer 5: Trainer/jockey connection strength
+function connectionAdjustments(entries: HorseEntry[]): number[] {
+  return entries.map((e) => {
+    let adj = 1.0;
+    // Hot jockey boost
+    if (e.jockeyWinPct && e.jockeyWinPct > 0.20) adj *= 1.08;
+    // Hot trainer boost
+    if (e.trainerWinPct && e.trainerWinPct > 0.25) adj *= 1.08;
+    // Distance specialist
+    if (e.distanceWins && e.distanceStarts && e.distanceStarts >= 3) {
+      const distPct = e.distanceWins / e.distanceStarts;
+      if (distPct > 0.30) adj *= 1.10;
+    }
+    // Surface specialist
+    if (e.surfaceWins && e.surfaceStarts && e.surfaceStarts >= 3) {
+      const surfPct = e.surfaceWins / e.surfaceStarts;
+      if (surfPct > 0.30) adj *= 1.08;
+    }
+    return adj;
+  });
+}
+
+// Layer 6: Class and form cycle
+function classFormAdjustments(entries: HorseEntry[]): number[] {
+  return entries.map((e) => {
+    let adj = 1.0;
+    // Class drop = significant advantage
+    if (e.isClassDrop) adj *= 1.15;
+    // Class raise = disadvantage
+    if (e.isClassRaise) adj *= 0.85;
+    // Optimal rest (14-35 days)
+    if (e.daysSinceLast) {
+      if (e.daysSinceLast >= 14 && e.daysSinceLast <= 35) adj *= 1.05;
+      if (e.daysSinceLast > 60) adj *= 0.92; // Layoff penalty
+      if (e.daysSinceLast < 7) adj *= 0.90; // Too quick turnaround
+    }
+    // Equipment change (first-time blinkers is positive)
+    if (e.equipmentChange) adj *= 1.05;
+    return adj;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Adjusted probabilities — combines ML odds + pace + form signals
+// ---------------------------------------------------------------------------
+
+function computeAdjustedProbs(entries: HorseEntry[]): number[] {
+  // Base: morning line implied
+  let probs = entries.map((e) => 1.0 / (e.mlOdds + 1.0));
+  const baseTotal = probs.reduce((a, b) => a + b, 0);
+  probs = probs.map((p) => p / baseTotal);
+
+  // Layer 3: Pace scenario adjustments
+  const paceAdj = paceAdjustments(entries);
+  probs = probs.map((p, i) => p * paceAdj[i]);
+
+  // Layer 4: Beyer speed figure trend
+  const beyerAdj = beyerTrendAdjustments(entries);
+  probs = probs.map((p, i) => p * beyerAdj[i]);
+
+  // Layer 5: Trainer/jockey connection strength
+  const connAdj = connectionAdjustments(entries);
+  probs = probs.map((p, i) => p * connAdj[i]);
+
+  // Layer 6: Class drop/raise + form cycle
+  const classAdj = classFormAdjustments(entries);
+  probs = probs.map((p, i) => p * classAdj[i]);
+
+  // Re-normalize
+  const total = probs.reduce((a, b) => a + b, 0);
+  probs = probs.map((p) => Math.max(p / total, 1e-6));
+
+  return probs;
+}
+
+// ---------------------------------------------------------------------------
+// Henery Monte Carlo simulation — full exotic engine
+// ---------------------------------------------------------------------------
+
+const TAKEOUT = 0.22;
+
+function estimatePayoff(prob: number): number {
+  if (prob <= 0) return 0;
+  return (1.0 / prob) * (1.0 - TAKEOUT);
+}
+
+export function runSimulation(
+  entries: HorseEntry[],
+  nSims: number = 100000,
+): SimulationResult {
+  const n = entries.length;
+  const probs = computeAdjustedProbs(entries);
+  const abilities = probs.map((p) => probit(p));
+
+  // Counts
+  const finishCounts: number[][] = Array.from({ length: n }, () =>
+    new Array(n).fill(0),
+  );
+  const exactaCounts: number[][] = Array.from({ length: n }, () =>
+    new Array(n).fill(0),
+  );
+  const trifectaCounts: number[][][] = Array.from({ length: n }, () =>
+    Array.from({ length: n }, () => new Array(n).fill(0)),
+  );
+  // Superfecta — only track top combos to avoid memory explosion
+  const superfectaMap = new Map<string, number>();
+
+  // Seeded PRNG (mulberry32)
+  let seed = Date.now() & 0xffffffff;
+  function random(): number {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  function randn(): number {
+    const u1 = random();
+    const u2 = random();
+    return Math.sqrt(-2 * Math.log(u1 + 1e-15)) * Math.cos(2 * Math.PI * u2);
+  }
+
+  for (let sim = 0; sim < nSims; sim++) {
+    const times: [number, number][] = [];
+    for (let i = 0; i < n; i++) {
+      times.push([-abilities[i] + randn(), i]);
+    }
+    times.sort((a, b) => a[0] - b[0]);
+    const ranking = times.map((t) => t[1]);
+
+    for (let pos = 0; pos < n; pos++) {
+      finishCounts[ranking[pos]][pos]++;
+    }
+    exactaCounts[ranking[0]][ranking[1]]++;
+    if (n >= 3) {
+      trifectaCounts[ranking[0]][ranking[1]][ranking[2]]++;
+    }
+    if (n >= 4) {
+      const key = `${ranking[0]},${ranking[1]},${ranking[2]},${ranking[3]}`;
+      superfectaMap.set(key, (superfectaMap.get(key) ?? 0) + 1);
+    }
+  }
+
+  // --- Predictions ---
+  const predictions: PredictionRow[] = entries
+    .map((e, i) => ({
+      name: e.name,
+      program: e.program,
+      mlOdds: e.mlOdds,
+      style: e.style,
+      winPct: (finishCounts[i][0] / nSims) * 100,
+      placePct:
+        ((finishCounts[i][0] + finishCounts[i][1]) / nSims) * 100,
+      showPct:
+        ((finishCounts[i][0] + finishCounts[i][1] + finishCounts[i][2]) /
+          nSims) *
+        100,
+      adjustedProb: probs[i],
+    }))
+    .sort((a, b) => b.winPct - a.winPct);
+
+  // --- Ranked Exactas ---
+  const exactaCombos: ExoticCombo[] = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j || exactaCounts[i][j] === 0) continue;
+      const prob = exactaCounts[i][j] / nSims;
+      exactaCombos.push({
+        rank: 0,
+        programs: [entries[i].program, entries[j].program],
+        names: [entries[i].name, entries[j].name],
+        probability: prob,
+        estimatedPayoff: estimatePayoff(prob),
+        unitCost: 2.0,
+        aboveCutoff: prob >= 0.01,
+      });
+    }
+  }
+  exactaCombos.sort((a, b) => b.probability - a.probability);
+  exactaCombos.forEach((c, i) => (c.rank = i + 1));
+  const topExactas = exactaCombos.slice(0, 50);
+
+  // --- Ranked Trifectas ---
+  const trifectaCombos: ExoticCombo[] = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      for (let k = 0; k < n; k++) {
+        if (k === i || k === j || trifectaCounts[i][j][k] === 0) continue;
+        const prob = trifectaCounts[i][j][k] / nSims;
+        trifectaCombos.push({
+          rank: 0,
+          programs: [entries[i].program, entries[j].program, entries[k].program],
+          names: [entries[i].name, entries[j].name, entries[k].name],
+          probability: prob,
+          estimatedPayoff: estimatePayoff(prob),
+          unitCost: 1.0,
+          aboveCutoff: prob >= 0.003,
+        });
+      }
+    }
+  }
+  trifectaCombos.sort((a, b) => b.probability - a.probability);
+  trifectaCombos.forEach((c, i) => (c.rank = i + 1));
+  const topTrifectas = trifectaCombos.slice(0, 50);
+
+  // --- Ranked Superfectas ---
+  const superfectaCombos: ExoticCombo[] = [];
+  for (const [key, count] of superfectaMap) {
+    const [i, j, k, l] = key.split(",").map(Number);
+    const prob = count / nSims;
+    if (prob <= 0) continue;
+    superfectaCombos.push({
+      rank: 0,
+      programs: [
+        entries[i].program,
+        entries[j].program,
+        entries[k].program,
+        entries[l].program,
+      ],
+      names: [
+        entries[i].name,
+        entries[j].name,
+        entries[k].name,
+        entries[l].name,
+      ],
+      probability: prob,
+      estimatedPayoff: estimatePayoff(prob),
+      unitCost: 0.1,
+      aboveCutoff: prob >= 0.001,
+    });
+  }
+  superfectaCombos.sort((a, b) => b.probability - a.probability);
+  superfectaCombos.forEach((c, i) => (c.rank = i + 1));
+  const topSuperfectas = superfectaCombos.slice(0, 100);
+
+  const makeList = (
+    betType: string,
+    unitCost: number,
+    combos: ExoticCombo[],
+  ): RankedExoticList => {
+    const above = combos.filter((c) => c.aboveCutoff);
+    return {
+      betType,
+      unitCost,
+      combos,
+      totalAboveCutoff: above.length,
+      costAboveCutoff: Math.round(above.length * unitCost * 100) / 100,
+    };
+  };
+
+  return {
+    predictions,
+    exactas: makeList("Exacta", 2.0, topExactas),
+    trifectas: makeList("Trifecta", 1.0, topTrifectas),
+    superfectas: makeList("Superfecta", 0.1, topSuperfectas),
+    paceScenario: getPaceScenario(entries),
+  };
 }

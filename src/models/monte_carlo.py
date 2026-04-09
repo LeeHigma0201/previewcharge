@@ -30,12 +30,14 @@ class SimulationResult:
     exacta_probs: np.ndarray  # P(horse i wins, horse j places) — shape (n, n)
     trifecta_probs: np.ndarray  # P(i, j, k) — shape (n, n, n)
     finish_matrix: np.ndarray  # P(horse i finishes in position j) — shape (n, n)
+    superfecta_probs: np.ndarray | None = None  # P(i, j, k, l) — shape (n, n, n, n)
 
 
 def henery_simulate(
     win_probs: np.ndarray,
     n_simulations: int = 100_000,
     seed: int | None = None,
+    compute_superfecta: bool = False,
 ) -> SimulationResult:
     """Run Monte Carlo simulation using the Henery (normal) model.
 
@@ -43,6 +45,7 @@ def henery_simulate(
         win_probs: Array of win probabilities (must sum to 1.0).
         n_simulations: Number of simulations (100k = ~1s for 12-horse field).
         seed: Random seed for reproducibility.
+        compute_superfecta: If True, compute 4D superfecta probability tensor.
 
     Returns:
         SimulationResult with full finish-order distributions.
@@ -103,6 +106,28 @@ def henery_simulate(
                     continue
                 trifecta_probs[i, j, k] = np.mean(mask_ij & (thirds == k))
 
+    # Superfecta: P(i first, j second, k third, l fourth)
+    superfecta_probs = None
+    if compute_superfecta and n_horses >= 4:
+        fourths = rankings[:, 3]
+        superfecta_probs = np.zeros((n_horses, n_horses, n_horses, n_horses))
+        for i in range(n_horses):
+            mask_i = winners == i
+            for j in range(n_horses):
+                if j == i:
+                    continue
+                mask_ij = mask_i & (runners_up == j)
+                for k in range(n_horses):
+                    if k == i or k == j:
+                        continue
+                    mask_ijk = mask_ij & (thirds == k)
+                    for l in range(n_horses):
+                        if l == i or l == j or l == k:
+                            continue
+                        superfecta_probs[i, j, k, l] = np.mean(
+                            mask_ijk & (fourths == l)
+                        )
+
     return SimulationResult(
         win_probs=win_probs_sim,
         place_probs=place_probs,
@@ -110,7 +135,52 @@ def henery_simulate(
         exacta_probs=exacta_probs,
         trifecta_probs=trifecta_probs,
         finish_matrix=finish_matrix,
+        superfecta_probs=superfecta_probs,
     )
+
+
+def compute_superfecta_for_anchor(
+    win_probs: np.ndarray,
+    anchor_idx: int,
+    n_simulations: int = 100_000,
+    seed: int | None = None,
+) -> np.ndarray:
+    """Compute superfecta probs only for combinations where anchor wins.
+
+    Much faster than full 4D tensor — O(n^3) instead of O(n^4).
+    Returns shape (n, n, n) where result[j, k, l] = P(anchor 1st, j 2nd, k 3rd, l 4th).
+    """
+    rng = np.random.default_rng(seed)
+    n_horses = len(win_probs)
+    win_probs = np.clip(win_probs, 1e-6, 1.0)
+    win_probs = win_probs / win_probs.sum()
+
+    abilities = norm.ppf(win_probs)
+    noise = rng.standard_normal((n_simulations, n_horses))
+    times = -abilities[np.newaxis, :] + noise
+    rankings = np.argsort(times, axis=1)
+
+    winners = rankings[:, 0]
+    runners_up = rankings[:, 1]
+    thirds = rankings[:, 2]
+    fourths = rankings[:, 3]
+
+    mask_anchor = winners == anchor_idx
+    result = np.zeros((n_horses, n_horses, n_horses))
+    for j in range(n_horses):
+        if j == anchor_idx:
+            continue
+        mask_j = mask_anchor & (runners_up == j)
+        for k in range(n_horses):
+            if k == anchor_idx or k == j:
+                continue
+            mask_jk = mask_j & (thirds == k)
+            for l in range(n_horses):
+                if l == anchor_idx or l == j or l == k:
+                    continue
+                result[j, k, l] = np.mean(mask_jk & (fourths == l))
+
+    return result
 
 
 def discounted_harville(
