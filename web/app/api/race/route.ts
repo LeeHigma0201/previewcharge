@@ -65,10 +65,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY not configured on server" },
+        { error: "GEMINI_API_KEY or GOOGLE_GENERATIVE_AI_API_KEY not configured on server" },
         { status: 500 },
       );
     }
