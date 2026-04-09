@@ -111,7 +111,7 @@ export default function Home() {
         jockey: String(jky?.jockey ?? h.jockey ?? ""),
         trainer: String(jky?.trainer ?? h.trainer ?? ""),
         mlOdds: Number(h.morning_line_odds ?? 5.0),
-        style: String(pac?.running_style ?? "P"),
+        style: String(pac?.running_style ?? "?"),
         speed: speedFigs[0] ?? 0,
         e1Pace: Number(pac?.early_pace ?? 80),
         latePace: Number(pac?.late_pace ?? 80),
@@ -177,7 +177,7 @@ export default function Home() {
           jockey: String(h.jockey ?? ""),
           trainer: String(h.trainer ?? ""),
           mlOdds: Number(h.morning_line_odds ?? 5.0),
-          style: "P" as string, speed: 0, e1Pace: 80, latePace: 80,
+          style: "?" as string, speed: 0, e1Pace: 80, latePace: 80,
           weight: Number(h.weight ?? 122),
         })),
       };
@@ -280,7 +280,7 @@ export default function Home() {
         jockey: String(jky?.jockey ?? h.jockey ?? ""),
         trainer: String(jky?.trainer ?? h.trainer ?? ""),
         mlOdds: Number(summ?.morning_line_odds ?? h.morning_line_odds ?? 5.0),
-        style: String(pac?.running_style ?? h.running_style ?? "P"),
+        style: String(pac?.running_style ?? h.running_style ?? "?"),
         speed: speedFigs[0] ?? 0,
         e1Pace: Number(pac?.early_pace ?? 80),
         latePace: Number(pac?.late_pace ?? 80),
@@ -590,7 +590,7 @@ export default function Home() {
                       p.style === "C" ? "text-purple-600 font-semibold" :
                       "text-gray-600"
                     }>
-                      {({E:"Speed",EP:"Presser",P:"Stalker",S:"Closer",C:"Deep Closer"} as Record<string,string>)[p.style] ?? p.style}
+                      {({"E":"Speed","EP":"Presser","P":"Stalker","S":"Closer","C":"Deep Closer","?":"Unknown"} as Record<string,string>)[p.style] ?? p.style}
                     </span>
                   </div>
                 </div>

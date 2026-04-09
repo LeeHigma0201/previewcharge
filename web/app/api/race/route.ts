@@ -224,81 +224,121 @@ export async function POST(request: NextRequest) {
     const { trackCode, raceNumber, date: isoDate } = parsed;
 
     // =================================================================
-    // STEP 1: Get race entries via Gemini search
-    // Two-part approach: first search for the race, then fill in details
+    // STEP 1: Get race entries — fetch Equibase HTML, parse with Gemini
+    // Falls back to Gemini search only if Equibase fetch fails
     // =================================================================
 
-    // Part A: Search for the race card
-    const step1Prompt = `TODAY IS ${isoDate}. I need the entries for ${trackCode} Race ${raceNumber} on ${isoDate}.
+    const dateCompact = isoDate.replaceAll("-", "");
+    let raceData: Record<string, unknown> | null = null;
+    let horses: Record<string, unknown>[] = [];
+    let _dataSource = "equibase_html";
 
-Search for this race. Try these searches:
-- "${trackCode} race ${raceNumber} entries ${isoDate}"
-- "Keeneland entries April 9 2026" (or whatever track this is)
-- "equibase ${trackCode} entries today"
-- "tvg ${trackCode} race card"
+    // --- Part A: Try fetching actual Equibase entries HTML ---
+    try {
+      const equibaseUrl = `${EQUIBASE_BASE}/static/entry/${trackCode}/${dateCompact}.html`;
+      const htmlRes = await fetch(equibaseUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; HorseGPT/3.14; research)",
+          Accept: "text/html",
+        },
+        signal: AbortSignal.timeout(8000),
+      });
 
-From the search results and your knowledge of today's horse racing, provide the entries for this specific race.
+      if (htmlRes.ok) {
+        let html = await htmlRes.text();
+        // Truncate to avoid token limits — keep first 80K chars which covers entries
+        if (html.length > 80000) html = html.substring(0, 80000);
 
-You MUST return a JSON object. If you can find ANY information about this race — even partial — include it. Fill in what you know:
+        if (html.length > 3000 && html.toLowerCase().includes("race")) {
+          const parsePrompt = PARSE_HTML_PROMPT
+            .replaceAll("{race_number}", String(raceNumber))
+            .replaceAll("{date}", isoDate)
+            .replaceAll("{html}", html);
 
+          const parseResponse = await ai.models.generateContent({
+            model: GEMINI_MODEL,
+            contents: parsePrompt,
+          });
+
+          const parseRaw = cleanJson(parseResponse.text ?? "");
+          const parsed = JSON.parse(parseRaw);
+
+          if (parsed.horses && parsed.horses.length > 0) {
+            raceData = parsed;
+            horses = parsed.horses;
+          }
+        }
+      }
+    } catch {
+      // Equibase fetch/parse failed — will fall back to Gemini search
+    }
+
+    // --- Part B: Fallback to Gemini search if Equibase didn't work ---
+    if (!raceData || horses.length === 0) {
+      _dataSource = "gemini_search";
+      const searchPrompt = `TODAY IS ${isoDate}. I need the entries for ${trackCode} Race ${raceNumber} on ${isoDate}.
+
+Search for this race on equibase.com, drf.com, or tvg.com.
+
+Return a JSON object with ALL entered horses (exclude scratches):
 {
   "track_code": "${trackCode}",
   "track_name": "Full track name",
   "race_number": ${raceNumber},
   "race_date": "${isoDate}",
-  "distance": "distance if known, or empty string",
-  "surface": "Dirt or Turf if known, or empty string",
-  "race_type": "race type if known, or empty string",
+  "distance": "distance text",
+  "surface": "Dirt or Turf or Synthetic",
+  "race_type": "race type",
   "purse": 0,
   "condition": "",
   "horses": [
     {
-      "name": "Horse Name",
+      "name": "Horse Name exactly as listed",
       "program_number": "1",
       "post_position": 1,
       "morning_line_odds": 5.0,
-      "jockey": "Jockey Name or empty",
-      "trainer": "Trainer Name or empty",
+      "jockey": "Jockey Name",
+      "trainer": "Trainer Name",
       "weight": 122
     }
   ]
 }
 
 RULES:
-- Include ALL horses you can find for this race
-- Do NOT include scratched horses
-- If you know the horse names but not odds, use 5.0 as default
-- If you know names but not jockeys, leave jockey as empty string
-- program_number should be "1", "2", etc. matching post position if not known
-- It is better to return partial data than no data
-- If you truly cannot find ANY horses for this race, return {"error": "Could not find entries for ${trackCode} Race ${raceNumber} on ${isoDate}"}
-- Return ONLY valid JSON, no markdown, no explanation`;
+- Extract EVERY horse still entered — do NOT skip any
+- morning_line_odds: "5-2" = 2.5, "8-1" = 8.0, "even" = 1.0
+- Copy names EXACTLY from the source — do not invent names
+- If you cannot find this race, return {"error": "No entries found"}
+- Return ONLY valid JSON, no markdown`;
 
-    const step1Response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: step1Prompt,
-      config: searchConfig,
-    });
+      const searchResponse = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: searchPrompt,
+        config: searchConfig,
+      });
 
-    const step1Raw = cleanJson(step1Response.text ?? "");
-    let raceData: Record<string, unknown>;
-    try {
-      raceData = JSON.parse(step1Raw);
-    } catch {
-      return NextResponse.json(
-        { error: `Could not parse race data. Response: ${step1Raw.substring(0, 300)}` },
-        { status: 422 },
-      );
+      const searchRaw = cleanJson(searchResponse.text ?? "");
+      try {
+        raceData = JSON.parse(searchRaw);
+      } catch {
+        return NextResponse.json(
+          { error: `Could not parse race data. Response: ${searchRaw.substring(0, 300)}` },
+          { status: 422 },
+        );
+      }
+
+      if (raceData!.error) {
+        return NextResponse.json({ error: raceData!.error }, { status: 404 });
+      }
+
+      horses = (raceData!.horses as Record<string, unknown>[]) ?? [];
     }
 
-    if (raceData.error) {
-      return NextResponse.json({ error: raceData.error }, { status: 404 });
-    }
-
-    let horses = raceData.horses as Record<string, unknown>[];
-    if (!horses || horses.length === 0) {
+    if (!raceData || horses.length === 0) {
       return NextResponse.json({ error: `No horses found for ${trackCode} Race ${raceNumber}` }, { status: 404 });
     }
+
+    raceData._dataSource = _dataSource;
 
     // =================================================================
     // STEP 2: Verify scratches with a dedicated search
