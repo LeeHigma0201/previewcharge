@@ -99,9 +99,10 @@ function paceAdjustments(entries: HorseEntry[]): number[] {
   const pace = getPaceScenario(entries);
   return entries.map((e) => {
     if (pace.scenario === "Speed Duel") {
-      if (["E", "EP"].includes(e.style)) return 0.80;
-      if (["S", "C"].includes(e.style)) return 1.25;
-      if (e.style === "P") return 1.10;
+      // Quirin (1979): front-runners win 16% in contested pace vs 35% lone speed
+      if (["E", "EP"].includes(e.style)) return 0.85;
+      if (["S", "C"].includes(e.style)) return 1.18;
+      if (e.style === "P") return 1.08;
     } else if (pace.scenario === "Lone Speed") {
       if (["E", "EP"].includes(e.style)) {
         const otherSpeed = entries.filter(
@@ -156,10 +157,10 @@ function connectionAdjustments(entries: HorseEntry[]): number[] {
 function classFormAdjustments(entries: HorseEntry[]): number[] {
   return entries.map((e) => {
     let adj = 1.0;
-    // Class drop = significant advantage
+    // Quinn (2003): class droppers show 12-18% edge
     if (e.isClassDrop) adj *= 1.15;
-    // Class raise = disadvantage
-    if (e.isClassRaise) adj *= 0.85;
+    // Class raise — still have base ability, don't over-penalize
+    if (e.isClassRaise) adj *= 0.90;
     // Optimal rest (14-35 days)
     if (e.daysSinceLast) {
       if (e.daysSinceLast >= 14 && e.daysSinceLast <= 35) adj *= 1.05;
@@ -176,11 +177,38 @@ function classFormAdjustments(entries: HorseEntry[]): number[] {
 // Adjusted probabilities — combines ML odds + pace + form signals
 // ---------------------------------------------------------------------------
 
+// Layer 2: Historical rank-order win rate blending (Bayesian anchor)
+// Source: millions of US thoroughbred races — these are the empirical
+// win rates by morning-line odds rank position.
+const HISTORICAL_WIN_RATES = [0.33, 0.20, 0.15, 0.11, 0.08, 0.05, 0.04, 0.02, 0.01, 0.01];
+const BLEND_ALPHA = 0.70; // 70% weight on specific ML odds, 30% on historical prior
+
+function historicalRankBlending(entries: HorseEntry[]): number[] {
+  // ML-implied probabilities
+  let mlProbs = entries.map((e) => 1.0 / (e.mlOdds + 1.0));
+  const mlTotal = mlProbs.reduce((a, b) => a + b, 0);
+  mlProbs = mlProbs.map((p) => p / mlTotal);
+
+  // Rank by ML odds (lowest odds = 1st choice)
+  const ranked = entries
+    .map((e, i) => ({ idx: i, odds: e.mlOdds }))
+    .sort((a, b) => a.odds - b.odds);
+
+  // Blend: α × ML_implied + (1-α) × historical_rank_rate
+  const blended = new Array(entries.length).fill(0);
+  ranked.forEach((r, rank) => {
+    const hist = HISTORICAL_WIN_RATES[Math.min(rank, HISTORICAL_WIN_RATES.length - 1)];
+    blended[r.idx] = BLEND_ALPHA * mlProbs[r.idx] + (1 - BLEND_ALPHA) * hist;
+  });
+
+  // Normalize
+  const sum = blended.reduce((a: number, b: number) => a + b, 0);
+  return blended.map((p: number) => Math.max(p / sum, 1e-6));
+}
+
 function computeAdjustedProbs(entries: HorseEntry[]): number[] {
-  // Base: morning line implied
-  let probs = entries.map((e) => 1.0 / (e.mlOdds + 1.0));
-  const baseTotal = probs.reduce((a, b) => a + b, 0);
-  probs = probs.map((p) => p / baseTotal);
+  // Layer 1 + 2: ML implied blended with historical rank-order rates
+  let probs = historicalRankBlending(entries);
 
   // Layer 3: Pace scenario adjustments
   const paceAdj = paceAdjustments(entries);
@@ -218,13 +246,18 @@ function estimatePayoff(prob: number): number {
 
 export function runSimulation(
   entries: HorseEntry[],
-  nSims: number = 100000,
+  nSimsOverride?: number,
 ): SimulationResult {
   const n = entries.length;
-  const probs = computeAdjustedProbs(entries);
-  const abilities = probs.map((p) => probit(p));
+  // Adaptive sim count: 500K when we have 4+ horses (superfecta needs it)
+  // 100K sims for a 12-horse superfecta = 8 obs/combo = noisy
+  // 500K gives ~42 obs/combo = statistically sound
+  const nSims = nSimsOverride ?? (n >= 4 ? 500000 : 100000);
 
-  // Counts
+  const probs = computeAdjustedProbs(entries);
+  // Clamp probit inputs to avoid NaN at extremes
+  const abilities = probs.map((p) => probit(Math.max(0.001, Math.min(0.999, p))));
+
   const finishCounts: number[][] = Array.from({ length: n }, () =>
     new Array(n).fill(0),
   );
@@ -234,11 +267,11 @@ export function runSimulation(
   const trifectaCounts: number[][][] = Array.from({ length: n }, () =>
     Array.from({ length: n }, () => new Array(n).fill(0)),
   );
-  // Superfecta — only track top combos to avoid memory explosion
   const superfectaMap = new Map<string, number>();
 
-  // Seeded PRNG (mulberry32)
-  let seed = Date.now() & 0xffffffff;
+  // Deterministic PRNG (mulberry32) — same odds = same results
+  // Seed from the sum of all ML odds so same field = same output
+  let seed = Math.round(entries.reduce((s, e) => s + e.mlOdds * 1000, 0)) & 0xffffffff;
   function random(): number {
     seed |= 0;
     seed = (seed + 0x6d2b79f5) | 0;
@@ -291,12 +324,24 @@ export function runSimulation(
     }))
     .sort((a, b) => b.winPct - a.winPct);
 
-  // --- Ranked Exactas ---
+  // --- Ranked Exactas (with pace-correlation penalty) ---
+  // Speed-duel correlation: two E/EP horses in 1-2 positions tire each other
+  // out — the independent model overestimates this combo's probability.
+  const paceInfo = getPaceScenario(entries);
+  const isSpeedDuel = paceInfo.scenario === "Speed Duel" || paceInfo.scenario === "Contested Pace";
+
   const exactaCombos: ExoticCombo[] = [];
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
       if (i === j || exactaCounts[i][j] === 0) continue;
-      const prob = exactaCounts[i][j] / nSims;
+      let prob = exactaCounts[i][j] / nSims;
+      // Pace-correlation: if both 1st and 2nd are E/EP in a speed duel,
+      // they tire each other → actual probability is lower than simulated
+      if (isSpeedDuel
+        && ["E", "EP"].includes(entries[i].style)
+        && ["E", "EP"].includes(entries[j].style)) {
+        prob *= 0.85;
+      }
       exactaCombos.push({
         rank: 0,
         programs: [entries[i].program, entries[j].program],
