@@ -225,44 +225,54 @@ export async function POST(request: NextRequest) {
 
     // =================================================================
     // STEP 1: Get race entries via Gemini search
-    // Equibase blocks server fetches (Imperva), so Gemini search is
-    // the primary data source. Search equibase.com, drf.com, tvg.com.
+    // Two-part approach: first search for the race, then fill in details
     // =================================================================
-    const step1Prompt = `TODAY IS ${isoDate}. Search equibase.com for the entries for ${trackCode} Race ${raceNumber} on ${isoDate}.
 
-Search specifically for: "equibase ${trackCode} entries ${isoDate}" or "${trackCode} race ${raceNumber} entries"
+    // Part A: Search for the race card
+    const step1Prompt = `TODAY IS ${isoDate}. I need the entries for ${trackCode} Race ${raceNumber} on ${isoDate}.
 
-Return ONLY a JSON object with the horses that are ENTERED AND NOT SCRATCHED:
+Search for this race. Try these searches:
+- "${trackCode} race ${raceNumber} entries ${isoDate}"
+- "Keeneland entries April 9 2026" (or whatever track this is)
+- "equibase ${trackCode} entries today"
+- "tvg ${trackCode} race card"
+
+From the search results and your knowledge of today's horse racing, provide the entries for this specific race.
+
+You MUST return a JSON object. If you can find ANY information about this race — even partial — include it. Fill in what you know:
+
 {
   "track_code": "${trackCode}",
   "track_name": "Full track name",
   "race_number": ${raceNumber},
   "race_date": "${isoDate}",
-  "distance": "distance",
-  "surface": "Dirt or Turf",
-  "race_type": "race type",
-  "purse": purse as integer,
-  "condition": "track condition",
+  "distance": "distance if known, or empty string",
+  "surface": "Dirt or Turf if known, or empty string",
+  "race_type": "race type if known, or empty string",
+  "purse": 0,
+  "condition": "",
   "horses": [
     {
-      "name": "Exact Horse Name",
+      "name": "Horse Name",
       "program_number": "1",
       "post_position": 1,
       "morning_line_odds": 5.0,
-      "jockey": "Jockey Name",
-      "trainer": "Trainer Name",
+      "jockey": "Jockey Name or empty",
+      "trainer": "Trainer Name or empty",
       "weight": 122
     }
   ]
 }
 
-CRITICAL:
-- Only include horses that are CONFIRMED ENTERED and NOT scratched
-- Do NOT include any horse that has been scratched or withdrawn
-- Copy horse names EXACTLY from the source — do not modify or guess
-- If you cannot find this specific race, return {"error": "reason"}
-- If the track has no racing today, list which US tracks ARE racing
-- Return ONLY valid JSON, no other text`;
+RULES:
+- Include ALL horses you can find for this race
+- Do NOT include scratched horses
+- If you know the horse names but not odds, use 5.0 as default
+- If you know names but not jockeys, leave jockey as empty string
+- program_number should be "1", "2", etc. matching post position if not known
+- It is better to return partial data than no data
+- If you truly cannot find ANY horses for this race, return {"error": "Could not find entries for ${trackCode} Race ${raceNumber} on ${isoDate}"}
+- Return ONLY valid JSON, no markdown, no explanation`;
 
     const step1Response = await ai.models.generateContent({
       model: GEMINI_MODEL,
