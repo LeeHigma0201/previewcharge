@@ -20,14 +20,115 @@ export default function Home() {
   const [loadingTracks, setLoadingTracks] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [actualFinish, setActualFinish] = useState(["", "", "", ""]);
-  const [dataSource, setDataSource] = useState<"search" | "chart">("search");
-  const [uploadLoading, setUploadLoading] = useState(false);
+  const [dataSource, setDataSource] = useState<"search" | "tvg">("search");
   const [history, setHistory] = useState<HistoryEntry[]>(() => {
     if (typeof window === "undefined") return [];
     try { return JSON.parse(localStorage.getItem("horsegpt_history") ?? "[]"); }
     catch { return []; }
   });
 
+  // TVG screenshot data — one slot per category
+  type CatKey = "summary" | "snapshot" | "speed" | "pace" | "jockey";
+  const [tvgData, setTvgData] = useState<Record<CatKey, unknown>>(
+    { summary: null, snapshot: null, speed: null, pace: null, jockey: null }
+  );
+  const [tvgLoading, setTvgLoading] = useState<CatKey | null>(null);
+  const [tvgUploaded, setTvgUploaded] = useState<Set<CatKey>>(new Set());
+
+  async function uploadTvgScreenshot(file: File, cat: CatKey) {
+    setTvgLoading(cat);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("category", cat);
+      const res = await fetch("/api/parse-pp", { method: "POST", body: fd });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setTvgData((prev) => ({ ...prev, [cat]: json.data }));
+      setTvgUploaded((prev) => new Set(prev).add(cat));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setTvgLoading(null);
+    }
+  }
+
+  function runFromTvg() {
+    setError(null);
+    setRace(null);
+    setResult(null);
+
+    // Merge all TVG categories into horse entries
+    const summaryData = tvgData.summary as { race?: Record<string, unknown>; horses?: Record<string, unknown>[] } | null;
+    const snapshotData = tvgData.snapshot as Record<string, unknown>[] | null;
+    const speedData = tvgData.speed as Record<string, unknown>[] | null;
+    const paceData = tvgData.pace as Record<string, unknown>[] | null;
+    const jockeyData = tvgData.jockey as Record<string, unknown>[] | null;
+
+    if (!summaryData?.horses?.length) {
+      setError("Upload the Summary screenshot first — it provides the horse names and basic race info.");
+      return;
+    }
+
+    const horses = summaryData.horses.filter((h) => !h.scratched);
+
+    // Build entries by merging all categories
+    const entries: HorseEntry[] = horses.map((h) => {
+      const name = String(h.name ?? "").toLowerCase();
+      const prog = String(h.program_number ?? "");
+
+      // Find matching data from other categories
+      const snap = snapshotData?.find((s) => String(s.program_number) === prog || String(s.name ?? "").toLowerCase() === name);
+      const spd = speedData?.find((s) => String(s.program_number) === prog || String(s.name ?? "").toLowerCase() === name);
+      const pac = paceData?.find((p) => String(p.program_number) === prog || String(p.name ?? "").toLowerCase() === name);
+      const jky = jockeyData?.find((j) => String(j.program_number) === prog || String(j.name ?? "").toLowerCase() === name);
+
+      const speedFigs = (spd?.speed_figures as number[]) ?? [];
+
+      return {
+        pp: Number(h.program_number ?? 0),
+        program: prog,
+        name: String(h.name ?? ""),
+        jockey: String(jky?.jockey ?? h.jockey ?? ""),
+        trainer: String(jky?.trainer ?? h.trainer ?? ""),
+        mlOdds: Number(h.morning_line_odds ?? 5.0),
+        style: String(pac?.running_style ?? "P"),
+        speed: speedFigs[0] ?? 0,
+        e1Pace: Number(pac?.early_pace ?? 80),
+        latePace: Number(pac?.late_pace ?? 80),
+        last3Beyer: speedFigs.length > 0 ? speedFigs.slice(0, 3) : [],
+        wins: Number(h.wins ?? 0),
+        starts: Number(h.starts ?? 0),
+        jockeyWinPct: Number(jky?.jockey_win_pct ?? 0),
+        trainerWinPct: Number(jky?.trainer_win_pct ?? 0),
+        lastFinishPosition: Number(snap?.last_finish_position ?? 0) || undefined,
+        daysSinceLast: Number(snap?.days_since_last ?? 0) || undefined,
+        isClassDrop: Boolean(spd?.class_rating && Number(spd.class_rating) < Number(h.morning_line_odds)),
+        weight: Number(h.weight ?? 122),
+      };
+    });
+
+    const raceInfo: RaceInfo = {
+      track: String(summaryData.race?.track_code ?? ""),
+      trackName: String(summaryData.race?.track_name ?? ""),
+      date: String(summaryData.race?.race_date ?? ""),
+      raceNumber: Number(summaryData.race?.race_number ?? 0),
+      distance: String(summaryData.race?.distance ?? ""),
+      surface: String(summaryData.race?.surface ?? ""),
+      raceType: String(summaryData.race?.race_type ?? ""),
+      purse: Number(summaryData.race?.purse ?? 0),
+      condition: String(summaryData.race?.condition ?? ""),
+      entries,
+    };
+
+    setRace(raceInfo);
+    setDataSource("tvg");
+    setResult(runSimulation(entries));
+  }
+
+  // Keep old chart upload for backward compat
+  const [uploadLoading, setUploadLoading] = useState(false);
   async function handleChartUpload(file: File) {
     setUploadLoading(true);
     setError(null);
@@ -36,10 +137,11 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("category", "summary");
       const res = await fetch("/api/parse-pp", { method: "POST", body: formData });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      const data = json.data as { race?: Record<string, unknown>; horses?: Record<string, unknown>[] };
       const raceInfo: RaceInfo = {
         track: String(data.race?.track_code ?? ""),
         trackName: String(data.race?.track_name ?? ""),
@@ -50,27 +152,19 @@ export default function Home() {
         raceType: String(data.race?.race_type ?? ""),
         purse: Number(data.race?.purse ?? 0),
         condition: String(data.race?.condition ?? ""),
-        entries: (data.horses ?? []).map((h: Record<string, unknown>) => ({
+        entries: (data.horses ?? []).filter((h) => !h.scratched).map((h) => ({
           pp: Number(h.program_number ?? 0),
           program: String(h.program_number ?? ""),
           name: String(h.name ?? ""),
           jockey: String(h.jockey ?? ""),
           trainer: String(h.trainer ?? ""),
-          mlOdds: Number(h.odds ?? 5.0),
-          style: String(h.running_style ?? "P"),
-          speed: Number(h.speed_figure ?? 0),
-          e1Pace: 80,
-          latePace: 80,
-          last3Beyer: h.speed_figure ? [Number(h.speed_figure)] : [],
-          lastFinishPosition: Number(h.finish_position ?? 0),
+          mlOdds: Number(h.morning_line_odds ?? 5.0),
+          style: "P" as string, speed: 0, e1Pace: 80, latePace: 80,
           weight: Number(h.weight ?? 122),
-          isClassDrop: false,
-          daysSinceLast: 21,
         })),
       };
-
       setRace(raceInfo);
-      setDataSource("chart");
+      setDataSource("tvg");
       setResult(runSimulation(raceInfo.entries));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Upload failed");
@@ -220,34 +314,60 @@ export default function Home() {
         )}
       </div>
 
-      {/* Chart Upload */}
-      <div className="mb-8 p-5 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50">
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <p className="font-bold text-lg">Upload Equibase Chart PDF</p>
-            <p className="text-sm text-gray-500">
-              Get free charts at equibase.com/static/chart/pdf/ — real speed figures, running lines, finish positions
-            </p>
-          </div>
-          <label className="px-6 py-3 rounded-xl bg-green-600 text-white font-bold text-base cursor-pointer hover:bg-green-700 transition-colors">
-            {uploadLoading ? "Parsing..." : "Upload Chart"}
-            <input
-              type="file"
-              accept=".pdf,image/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleChartUpload(f);
-              }}
-              disabled={uploadLoading}
-            />
-          </label>
+      {/* TVG Screenshots — 5 categories */}
+      <div className="mb-8 p-6 rounded-xl border-2 border-gray-200 bg-gray-50">
+        <h3 className="text-xl font-black mb-1">TVG Past Performances</h3>
+        <p className="text-sm text-gray-500 mb-4">
+          Upload screenshots from TVG for each category. Summary is required. Others add more signal to the model.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-4">
+          {([
+            { key: "summary" as CatKey, label: "Summary", desc: "Horse names, odds, jockeys", required: true },
+            { key: "snapshot" as CatKey, label: "Snapshot", desc: "Quick overview, ratings", required: false },
+            { key: "speed" as CatKey, label: "Speed & Class", desc: "Speed figures, class levels", required: false },
+            { key: "pace" as CatKey, label: "Pace", desc: "Running styles, early speed", required: false },
+            { key: "jockey" as CatKey, label: "Jockey/Trainer", desc: "Win %, meet stats", required: false },
+          ]).map(({ key, label, desc, required }) => (
+            <label key={key}
+              className={`flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+                tvgUploaded.has(key)
+                  ? "bg-green-50 border-green-400"
+                  : tvgLoading === key
+                    ? "bg-blue-50 border-blue-300"
+                    : "bg-white border-gray-200 hover:border-blue-400"
+              }`}>
+              <div className="text-base font-bold">{label}</div>
+              <div className="text-xs text-gray-500 text-center mt-1">{desc}</div>
+              {required && !tvgUploaded.has(key) && (
+                <div className="text-xs text-red-500 font-semibold mt-1">Required</div>
+              )}
+              {tvgUploaded.has(key) && (
+                <div className="text-xs text-green-700 font-bold mt-1">Uploaded</div>
+              )}
+              {tvgLoading === key && (
+                <div className="text-xs text-blue-600 font-bold mt-1">Parsing...</div>
+              )}
+              <input type="file" accept="image/*,.pdf" className="hidden"
+                disabled={tvgLoading !== null}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) uploadTvgScreenshot(f, key);
+                }} />
+            </label>
+          ))}
         </div>
-        {dataSource === "chart" && race && (
-          <p className="mt-2 text-sm text-green-700 font-semibold">
-            Chart loaded — running with real data
-          </p>
-        )}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={runFromTvg}
+            disabled={!tvgUploaded.has("summary") || loading}
+            className="px-8 py-3 rounded-xl bg-green-600 text-white font-bold text-lg hover:bg-green-700 disabled:opacity-40 transition-colors"
+          >
+            Run Model from TVG Data
+          </button>
+          <span className="text-sm text-gray-500">
+            {tvgUploaded.size}/5 categories uploaded
+          </span>
+        </div>
       </div>
 
       {error && (
@@ -272,11 +392,11 @@ export default function Home() {
                 {race.trackName || race.track} &mdash; Race {race.raceNumber}
               </h2>
               <span className={`px-3 py-1 rounded-lg text-sm font-bold ${
-                dataSource === "chart"
+                dataSource === "tvg"
                   ? "bg-green-100 text-green-800 border border-green-300"
                   : "bg-yellow-100 text-yellow-800 border border-yellow-300"
               }`}>
-                {dataSource === "chart" ? "Chart Data (Full)" : "Search Data (Partial)"}
+                {dataSource === "tvg" ? "TVG Data (Full)" : "Search Data (Partial)"}
               </span>
             </div>
             <p className="text-lg text-gray-600">
