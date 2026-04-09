@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type {
   HorseEntry,
   RaceInfo,
@@ -11,13 +11,28 @@ import type {
 import { runSimulation } from "./lib/data";
 
 export default function Home() {
-  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [race, setRace] = useState<RaceInfo | null>(null);
   const [result, setResult] = useState<SimulationResult | null>(null);
-  const [todayTracks, setTodayTracks] = useState<{ code: string; name: string }[] | null>(null);
+
+  // Step 1: Track selection
+  const [tracks, setTracks] = useState<{ code: string; name: string }[] | null>(null);
   const [loadingTracks, setLoadingTracks] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState<{ code: string; name: string } | null>(null);
+
+  // Step 2: Race number
+  const [selectedRaceNum, setSelectedRaceNum] = useState<number | null>(null);
+
+  // Auto-load today's tracks on mount
+  useEffect(() => {
+    setLoadingTracks(true);
+    fetch("/api/today")
+      .then((r) => r.json())
+      .then((d) => setTracks(d.tracks ?? []))
+      .catch(() => setTracks([]))
+      .finally(() => setLoadingTracks(false));
+  }, []);
   const [showResults, setShowResults] = useState(false);
   const [actualFinish, setActualFinish] = useState(["", "", "", ""]);
   const [dataSource, setDataSource] = useState<"search" | "tvg">("search");
@@ -173,22 +188,11 @@ export default function Home() {
     }
   }
 
-  async function findTodayRaces() {
-    setLoadingTracks(true);
-    try {
-      const res = await fetch("/api/today");
-      const data = await res.json();
-      setTodayTracks(data.tracks ?? []);
-    } catch { setTodayTracks([]); }
-    finally { setLoadingTracks(false); }
-  }
-
-  // Step 1: Select a race via Gemini search — gets base entries + scratches
-  // Does NOT run the model yet — waits for optional TVG screenshot enrichment
+  // Step 3: Load entries for selected track + race
   const [geminiEntries, setGeminiEntries] = useState<Record<string, unknown>[]>([]);
 
-  async function handleSelectRace() {
-    if (!query.trim()) return;
+  async function loadRaceEntries() {
+    if (!selectedTrack || !selectedRaceNum) return;
     setLoading(true);
     setError(null);
     setRace(null);
@@ -199,10 +203,11 @@ export default function Home() {
     setShowResults(false);
     setActualFinish(["", "", "", ""]);
     try {
+      const query = `${selectedTrack.name} Race ${selectedRaceNum} today`;
       const res = await fetch("/api/race", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: query.trim() }),
+        body: JSON.stringify({ query }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -211,10 +216,10 @@ export default function Home() {
       setGeminiEntries(horses);
 
       const raceInfo: RaceInfo = {
-        track: String(data.track_code ?? ""),
-        trackName: String(data.track_name ?? ""),
+        track: String(data.track_code ?? selectedTrack.code),
+        trackName: String(data.track_name ?? selectedTrack.name),
         date: String(data.race_date ?? ""),
-        raceNumber: Number(data.race_number ?? 0),
+        raceNumber: selectedRaceNum,
         distance: String(data.distance ?? ""),
         surface: String(data.surface ?? ""),
         raceType: String(data.race_type ?? ""),
@@ -228,6 +233,14 @@ export default function Home() {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally { setLoading(false); }
   }
+
+  // Auto-load when race number is selected
+  useEffect(() => {
+    if (selectedTrack && selectedRaceNum) {
+      loadRaceEntries();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTrack, selectedRaceNum]);
 
   // Step 3: Run the model — merges Gemini base data + TVG screenshot data
   function handleRunModel() {
@@ -314,44 +327,69 @@ export default function Home() {
         7-layer probability model &middot; 500K Monte Carlo simulations
       </p>
 
-      {/* STEP 1: Select a race */}
-      <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">Step 1 — Select Race</div>
-      <div className="flex gap-3 mb-4">
-        <input
-          type="text" value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSelectRace()}
-          placeholder="Keeneland Race 5 today"
-          className="flex-1 px-5 py-4 text-xl rounded-xl border-2 border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:border-blue-500"
-        />
-        <button
-          onClick={handleSelectRace} disabled={loading || !query.trim()}
-          className="px-8 py-4 rounded-xl bg-blue-600 text-white font-bold text-xl hover:bg-blue-700 disabled:opacity-40 transition-colors"
-        >
-          {loading ? "Searching..." : "Find Race"}
-        </button>
+      {/* STEP 1: Select a Track */}
+      <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">
+        Step 1 — Select Track
       </div>
-
-      {/* Today's Tracks */}
-      <div className="mb-8">
-        <button onClick={findTodayRaces} disabled={loadingTracks}
-          className="text-base px-5 py-2.5 rounded-lg border-2 border-gray-300 hover:border-blue-500 font-medium transition-colors disabled:opacity-50">
-          {loadingTracks ? "Checking Equibase..." : "Find Today's Races"}
-        </button>
-        {todayTracks && todayTracks.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {todayTracks.map((t) => (
-              <button key={t.code} onClick={() => setQuery(`${t.name} Race 1 today`)}
-                className="px-4 py-2 text-base font-semibold rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors">
+      <div className="mb-6">
+        {loadingTracks && (
+          <p className="text-base text-gray-500">Checking which tracks are racing today...</p>
+        )}
+        {tracks && tracks.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {tracks.map((t) => (
+              <button
+                key={t.code}
+                onClick={() => { setSelectedTrack(t); setSelectedRaceNum(null); setRace(null); setResult(null); setGeminiEntries([]); }}
+                className={`px-5 py-3 text-base font-bold rounded-xl border-2 transition-colors ${
+                  selectedTrack?.code === t.code
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white border-gray-200 hover:border-blue-500 hover:bg-blue-50"
+                }`}
+              >
                 {t.name}
               </button>
             ))}
           </div>
         )}
-        {todayTracks && todayTracks.length === 0 && (
-          <span className="ml-3 text-base text-gray-500">No entries posted yet</span>
+        {tracks && tracks.length === 0 && (
+          <p className="text-base text-gray-500">No tracks found with entries today.</p>
         )}
       </div>
+
+      {/* STEP 2: Select Race Number */}
+      {selectedTrack && (
+        <>
+          <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">
+            Step 2 — Select Race at {selectedTrack.name}
+          </div>
+          <div className="mb-6 flex flex-wrap gap-2">
+            {Array.from({ length: 14 }, (_, i) => i + 1).map((num) => (
+              <button
+                key={num}
+                onClick={() => setSelectedRaceNum(num)}
+                className={`w-14 h-14 text-xl font-black rounded-xl border-2 transition-colors ${
+                  selectedRaceNum === num
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white border-gray-200 hover:border-blue-500 hover:bg-blue-50"
+                }`}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Loading state for race entries */}
+      {loading && (
+        <div className="mb-6 text-center py-8">
+          <div className="text-xl font-bold mb-2">
+            Loading {selectedTrack?.name} Race {selectedRaceNum}...
+          </div>
+          <div className="text-base text-gray-500">Gemini is searching for entries and checking scratches</div>
+        </div>
+      )}
 
       {/* Show race found + Step 2 only after race is selected */}
       {race && geminiEntries.length > 0 && !result && (
@@ -445,12 +483,7 @@ export default function Home() {
         </div>
       )}
 
-      {loading && (
-        <div className="text-center py-16">
-          <div className="text-2xl font-bold mb-2">Fetching race data...</div>
-          <div className="text-lg text-gray-500">Running 500,000 Monte Carlo simulations</div>
-        </div>
-      )}
+      {/* old loading state removed — replaced by inline loading in step flow */}
 
       {race && result && (
         <>
