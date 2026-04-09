@@ -20,11 +20,64 @@ export default function Home() {
   const [loadingTracks, setLoadingTracks] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [actualFinish, setActualFinish] = useState(["", "", "", ""]);
+  const [dataSource, setDataSource] = useState<"search" | "chart">("search");
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>(() => {
     if (typeof window === "undefined") return [];
     try { return JSON.parse(localStorage.getItem("horsegpt_history") ?? "[]"); }
     catch { return []; }
   });
+
+  async function handleChartUpload(file: File) {
+    setUploadLoading(true);
+    setError(null);
+    setRace(null);
+    setResult(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/parse-pp", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      const raceInfo: RaceInfo = {
+        track: String(data.race?.track_code ?? ""),
+        trackName: String(data.race?.track_name ?? ""),
+        date: String(data.race?.race_date ?? ""),
+        raceNumber: Number(data.race?.race_number ?? 0),
+        distance: String(data.race?.distance ?? ""),
+        surface: String(data.race?.surface ?? ""),
+        raceType: String(data.race?.race_type ?? ""),
+        purse: Number(data.race?.purse ?? 0),
+        condition: String(data.race?.condition ?? ""),
+        entries: (data.horses ?? []).map((h: Record<string, unknown>) => ({
+          pp: Number(h.program_number ?? 0),
+          program: String(h.program_number ?? ""),
+          name: String(h.name ?? ""),
+          jockey: String(h.jockey ?? ""),
+          trainer: String(h.trainer ?? ""),
+          mlOdds: Number(h.odds ?? 5.0),
+          style: String(h.running_style ?? "P"),
+          speed: Number(h.speed_figure ?? 0),
+          e1Pace: 80,
+          latePace: 80,
+          last3Beyer: h.speed_figure ? [Number(h.speed_figure)] : [],
+          lastFinishPosition: Number(h.finish_position ?? 0),
+          weight: Number(h.weight ?? 122),
+          isClassDrop: false,
+          daysSinceLast: 21,
+        })),
+      };
+
+      setRace(raceInfo);
+      setDataSource("chart");
+      setResult(runSimulation(raceInfo.entries));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploadLoading(false);
+    }
+  }
 
   async function findTodayRaces() {
     setLoadingTracks(true);
@@ -95,6 +148,7 @@ export default function Home() {
         entries,
       };
       setRace(raceInfo);
+      setDataSource("search");
       setResult(runSimulation(entries));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -166,6 +220,36 @@ export default function Home() {
         )}
       </div>
 
+      {/* Chart Upload */}
+      <div className="mb-8 p-5 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50">
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <p className="font-bold text-lg">Upload Equibase Chart PDF</p>
+            <p className="text-sm text-gray-500">
+              Get free charts at equibase.com/static/chart/pdf/ — real speed figures, running lines, finish positions
+            </p>
+          </div>
+          <label className="px-6 py-3 rounded-xl bg-green-600 text-white font-bold text-base cursor-pointer hover:bg-green-700 transition-colors">
+            {uploadLoading ? "Parsing..." : "Upload Chart"}
+            <input
+              type="file"
+              accept=".pdf,image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleChartUpload(f);
+              }}
+              disabled={uploadLoading}
+            />
+          </label>
+        </div>
+        {dataSource === "chart" && race && (
+          <p className="mt-2 text-sm text-green-700 font-semibold">
+            Chart loaded — running with real data
+          </p>
+        )}
+      </div>
+
       {error && (
         <div className="mb-8 p-5 rounded-xl bg-red-50 border-2 border-red-300 text-red-800 text-lg">
           {error}
@@ -183,9 +267,18 @@ export default function Home() {
         <>
           {/* Race Header */}
           <div className="mb-8 p-6 rounded-xl bg-gray-50 border-2 border-gray-200">
-            <h2 className="text-3xl font-black mb-1">
-              {race.trackName || race.track} &mdash; Race {race.raceNumber}
-            </h2>
+            <div className="flex items-center gap-3 mb-1">
+              <h2 className="text-3xl font-black">
+                {race.trackName || race.track} &mdash; Race {race.raceNumber}
+              </h2>
+              <span className={`px-3 py-1 rounded-lg text-sm font-bold ${
+                dataSource === "chart"
+                  ? "bg-green-100 text-green-800 border border-green-300"
+                  : "bg-yellow-100 text-yellow-800 border border-yellow-300"
+              }`}>
+                {dataSource === "chart" ? "Chart Data (Full)" : "Search Data (Partial)"}
+              </span>
+            </div>
             <p className="text-lg text-gray-600">
               {race.date} &middot; {race.distance} &middot; {race.surface} &middot; {race.raceType} &middot; ${race.purse.toLocaleString()}
             </p>
