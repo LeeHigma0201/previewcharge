@@ -210,6 +210,7 @@ export async function POST(request: NextRequest) {
     }
 
     const ai = new GoogleGenAI({ apiKey });
+    const searchConfig = { tools: [{ googleSearch: {} }] };
 
     // --- Parse the query ---
     const parsed = parseQuery(query);
@@ -221,89 +222,125 @@ export async function POST(request: NextRequest) {
     }
 
     const { trackCode, raceNumber, date: isoDate } = parsed;
-    const dateCompact = isoDate.replace(/-/g, "");
 
-    // --- Step 1: Fetch Equibase entries HTML directly ---
-    const equibaseUrl = `${EQUIBASE_BASE}/static/entry/${trackCode}/${dateCompact}.html`;
-    let html: string;
-    try {
-      const res = await fetch(equibaseUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; HorseGPT/3.14; research)",
-          Accept: "text/html",
-        },
-      });
-      if (!res.ok) {
-        // Fallback: try Gemini search if Equibase page not found
-        return await fallbackGeminiSearch(ai, query, isoDate, apiKey);
-      }
-      html = await res.text();
-      if (!html || html.length < 500) {
-        return await fallbackGeminiSearch(ai, query, isoDate, apiKey);
-      }
-    } catch {
-      return await fallbackGeminiSearch(ai, query, isoDate, apiKey);
+    // =================================================================
+    // STEP 1: Get race entries via Gemini search
+    // Equibase blocks server fetches (Imperva), so Gemini search is
+    // the primary data source. Search equibase.com, drf.com, tvg.com.
+    // =================================================================
+    const step1Prompt = `TODAY IS ${isoDate}. Search equibase.com for the entries for ${trackCode} Race ${raceNumber} on ${isoDate}.
+
+Search specifically for: "equibase ${trackCode} entries ${isoDate}" or "${trackCode} race ${raceNumber} entries"
+
+Return ONLY a JSON object with the horses that are ENTERED AND NOT SCRATCHED:
+{
+  "track_code": "${trackCode}",
+  "track_name": "Full track name",
+  "race_number": ${raceNumber},
+  "race_date": "${isoDate}",
+  "distance": "distance",
+  "surface": "Dirt or Turf",
+  "race_type": "race type",
+  "purse": purse as integer,
+  "condition": "track condition",
+  "horses": [
+    {
+      "name": "Exact Horse Name",
+      "program_number": "1",
+      "post_position": 1,
+      "morning_line_odds": 5.0,
+      "jockey": "Jockey Name",
+      "trainer": "Trainer Name",
+      "weight": 122
     }
+  ]
+}
 
-    // --- Step 2: Parse HTML with Gemini (no search, just extraction) ---
-    // Truncate HTML to avoid token limits — keep first 80K chars
-    const trimmedHtml = html.length > 80000 ? html.substring(0, 80000) : html;
+CRITICAL:
+- Only include horses that are CONFIRMED ENTERED and NOT scratched
+- Do NOT include any horse that has been scratched or withdrawn
+- Copy horse names EXACTLY from the source — do not modify or guess
+- If you cannot find this specific race, return {"error": "reason"}
+- If the track has no racing today, list which US tracks ARE racing
+- Return ONLY valid JSON, no other text`;
 
-    const parsePrompt = PARSE_HTML_PROMPT
-      .replaceAll("{race_number}", String(raceNumber))
-      .replaceAll("{date}", isoDate)
-      .replaceAll("{html}", trimmedHtml);
-
-    const parseResponse = await ai.models.generateContent({
+    const step1Response = await ai.models.generateContent({
       model: GEMINI_MODEL,
-      contents: parsePrompt,
+      contents: step1Prompt,
+      config: searchConfig,
     });
 
-    const parseRaw = cleanJson(parseResponse.text ?? "");
+    const step1Raw = cleanJson(step1Response.text ?? "");
     let raceData: Record<string, unknown>;
     try {
-      raceData = JSON.parse(parseRaw);
+      raceData = JSON.parse(step1Raw);
     } catch {
       return NextResponse.json(
-        { error: `Failed to parse Equibase data. The entries page was fetched but Gemini couldn't extract structured data.` },
+        { error: `Could not parse race data. Response: ${step1Raw.substring(0, 300)}` },
         { status: 422 },
       );
+    }
+
+    if (raceData.error) {
+      return NextResponse.json({ error: raceData.error }, { status: 404 });
     }
 
     let horses = raceData.horses as Record<string, unknown>[];
     if (!horses || horses.length === 0) {
-      return NextResponse.json({ error: `No horses found in Race ${raceNumber} at ${trackCode}` }, { status: 404 });
+      return NextResponse.json({ error: `No horses found for ${trackCode} Race ${raceNumber}` }, { status: 404 });
     }
 
-    // --- VALIDATION: reject hallucinated horses ---
-    // Every horse name Gemini returns MUST appear in the raw HTML source.
-    // If a name isn't in the HTML, Gemini made it up — remove it.
-    const htmlLower = html.toLowerCase();
-    const beforeCount = horses.length;
-    horses = horses.filter((h) => {
-      const name = String(h.name ?? "").toLowerCase().trim();
-      if (!name || name.length < 2) return false;
-      // Check if this horse name appears in the actual HTML
-      return htmlLower.includes(name);
-    });
+    // =================================================================
+    // STEP 2: Verify scratches with a dedicated search
+    // Scratches happen after entries are drawn. This catches late scratches.
+    // =================================================================
+    try {
+      const horseNames = horses.map((h) => String(h.name)).join(", ");
+      const scratchPrompt = `TODAY IS ${isoDate}. Check for scratches in ${trackCode} Race ${raceNumber} on ${isoDate}.
 
-    if (horses.length === 0) {
-      return NextResponse.json(
-        { error: `Validation failed: none of the parsed horses were found in the source HTML. Gemini may have parsed the wrong race.` },
-        { status: 422 },
-      );
+Search for "${trackCode} scratches ${isoDate}" or "equibase scratches today"
+
+These horses are currently entered: ${horseNames}
+
+Return ONLY a JSON object:
+{
+  "scratches": ["Horse Name 1", "Horse Name 2"],
+  "source": "where you found this info"
+}
+
+If NO scratches found, return: {"scratches": [], "source": "no scratches found"}
+Return ONLY valid JSON.`;
+
+      const scratchResponse = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: scratchPrompt,
+        config: searchConfig,
+      });
+
+      const scratchRaw = cleanJson(scratchResponse.text ?? "");
+      const scratchData = JSON.parse(scratchRaw);
+      const scratchNames: string[] = (scratchData.scratches ?? []).map((s: string) => s.toLowerCase().trim());
+
+      if (scratchNames.length > 0) {
+        const before = horses.length;
+        horses = horses.filter((h) => {
+          const name = String(h.name ?? "").toLowerCase().trim();
+          return !scratchNames.includes(name);
+        });
+        raceData.horses = horses;
+        raceData._scratches = `${before - horses.length} horse(s) scratched: ${scratchData.scratches.join(", ")}`;
+      }
+    } catch {
+      // Scratch check failed — proceed with original entries
     }
 
-    // Report if any were removed
-    if (horses.length < beforeCount) {
-      raceData._validation = `${beforeCount - horses.length} horse(s) removed — not found in source HTML`;
-    }
-    raceData.horses = horses;
-
-    // --- Step 3: Enrich with past performance data via Gemini search ---
+    // =================================================================
+    // STEP 3: Enrich with past performance data
+    // Search for each horse's actual racing record.
+    // =================================================================
     try {
       const horseList = horses.map((h, i) =>
-        `${i + 1}. ${h.name} (Jockey: ${h.jockey}, Trainer: ${h.trainer}, ML: ${h.morning_line_odds})`
+        `${i + 1}. ${h.name} (Jockey: ${h.jockey}, Trainer: ${h.trainer})`
       ).join("\n");
 
       const raceLabel = `${raceData.track_name ?? trackCode} Race ${raceNumber} on ${isoDate}`;
@@ -317,7 +354,7 @@ export async function POST(request: NextRequest) {
       const enrichResponse = await ai.models.generateContent({
         model: GEMINI_MODEL,
         contents: enrichPrompt,
-        config: { tools: [{ googleSearch: {} }] },
+        config: searchConfig,
       });
 
       const enrichRaw = cleanJson(enrichResponse.text ?? "");
@@ -327,7 +364,6 @@ export async function POST(request: NextRequest) {
         for (let i = 0; i < horses.length; i++) {
           const detail = details.find((d) => d.name === horses[i].name) ?? details[i];
           if (detail) {
-            // Merge but don't overwrite existing fields with null
             for (const [k, v] of Object.entries(detail)) {
               if (v !== null && v !== undefined && k !== "name") {
                 horses[i][k] = v;
@@ -337,72 +373,12 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch {
-      // Enrichment failed — algo still works with base data (layers 1-2 + Monte Carlo)
+      // Enrichment failed — model works with base data
     }
 
     return NextResponse.json(raceData);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
-
-// Fallback: if Equibase fetch fails, try Gemini with search grounding
-async function fallbackGeminiSearch(
-  ai: GoogleGenAI,
-  query: string,
-  date: string,
-  _apiKey: string,
-): Promise<Response> {
-  const prompt = `TODAY IS ${date}. Search the web for the ACTUAL race entries for: "${query}"
-
-Search equibase.com, drf.com, tvg.com for the real entries.
-
-Return ONLY a JSON object with the real data:
-{
-  "track_code": "3-letter code",
-  "track_name": "Full track name",
-  "race_number": 5,
-  "race_date": "${date}",
-  "distance": "6f",
-  "surface": "Dirt",
-  "race_type": "ALW",
-  "purse": 50000,
-  "condition": "Fast",
-  "horses": [
-    {
-      "name": "Real Horse Name",
-      "program_number": "1",
-      "post_position": 1,
-      "morning_line_odds": 5.0,
-      "jockey": "Real Jockey Name",
-      "trainer": "Real Trainer Name"
-    }
-  ]
-}
-
-If the track has NO racing on ${date}, return:
-{"error": "No racing at [track] on ${date}. Tracks racing today include: [list tracks that ARE running]"}
-
-Return ONLY valid JSON.`;
-
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-    config: { tools: [{ googleSearch: {} }] },
-  });
-
-  const raw = cleanJson(response.text ?? "");
-  try {
-    const data = JSON.parse(raw);
-    if (data.error) {
-      return NextResponse.json({ error: data.error }, { status: 404 });
-    }
-    return NextResponse.json(data);
-  } catch {
-    return NextResponse.json(
-      { error: `Could not find race data. Gemini response: ${raw.substring(0, 200)}` },
-      { status: 422 },
-    );
   }
 }
