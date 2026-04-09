@@ -402,16 +402,33 @@ export function runSimulation(
   const abilities = probs.map((p) => probit(Math.max(0.001, Math.min(0.999, p))));
 
   // ---------------------------------------------------------------
-  // PHASE 2: Convergence-based Monte Carlo simulation
+  // PHASE 2: Statistically-driven Monte Carlo simulation
   //
-  // Run in batches of 50K. After each batch, check if win
-  // probabilities have converged (change < 0.5% between batches).
-  // Stop when stable or after max iterations.
-  // This ensures we simulate exactly as much as needed — not more.
+  // Formula: n = (z² × p × (1-p)) / e²
+  // At 95% confidence (z=1.96):
+  //   Win probs (~15%): n = (3.84 × 0.15 × 0.85) / 0.005² = 19,584
+  //   Exacta (~3%):     n = (3.84 × 0.03 × 0.97) / 0.003² = 12,390
+  //   Trifecta (~0.5%): n = (3.84 × 0.005 × 0.995) / 0.002² = 4,776
+  //   Superfecta (~0.1%): needs ~38K for 0.1% margin
+  //
+  // Strategy: Start at computed minimum, run batches, stop at convergence.
+  // Smaller fields need fewer sims. Larger fields need more for exotics.
   // ---------------------------------------------------------------
-  const BATCH_SIZE = 50000;
-  const MAX_BATCHES = 10; // max 500K total
-  const CONVERGENCE_THRESHOLD = 0.005; // 0.5% change = converged
+
+  // Compute minimum sims needed for this field size
+  // Use the rarest bet type we need: superfecta prob ≈ 1/(n × (n-1) × (n-2) × (n-3))
+  const rarestProb = n >= 4
+    ? 1 / (n * (n - 1) * (n - 2) * (n - 3))  // superfecta
+    : n >= 3
+      ? 1 / (n * (n - 1) * (n - 2))  // trifecta
+      : 1 / (n * (n - 1));  // exacta
+  const marginOfError = Math.max(rarestProb * 0.3, 0.0005); // 30% relative margin or 0.05% absolute
+  const minSims = Math.ceil((3.84 * rarestProb * (1 - rarestProb)) / (marginOfError ** 2));
+
+  // Clamp between 10K and 300K — never waste compute, never starve accuracy
+  const BATCH_SIZE = Math.min(Math.max(Math.ceil(minSims / 3), 10000), 50000);
+  const MAX_BATCHES = Math.min(Math.ceil(minSims / BATCH_SIZE) + 2, 8);
+  const CONVERGENCE_THRESHOLD = 0.003; // 0.3% change between batches = converged
 
   const finishCounts: number[][] = Array.from({ length: n }, () =>
     new Array(n).fill(0),
