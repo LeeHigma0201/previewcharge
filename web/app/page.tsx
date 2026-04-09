@@ -6,6 +6,7 @@ import type {
   RaceInfo,
   SimulationResult,
   RankedExoticList,
+  OverlayInfo,
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
 
@@ -193,10 +194,15 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Win Probabilities */}
-          <h3 className="text-2xl font-black mb-4">Win Probabilities</h3>
+          {/* Win Probabilities — ranked by ABILITY (not odds) */}
+          <h3 className="text-2xl font-black mb-1">Win Probabilities</h3>
+          <p className="text-sm text-gray-500 mb-4">Ranked by ability model (speed, pace, class, form, connections). Odds used ONLY for overlay detection.</p>
           <div className="space-y-3 mb-10">
-            {result.predictions.map((p, i) => (
+            {result.predictions.map((p, i) => {
+              // Find this horse's overlay info
+              const progIdx = race.entries.findIndex((e) => e.program === p.program);
+              const ov = progIdx >= 0 ? result.overlays[progIdx] : null;
+              return (
               <div key={p.program}
                 className={`flex items-center gap-5 p-5 rounded-xl border-2 ${
                   i === 0 ? "bg-green-50 border-green-400" :
@@ -228,8 +234,26 @@ export default function Home() {
                     P {p.placePct.toFixed(0)}% &middot; S {p.showPct.toFixed(0)}%
                   </div>
                 </div>
+                {ov && (
+                  <div className="shrink-0 w-24 text-center">
+                    {ov.isOverlay ? (
+                      <span className="inline-block px-3 py-1 rounded-lg bg-green-600 text-white text-sm font-bold">
+                        +{ov.overlayPct}% VALUE
+                      </span>
+                    ) : ov.overlayPct < -20 ? (
+                      <span className="inline-block px-3 py-1 rounded-lg bg-red-100 text-red-700 text-sm font-bold">
+                        {ov.overlayPct}%
+                      </span>
+                    ) : (
+                      <span className="text-sm text-gray-400">
+                        {ov.overlayPct > 0 ? "+" : ""}{ov.overlayPct}%
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Exotic Bets */}

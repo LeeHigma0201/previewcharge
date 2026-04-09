@@ -87,10 +87,19 @@ export interface PaceScenario {
   description: string;
 }
 
+export interface OverlayInfo {
+  modelProb: number;
+  marketProb: number;
+  overlay: number;
+  isOverlay: boolean;
+  overlayPct: number;
+}
+
 export interface SimulationResult {
   predictions: PredictionRow[];
   exactas: RankedExoticList;
   trifectas: RankedExoticList;
   superfectas: RankedExoticList;
   paceScenario: PaceScenario;
+  overlays: OverlayInfo[];
 }
