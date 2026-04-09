@@ -194,6 +194,12 @@ export default function Home() {
             </p>
           </div>
 
+          {/* Simulation info */}
+          <div className="mb-6 text-sm text-gray-500">
+            Simulation: {result.simInfo.totalSims.toLocaleString()} races simulated in {result.simInfo.batchesRun} batches
+            {result.simInfo.converged ? " (converged)" : " (max reached)"}
+          </div>
+
           {/* Win Probabilities — ranked by ABILITY (not odds) */}
           <h3 className="text-2xl font-black mb-1">Win Probabilities</h3>
           <p className="text-sm text-gray-500 mb-4">Ranked by ability model (speed, pace, class, form, connections). Odds used ONLY for overlay detection.</p>

@@ -392,17 +392,26 @@ function estimatePayoff(prob: number): number {
 
 export function runSimulation(
   entries: HorseEntry[],
-  nSimsOverride?: number,
 ): SimulationResult {
   const n = entries.length;
-  // Adaptive sim count: 500K when we have 4+ horses (superfecta needs it)
-  // 100K sims for a 12-horse superfecta = 8 obs/combo = noisy
-  // 500K gives ~42 obs/combo = statistically sound
-  const nSims = nSimsOverride ?? (n >= 4 ? 500000 : 100000);
 
+  // ---------------------------------------------------------------
+  // PHASE 1: Compute ability-based probabilities (no odds)
+  // ---------------------------------------------------------------
   const probs = computeAbilityProbs(entries);
-  // Clamp probit inputs to avoid NaN at extremes
   const abilities = probs.map((p) => probit(Math.max(0.001, Math.min(0.999, p))));
+
+  // ---------------------------------------------------------------
+  // PHASE 2: Convergence-based Monte Carlo simulation
+  //
+  // Run in batches of 50K. After each batch, check if win
+  // probabilities have converged (change < 0.5% between batches).
+  // Stop when stable or after max iterations.
+  // This ensures we simulate exactly as much as needed — not more.
+  // ---------------------------------------------------------------
+  const BATCH_SIZE = 50000;
+  const MAX_BATCHES = 10; // max 500K total
+  const CONVERGENCE_THRESHOLD = 0.005; // 0.5% change = converged
 
   const finishCounts: number[][] = Array.from({ length: n }, () =>
     new Array(n).fill(0),
@@ -415,9 +424,10 @@ export function runSimulation(
   );
   const superfectaMap = new Map<string, number>();
 
-  // Deterministic PRNG (mulberry32) — same odds = same results
-  // Seed from the sum of all ML odds so same field = same output
-  let seed = Math.round(entries.reduce((s, e) => s + e.mlOdds * 1000, 0)) & 0xffffffff;
+  // Seed from ABILITY scores, NOT odds — keeps the model odds-free
+  let seed = Math.round(
+    abilities.reduce((s, a) => s + Math.abs(a) * 100000, 7919),
+  ) & 0xffffffff;
   function random(): number {
     seed |= 0;
     seed = (seed + 0x6d2b79f5) | 0;
@@ -431,26 +441,46 @@ export function runSimulation(
     return Math.sqrt(-2 * Math.log(u1 + 1e-15)) * Math.cos(2 * Math.PI * u2);
   }
 
-  for (let sim = 0; sim < nSims; sim++) {
-    const times: [number, number][] = [];
-    for (let i = 0; i < n; i++) {
-      times.push([-abilities[i] + randn(), i]);
-    }
-    times.sort((a, b) => a[0] - b[0]);
-    const ranking = times.map((t) => t[1]);
+  let totalSims = 0;
+  let prevWinProbs = new Array(n).fill(0);
+  let batchesRun = 0;
 
-    for (let pos = 0; pos < n; pos++) {
-      finishCounts[ranking[pos]][pos]++;
+  for (let batch = 0; batch < MAX_BATCHES; batch++) {
+    for (let sim = 0; sim < BATCH_SIZE; sim++) {
+      const times: [number, number][] = [];
+      for (let i = 0; i < n; i++) {
+        times.push([-abilities[i] + randn(), i]);
+      }
+      times.sort((a, b) => a[0] - b[0]);
+      const ranking = times.map((t) => t[1]);
+
+      for (let pos = 0; pos < n; pos++) {
+        finishCounts[ranking[pos]][pos]++;
+      }
+      exactaCounts[ranking[0]][ranking[1]]++;
+      if (n >= 3) {
+        trifectaCounts[ranking[0]][ranking[1]][ranking[2]]++;
+      }
+      if (n >= 4) {
+        const key = `${ranking[0]},${ranking[1]},${ranking[2]},${ranking[3]}`;
+        superfectaMap.set(key, (superfectaMap.get(key) ?? 0) + 1);
+      }
     }
-    exactaCounts[ranking[0]][ranking[1]]++;
-    if (n >= 3) {
-      trifectaCounts[ranking[0]][ranking[1]][ranking[2]]++;
+    totalSims += BATCH_SIZE;
+    batchesRun++;
+
+    // Check convergence: has the win probability distribution stabilized?
+    const currWinProbs = finishCounts.map((row) => row[0] / totalSims);
+    if (batch > 0) {
+      const maxDelta = Math.max(
+        ...currWinProbs.map((p, i) => Math.abs(p - prevWinProbs[i])),
+      );
+      if (maxDelta < CONVERGENCE_THRESHOLD) break; // stable — stop simulating
     }
-    if (n >= 4) {
-      const key = `${ranking[0]},${ranking[1]},${ranking[2]},${ranking[3]}`;
-      superfectaMap.set(key, (superfectaMap.get(key) ?? 0) + 1);
-    }
+    prevWinProbs = currWinProbs;
   }
+
+  const nSims = totalSims;
 
   // --- Predictions ---
   const predictions: PredictionRow[] = entries
@@ -582,5 +612,10 @@ export function runSimulation(
     superfectas: makeList("Superfecta", 0.1, topSuperfectas),
     paceScenario: getPaceScenario(entries),
     overlays,
+    simInfo: {
+      totalSims: nSims,
+      batchesRun,
+      converged: batchesRun < MAX_BATCHES,
+    },
   };
 }

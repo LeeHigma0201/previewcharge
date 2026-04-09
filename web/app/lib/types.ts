@@ -102,4 +102,9 @@ export interface SimulationResult {
   superfectas: RankedExoticList;
   paceScenario: PaceScenario;
   overlays: OverlayInfo[];
+  simInfo: {
+    totalSims: number;
+    batchesRun: number;
+    converged: boolean;
+  };
 }
