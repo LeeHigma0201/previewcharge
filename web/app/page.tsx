@@ -11,23 +11,116 @@ import type {
 import { runSimulation } from "./lib/data";
 
 // ── Keeneland April 11, 2026 — Hyper-focused build ──
-const SPLASH_MODE = true; // flip to false when ready
+const SPLASH_MODE = true; // flip to false to remove gate entirely
+
+// Tomorrow's confirmed card
+const KEE_CARD = [
+  { race: 1, type: "MCL", surface: "Dirt", purse: "$53K", distance: "6f" },
+  { race: 2, type: "MCL", surface: "Dirt", purse: "$48K", distance: "6f" },
+  { race: 3, type: "ALW", surface: "Dirt", purse: "$50K", distance: "6.5f" },
+  { race: 4, type: "MSW", surface: "Dirt", purse: "$110K", distance: "1 1/16m" },
+  { race: 5, type: "MSW", surface: "Turf", purse: "$110K", distance: "1m" },
+  { race: 6, type: "ALW", surface: "Dirt", purse: "$130K", distance: "7f" },
+  { race: 7, type: "ALW", surface: "Turf", purse: "$120K", distance: "1 1/16m" },
+  { race: 8, type: "MSW", surface: "Dirt", purse: "$110K", distance: "6.5f" },
+  { race: 9, type: "STK", surface: "Turf", purse: "$650K", distance: "1 1/16m", name: "Jenny Wiley S. (G1)" },
+  { race: 10, type: "STK", surface: "Dirt", purse: "$400K", distance: "1 1/16m", name: "Stonestreet Lexington S. (G3)" },
+  { race: 11, type: "MSW", surface: "Turf", purse: "$110K", distance: "1 1/16m" },
+];
 
 export default function Home() {
-  if (SPLASH_MODE) {
+  const [authed, setAuthed] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+
+  // Check localStorage for existing session
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const session = localStorage.getItem("horsegpt_auth");
+      if (session === "jason") setAuthed(true);
+    }
+  }, []);
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (username.toLowerCase() === "jason" && password === "horse") {
+      setAuthed(true);
+      setLoginError("");
+      localStorage.setItem("horsegpt_auth", "jason");
+    } else {
+      setLoginError("Invalid credentials");
+    }
+  }
+
+  // Public splash page with login form
+  if (SPLASH_MODE && !authed) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-black text-white">
         <h1 className="text-6xl font-black tracking-tight mb-4">
           HorseGPT
         </h1>
-        <p className="text-2xl text-gray-300 mb-8 text-center">
+        <p className="text-2xl text-gray-300 mb-6 text-center">
           Rebuilding for Keeneland &mdash; April 11, 2026
         </p>
-        <div className="text-lg text-gray-500 text-center max-w-md">
+        <div className="text-lg text-gray-500 text-center max-w-md mb-10">
           The exotic engine is being calibrated for Keeneland&rsquo;s spring meet.
           Check back tomorrow morning for race-by-race analysis.
         </div>
-        <div className="mt-12 text-sm text-gray-700">
+
+        {/* Tomorrow's card preview */}
+        <div className="w-full max-w-lg mb-10">
+          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3 text-center">
+            Tomorrow&rsquo;s Card &mdash; 11 Races
+          </h2>
+          <div className="grid grid-cols-1 gap-1.5">
+            {KEE_CARD.map((r) => (
+              <div key={r.race} className={`flex items-center justify-between px-4 py-2 rounded-lg ${
+                r.type === "STK" ? "bg-yellow-900/30 border border-yellow-700/40" : "bg-gray-900/60 border border-gray-800/40"
+              }`}>
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-sm font-black">
+                    {r.race}
+                  </span>
+                  <span className="text-sm">
+                    {r.name ? <span className="text-yellow-400 font-bold">{r.name}</span> : <span className="text-gray-400">{r.type}</span>}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span className={r.surface === "Turf" ? "text-green-500" : "text-amber-600"}>{r.surface}</span>
+                  <span>{r.distance}</span>
+                  <span className="font-semibold text-gray-400">{r.purse}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Login form */}
+        <form onSubmit={handleLogin} className="w-full max-w-xs">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="flex-1 px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-600 text-sm focus:border-blue-500 focus:outline-none"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="flex-1 px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-600 text-sm focus:border-blue-500 focus:outline-none"
+            />
+            <button type="submit" className="px-5 py-3 rounded-lg bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-colors">
+              Go
+            </button>
+          </div>
+          {loginError && <p className="text-red-500 text-sm mt-2 text-center">{loginError}</p>}
+        </form>
+
+        <div className="mt-8 text-sm text-gray-700">
           Benter logistic + Monte Carlo exotic pricing &middot; Tuned for KEE dirt &amp; turf biases
         </div>
       </main>
