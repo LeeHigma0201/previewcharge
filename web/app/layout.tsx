@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "HorseGPT v3.14",
+  title: "HorseGPT — Keeneland April 11",
   description:
-    "Multi-model horse racing handicapping tool. Benter odds-offset logistic + LightGBM ensemble with Monte Carlo exotic pricing.",
+    "Keeneland-focused horse racing handicapping. Monte Carlo exotic pricing tuned for KEE spring meet.",
 };
 
 export default function RootLayout({

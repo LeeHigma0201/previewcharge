@@ -95,84 +95,6 @@ export function getPaceScenario(entries: HorseEntry[]): PaceScenario {
   return { scenario, earlyCount, presserCount, closerCount, description };
 }
 
-function paceAdjustments(entries: HorseEntry[]): number[] {
-  const pace = getPaceScenario(entries);
-  return entries.map((e) => {
-    if (pace.scenario === "Speed Duel") {
-      // Quirin (1979): front-runners win 16% in contested pace vs 35% lone speed
-      if (["E", "EP"].includes(e.style)) return 0.85;
-      if (["S", "C"].includes(e.style)) return 1.18;
-      if (e.style === "P") return 1.08;
-    } else if (pace.scenario === "Lone Speed") {
-      if (["E", "EP"].includes(e.style)) {
-        const otherSpeed = entries.filter(
-          (x) => x.name !== e.name && ["E", "EP"].includes(x.style),
-        ).length;
-        if (otherSpeed === 0) return 1.30;
-      }
-      if (["S", "C"].includes(e.style)) return 0.85;
-    } else if (pace.scenario === "Contested Pace") {
-      if (["S", "C"].includes(e.style)) return 1.10;
-      if (["E", "EP"].includes(e.style)) return 0.90;
-    }
-    return 1.0;
-  });
-}
-
-function beyerTrendAdjustments(entries: HorseEntry[]): number[] {
-  return entries.map((e) => {
-    if (!e.last3Beyer || e.last3Beyer.length < 2) return 1.0;
-    const recent = e.last3Beyer[0];
-    const avg =
-      e.last3Beyer.reduce((a, b) => a + b, 0) / e.last3Beyer.length;
-    if (recent > avg + 3) return 1.10; // Improving form
-    if (recent < avg - 3) return 0.90; // Declining form
-    return 1.0;
-  });
-}
-
-// Layer 5: Trainer/jockey connection strength
-function connectionAdjustments(entries: HorseEntry[]): number[] {
-  return entries.map((e) => {
-    let adj = 1.0;
-    // Hot jockey boost
-    if (e.jockeyWinPct && e.jockeyWinPct > 0.20) adj *= 1.08;
-    // Hot trainer boost
-    if (e.trainerWinPct && e.trainerWinPct > 0.25) adj *= 1.08;
-    // Distance specialist
-    if (e.distanceWins && e.distanceStarts && e.distanceStarts >= 3) {
-      const distPct = e.distanceWins / e.distanceStarts;
-      if (distPct > 0.30) adj *= 1.10;
-    }
-    // Surface specialist
-    if (e.surfaceWins && e.surfaceStarts && e.surfaceStarts >= 3) {
-      const surfPct = e.surfaceWins / e.surfaceStarts;
-      if (surfPct > 0.30) adj *= 1.08;
-    }
-    return adj;
-  });
-}
-
-// Layer 6: Class and form cycle
-function classFormAdjustments(entries: HorseEntry[]): number[] {
-  return entries.map((e) => {
-    let adj = 1.0;
-    // Quinn (2003): class droppers show 12-18% edge
-    if (e.isClassDrop) adj *= 1.15;
-    // Class raise — still have base ability, don't over-penalize
-    if (e.isClassRaise) adj *= 0.90;
-    // Optimal rest (14-35 days)
-    if (e.daysSinceLast) {
-      if (e.daysSinceLast >= 14 && e.daysSinceLast <= 35) adj *= 1.05;
-      if (e.daysSinceLast > 60) adj *= 0.92; // Layoff penalty
-      if (e.daysSinceLast < 7) adj *= 0.90; // Too quick turnaround
-    }
-    // Equipment change (first-time blinkers is positive)
-    if (e.equipmentChange) adj *= 1.05;
-    return adj;
-  });
-}
-
 // ===========================================================================
 // PHASE 1: PURE ABILITY MODEL — NO ODDS ALLOWED
 //
@@ -189,12 +111,13 @@ function classFormAdjustments(entries: HorseEntry[]): number[] {
 // ===========================================================================
 
 const WEIGHTS = {
-  speed: 0.35,
+  speed: 0.30,
   pace: 0.20,
   class: 0.15,
   form: 0.15,
   connections: 0.10,
   post: 0.05,
+  trackBias: 0.05, // KEE surface/condition effect (0 for non-KEE)
 };
 
 // Z-score a numeric array within the field (mean=0, std=1)
@@ -209,17 +132,31 @@ function zScore(values: number[]): number[] {
 }
 
 // Score 1: SPEED — Beyer speed figures, z-scored within field
+// Fix (Marcus Chen critique): horses WITHOUT Beyer data were getting 0,
+// which z-scores to a massively negative value when others have real data
+// (e.g., field of [82, 79, 85, 0] → the 0 is ~-2.5 sigma). This punishes
+// unknowns far more than warranted. Instead, impute the field MEDIAN for
+// missing horses — they get z-score ≈ 0 (neutral), not a death sentence.
 function speedScores(entries: HorseEntry[]): number[] {
-  const avgs = entries.map((e) => {
+  const rawAvgs = entries.map((e) => {
     if (e.last3Beyer && e.last3Beyer.length > 0) {
       return e.last3Beyer.reduce((a, b) => a + b, 0) / e.last3Beyer.length;
     }
-    // No Beyer data: use 0 (field average after z-scoring)
-    return 0;
+    return null; // explicitly mark as missing
   });
+
   // If ALL horses lack data, return zeros (no signal)
-  if (avgs.every((a) => a === 0)) return entries.map(() => 0);
-  return zScore(avgs);
+  const known = rawAvgs.filter((a): a is number => a !== null);
+  if (known.length === 0) return entries.map(() => 0);
+
+  // Impute missing with field median (robust to outliers, per Dr. Vasquez)
+  const sorted = [...known].sort((a, b) => a - b);
+  const median = sorted.length % 2 === 0
+    ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+    : sorted[Math.floor(sorted.length / 2)];
+
+  const imputed = rawAvgs.map((a) => a ?? median);
+  return zScore(imputed);
 }
 
 // Score 2: PACE FIT — running style × field pace scenario
@@ -316,12 +253,41 @@ function connectionScores(entries: HorseEntry[]): number[] {
 }
 
 // Score 6: POST POSITION — inside advantage on dirt sprints
-function postScores(entries: HorseEntry[]): number[] {
+function postScores(entries: HorseEntry[], race?: RaceInfo): number[] {
   const n = entries.length;
+  const isKEE = race?.track === "KEE";
+  const isDirt = !race?.surface || race.surface.toLowerCase().includes("dirt");
+  const isSprint = race?.distance ? parseDistanceFurlongs(race.distance) <= 7 : true;
+
   return entries.map((e) => {
-    // Inside posts (1-3) have slight advantage in dirt sprints
-    // Outside posts in large fields (10+) have disadvantage
     const pp = e.pp;
+
+    // Keeneland-specific post position bias
+    if (isKEE && isDirt && isSprint) {
+      // KEE dirt sprints: inside posts have 5-8% edge, outside posts struggle
+      if (pp <= 2) return 0.6;   // Strong inside advantage
+      if (pp <= 4) return 0.4;   // Solid inside advantage
+      if (pp <= 6) return 0;
+      if (pp >= 10) return -0.6; // Significant outside disadvantage
+      if (pp >= 8) return -0.4;
+      return -0.2;
+    }
+
+    if (isKEE && isDirt && !isSprint) {
+      // KEE dirt routes (1 1/16m+): inside still helps but less extreme
+      if (pp <= 3) return 0.3;
+      if (pp <= 6) return 0;
+      if (n >= 10 && pp >= n - 1) return -0.3;
+      return -0.1;
+    }
+
+    if (isKEE && !isDirt) {
+      // KEE turf: more neutral, slight outside preference at routes
+      if (isSprint && pp <= 3) return 0.2;
+      return 0;
+    }
+
+    // Generic (non-KEE) fallback
     if (pp <= 3) return 0.3;
     if (pp <= 6) return 0;
     if (n >= 10 && pp >= n - 1) return -0.4;
@@ -329,23 +295,71 @@ function postScores(entries: HorseEntry[]): number[] {
   });
 }
 
+// Parse distance string to furlongs for bias calculations
+function parseDistanceFurlongs(dist: string): number {
+  const d = dist.toLowerCase();
+  const fMatch = d.match(/([\d.]+)\s*furlong/);
+  if (fMatch) return parseFloat(fMatch[1]);
+  const mFracMatch = d.match(/(\d+)\s+(\d+)\/(\d+)\s*mile/);
+  if (mFracMatch) return (parseInt(mFracMatch[1]) + parseInt(mFracMatch[2]) / parseInt(mFracMatch[3])) * 8;
+  const mMatch = d.match(/([\d.]+)\s*mile/);
+  if (mMatch) return parseFloat(mMatch[1]) * 8;
+  return 8; // default to 1 mile
+}
+
+// Keeneland-specific track condition adjustments
+// NOTE: These return values on the SAME SCALE as the other score functions
+// (roughly -1 to +1 z-score range). They go through the weight system
+// via WEIGHTS.trackBias to prevent them from dominating the model.
+// (Dr. Vasquez critique: raw additive adjustments were 13x too strong)
+function keenelandConditionAdj(entries: HorseEntry[], race?: RaceInfo): number[] {
+  if (race?.track !== "KEE") return entries.map(() => 0);
+
+  const isDirt = !race.surface || race.surface.toLowerCase().includes("dirt");
+  const condition = (race.condition || "").toLowerCase();
+  const isWet = ["muddy", "sloppy", "good", "yielding", "soft"].some((c) => condition.includes(c));
+
+  return entries.map((e) => {
+    if (!isDirt) return 0;
+
+    const style = e.style || "P";
+
+    // These scores are on the same scale as paceScores, but capture
+    // the TRACK-SPECIFIC surface effect, not the field pace dynamic.
+    // paceScores measures "lone speed vs speed duel" (field composition).
+    // This measures "does KEE dirt help speed horses hold?" (track surface).
+    if (isWet) {
+      // KEE wet dirt: surface becomes deeper, tiring for front-runners
+      if (["S", "C"].includes(style)) return 0.6;
+      if (["E", "EP"].includes(style)) return -0.5;
+    } else {
+      // KEE fast dirt: firm surface helps speed maintain
+      if (["E", "EP"].includes(style)) return 0.3;
+      if (["S", "C"].includes(style)) return -0.15;
+    }
+    return 0;
+  });
+}
+
 // COMPOSITE: Weighted ability score → probability
-function computeAbilityProbs(entries: HorseEntry[]): number[] {
+function computeAbilityProbs(entries: HorseEntry[], race?: RaceInfo): number[] {
   const speed = speedScores(entries);
   const pace = paceScores(entries);
   const cls = classScores(entries);
   const form = formScores(entries);
   const conn = connectionScores(entries);
-  const post = postScores(entries);
+  const post = postScores(entries, race);
+  const keeAdj = keenelandConditionAdj(entries, race);
 
-  // Weighted composite ability score
+  // Weighted composite ability score — all factors go through weight system
   const abilities = entries.map((_, i) =>
     WEIGHTS.speed * speed[i] +
     WEIGHTS.pace * pace[i] +
     WEIGHTS.class * cls[i] +
     WEIGHTS.form * form[i] +
     WEIGHTS.connections * conn[i] +
-    WEIGHTS.post * post[i],
+    WEIGHTS.post * post[i] +
+    WEIGHTS.trackBias * keeAdj[i],
   );
 
   // Convert ability scores to probabilities via softmax
@@ -382,7 +396,9 @@ function detectOverlays(
       modelProb: modelProbs[i],
       marketProb,
       overlay,
-      isOverlay: overlay > 1.20,  // model says 20%+ more likely than market
+      // Morning line odds have ~30-50% noise vs true market (Marcus Chen critique).
+      // Require 40%+ edge to flag as VALUE, not 20%, to avoid false positives.
+      isOverlay: overlay > 1.40,
       overlayPct: Math.round((overlay - 1) * 100),
     };
   });
@@ -402,13 +418,14 @@ function estimatePayoff(prob: number): number {
 export function runSimulation(
   entries: HorseEntry[],
   simCountOverride?: number,
+  race?: RaceInfo,
 ): SimulationResult {
   const n = entries.length;
 
   // ---------------------------------------------------------------
   // PHASE 1: Compute ability-based probabilities (no odds)
   // ---------------------------------------------------------------
-  const probs = computeAbilityProbs(entries);
+  const probs = computeAbilityProbs(entries, race);
   const abilities = probs.map((p) => probit(Math.max(0.001, Math.min(0.999, p))));
 
   // ---------------------------------------------------------------

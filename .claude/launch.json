@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "Next.js Frontend",
-      "runtimeExecutable": "cmd.exe",
-      "runtimeArgs": ["/c", "cd web && npx next dev"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "web"],
       "port": 3000
     },
     {

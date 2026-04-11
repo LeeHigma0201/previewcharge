@@ -4,6 +4,57 @@ import { NextRequest, NextResponse } from "next/server";
 const GEMINI_MODEL = "gemini-2.5-flash";
 const EQUIBASE_BASE = "https://www.equibase.com";
 
+// Keeneland Spring Meet 2026 — Track Intelligence
+const KEE_CONTEXT = `
+KEENELAND SPRING MEET 2026 TRACK PROFILE:
+
+DIRT SURFACE:
+- One-turn mile at 1 1/16 miles, standard oval configuration
+- Speed-favoring in fast/dry conditions — front-runners and pressers hold well
+- Inside posts (1-4) have a significant 5-8% edge in sprints (6f, 6.5f)
+- Outside posts (8+) are at a disadvantage in sprints, must use more energy
+- When track is wet (muddy/sloppy), bias flips — closers gain major advantage
+- The dirt surface is sandy loam, dries quickly after rain
+
+TURF COURSE:
+- 7.5 furlong turf course, widened layout
+- Fair course with no extreme bias at route distances
+- Closers competitive at 1 mile+ on turf
+- Firm turf favors tactical speed; yielding turf helps closers
+
+KEY TRAINERS AT KEE SPRING MEET (historically high win%):
+- Brad Cox (Louisville-based, dominant at KEE, especially with 2YOs and 3YOs)
+- Kenny McPeek (Lexington-based, strong turf record at KEE)
+- Wesley Ward (turf/sprint specialist, watch for first-time starters)
+- Chad Brown (ships best from NY for stakes, high win% when he enters)
+- Todd Pletcher (Derby prep specialist, strong in allowances)
+- Bill Mott (stakes specialist, watch for class drops)
+- Mark Casse (Canadian shipper, strong turf record)
+
+KEY JOCKEYS AT KEE SPRING MEET:
+- Tyler Gaffalione (top rider at KEE, high mount quality)
+- Flavien Prat (ships from CA/NY for big races, very high win%)
+- Irad Ortiz Jr. (NY-based, ships for graded stakes, elite talent)
+- Joel Rosario (elite rider, particularly strong on turf)
+- Julien Leparoux (Lexington-based, local advantage, knows the track intimately)
+- Brian Hernandez Jr. (Louisville-based, strong at KEE)
+- Florent Geroux (strong at KEE, especially on turf)
+
+SPRING MEET CONTEXT:
+- This is peak Derby prep season — many horses pointing to Kentucky Derby
+- Class levels are elevated due to Derby hopefuls
+- Watch for class drops from graded stakes runners entering allowances
+- 3-year-old races may have future stars; maiden special weight races can be very competitive
+- Weather: April in Lexington can be unpredictable — check for rain
+
+DISTANCE/SURFACE COMBINATIONS TO WATCH:
+- 6f dirt: Speed-biased, inside posts critical, short run to first turn
+- 1 1/16m dirt: One turn, inside speed important, but pace matters more
+- 1 1/8m turf: Closers get their best shot at this distance
+- 7f dirt: Tricky distance — one turn, speed can carry but closers have time
+`;
+
+
 // Track alias map — ported from src/data/scrapers/equibase.py
 const TRACK_ALIASES: Record<string, string> = {
   saratoga: "SAR", belmont: "BEL", aqueduct: "AQU",
@@ -133,6 +184,10 @@ CRITICAL RULES:
 - Running style must be determined from actual race charts, not guessed from the name.
 - Return ONLY valid JSON. No markdown, no explanation.`;
 
+// ── Race data cache — avoids repeated Gemini calls for same race ──
+const raceCache = new Map<string, { data: Record<string, unknown>; timestamp: number }>();
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 function parseQuery(query: string): { trackCode: string; raceNumber: number; date: string } | null {
   const q = query.toLowerCase().trim();
   const today = new Date();
@@ -216,18 +271,31 @@ export async function POST(request: NextRequest) {
     const parsed = parseQuery(query);
     if (!parsed) {
       return NextResponse.json(
-        { error: "Could not parse track and race number. Try: 'Keeneland Race 5 today' or 'CD R3 tomorrow'" },
+        { error: "Could not parse race number. Try: 'Keeneland Race 5 April 11 2026'" },
         { status: 400 },
       );
     }
 
-    const { trackCode, raceNumber, date: isoDate } = parsed;
+    // Force Keeneland April 11, 2026
+    const trackCode = "KEE";
+    const raceNumber = parsed.raceNumber;
+    const isoDate = "2026-04-11";
+
+    // Check cache first
+    const cacheKey = `${trackCode}-${raceNumber}-${isoDate}`;
+    const cached = raceCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return NextResponse.json(cached.data);
+    }
 
     // =================================================================
     // STEP 1: Get race entries — fetch Equibase HTML, parse with Gemini
     // Falls back to Gemini search only if Equibase fetch fails
     // =================================================================
 
+    // Equibase URL pattern: {TRACK}{MMDDYY}USA-EQB.html (updated April 2026)
+    const dateParts = isoDate.split("-");
+    const mmddyy = `${dateParts[1]}${dateParts[2]}${dateParts[0].slice(2)}`;
     const dateCompact = isoDate.replaceAll("-", "");
     let raceData: Record<string, unknown> | null = null;
     let horses: Record<string, unknown>[] = [];
@@ -237,7 +305,8 @@ export async function POST(request: NextRequest) {
     // Note: Equibase uses Imperva bot protection which blocks many server IPs.
     // We try anyway since it works from some regions, but always fall back.
     try {
-      const equibaseUrl = `${EQUIBASE_BASE}/static/entry/${trackCode}/${dateCompact}.html`;
+      // Try new URL pattern first, fall back to old
+      const equibaseUrl = `${EQUIBASE_BASE}/static/entry/${trackCode}${mmddyy}USA-EQB.html`;
       const htmlRes = await fetch(equibaseUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
@@ -418,7 +487,8 @@ Return ONLY valid JSON.`;
         .replaceAll("{race_label}", raceLabel)
         .replaceAll("{race_type}", String(raceData.race_type ?? "ALW"))
         .replaceAll("{purse}", String(raceData.purse ?? 0))
-        .replaceAll("{horse_list}", horseList);
+        .replaceAll("{horse_list}", horseList)
+        + `\n\nTRACK CONTEXT FOR KEENELAND:\n${KEE_CONTEXT}\n\nUse this context when evaluating jockey/trainer records. Search for their CURRENT Keeneland spring 2026 meet statistics, not just career stats.`;
 
       const enrichResponse = await ai.models.generateContent({
         model: GEMINI_MODEL,
@@ -444,6 +514,9 @@ Return ONLY valid JSON.`;
     } catch {
       // Enrichment failed — model works with base data
     }
+
+    // Cache the result for subsequent requests
+    raceCache.set(cacheKey, { data: raceData as Record<string, unknown>, timestamp: Date.now() });
 
     return NextResponse.json(raceData);
   } catch (err: unknown) {

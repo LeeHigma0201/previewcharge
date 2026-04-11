@@ -194,7 +194,9 @@ def scrape_entries(
 
     track = track_code.upper()
     date_str = race_date.strftime("%m/%d/%Y")
-    url = f"{EQUIBASE_BASE}/static/entry/{track}/{race_date.strftime('%Y%m%d')}.html"
+    # Equibase URL pattern updated April 2026: {TRACK}{MMDDYY}USA-EQB.html
+    mmddyy = race_date.strftime("%m%d%y")
+    url = f"{EQUIBASE_BASE}/static/entry/{track}{mmddyy}USA-EQB.html"
 
     card = ScrapedCard(track_code=track, race_date=race_date.isoformat())
 
@@ -320,7 +322,9 @@ def scrape_results(
     _require_deps()
 
     track = track_code.upper()
-    url = f"{EQUIBASE_BASE}/static/chart/{track}/{race_date.strftime('%Y%m%d')}.html"
+    # Equibase URL pattern updated April 2026
+    mmddyy = race_date.strftime("%m%d%y")
+    url = f"{EQUIBASE_BASE}/static/chart/{track}{mmddyy}USA-EQB.html"
 
     card = ScrapedCard(track_code=track, race_date=race_date.isoformat())
 

@@ -10,32 +10,48 @@ import type {
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
 
+// ── Keeneland April 11, 2026 — Hyper-focused build ──
+const SPLASH_MODE = true; // flip to false when ready
+
 export default function Home() {
+  if (SPLASH_MODE) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-black text-white">
+        <h1 className="text-6xl font-black tracking-tight mb-4">
+          HorseGPT
+        </h1>
+        <p className="text-2xl text-gray-300 mb-8 text-center">
+          Rebuilding for Keeneland &mdash; April 11, 2026
+        </p>
+        <div className="text-lg text-gray-500 text-center max-w-md">
+          The exotic engine is being calibrated for Keeneland&rsquo;s spring meet.
+          Check back tomorrow morning for race-by-race analysis.
+        </div>
+        <div className="mt-12 text-sm text-gray-700">
+          Benter logistic + Monte Carlo exotic pricing &middot; Tuned for KEE dirt &amp; turf biases
+        </div>
+      </main>
+    );
+  }
+
+  return <KeenelandApp />;
+}
+
+function KeenelandApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [race, setRace] = useState<RaceInfo | null>(null);
   const [result, setResult] = useState<SimulationResult | null>(null);
 
-  // Step 1: Track selection
-  const [tracks, setTracks] = useState<{ code: string; name: string }[] | null>(null);
-  const [loadingTracks, setLoadingTracks] = useState(false);
-  const [selectedTrack, setSelectedTrack] = useState<{ code: string; name: string } | null>(null);
+  // Hardcoded to Keeneland
+  const selectedTrack = { code: "KEE", name: "Keeneland" };
 
-  // Step 2: Race number
+  // Race number selection
   const [selectedRaceNum, setSelectedRaceNum] = useState<number | null>(null);
 
   // Monte Carlo sim count — 0 = auto (convergence-based)
   const [simCount, setSimCount] = useState(0);
 
-  // Auto-load today's tracks on mount
-  useEffect(() => {
-    setLoadingTracks(true);
-    fetch("/api/today")
-      .then((r) => r.json())
-      .then((d) => setTracks(d.tracks ?? []))
-      .catch(() => setTracks([]))
-      .finally(() => setLoadingTracks(false));
-  }, []);
   const [showResults, setShowResults] = useState(false);
   const [actualFinish, setActualFinish] = useState(["", "", "", ""]);
   const [dataSource, setDataSource] = useState<"search" | "tvg">("search");
@@ -142,7 +158,7 @@ export default function Home() {
 
     setRace(raceInfo);
     setDataSource("tvg");
-    setResult(runSimulation(entries, simCount || undefined));
+    setResult(runSimulation(entries, simCount || undefined, raceInfo));
   }
 
   // Keep old chart upload for backward compat
@@ -183,7 +199,7 @@ export default function Home() {
       };
       setRace(raceInfo);
       setDataSource("tvg");
-      setResult(runSimulation(raceInfo.entries));
+      setResult(runSimulation(raceInfo.entries, undefined, raceInfo));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -206,7 +222,7 @@ export default function Home() {
     setShowResults(false);
     setActualFinish(["", "", "", ""]);
     try {
-      const query = `${selectedTrack.name} Race ${selectedRaceNum} today`;
+      const query = `Keeneland Race ${selectedRaceNum} April 11 2026`;
       const res = await fetch("/api/race", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -298,9 +314,10 @@ export default function Home() {
       };
     });
 
-    setRace((prev) => prev ? { ...prev, entries } : null);
+    const updatedRace = race ? { ...race, entries } : null;
+    setRace(updatedRace);
     setDataSource(tvgUploaded.size > 0 ? "tvg" : "search");
-    setResult(runSimulation(entries, simCount || undefined));
+    setResult(runSimulation(entries, simCount || undefined, updatedRace ?? undefined));
   }
 
   function saveResult() {
@@ -324,65 +341,31 @@ export default function Home() {
   return (
     <main className="max-w-4xl mx-auto px-6 py-10">
       <h1 className="text-5xl font-black tracking-tight mb-1">
-        HorseGPT <span className="text-blue-600">Exotic Engine</span>
+        HorseGPT <span className="text-blue-600">Keeneland</span>
       </h1>
       <p className="text-gray-500 text-lg mb-8">
-        7-layer probability model &middot; 500K Monte Carlo simulations
+        April 11, 2026 &middot; Monte Carlo exotic pricing &middot; Tuned for KEE spring meet
       </p>
 
-      {/* STEP 1: Select a Track */}
+      {/* Select Race Number */}
       <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">
-        Step 1 — Select Track
+        Select Race at Keeneland
       </div>
-      <div className="mb-6">
-        {loadingTracks && (
-          <p className="text-base text-gray-500">Checking which tracks are racing today...</p>
-        )}
-        {tracks && tracks.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {tracks.map((t) => (
-              <button
-                key={t.code}
-                onClick={() => { setSelectedTrack(t); setSelectedRaceNum(null); setRace(null); setResult(null); setGeminiEntries([]); }}
-                className={`px-5 py-3 text-base font-bold rounded-xl border-2 transition-colors ${
-                  selectedTrack?.code === t.code
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white border-gray-200 hover:border-blue-500 hover:bg-blue-50"
-                }`}
-              >
-                {t.name}
-              </button>
-            ))}
-          </div>
-        )}
-        {tracks && tracks.length === 0 && (
-          <p className="text-base text-gray-500">No tracks found with entries today.</p>
-        )}
+      <div className="mb-6 flex flex-wrap gap-2">
+        {Array.from({ length: 11 }, (_, i) => i + 1).map((num) => (
+          <button
+            key={num}
+            onClick={() => setSelectedRaceNum(num)}
+            className={`w-14 h-14 text-xl font-black rounded-xl border-2 transition-colors ${
+              selectedRaceNum === num
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-white border-gray-200 hover:border-blue-500 hover:bg-blue-50"
+            }`}
+          >
+            {num}
+          </button>
+        ))}
       </div>
-
-      {/* STEP 2: Select Race Number */}
-      {selectedTrack && (
-        <>
-          <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">
-            Step 2 — Select Race at {selectedTrack.name}
-          </div>
-          <div className="mb-6 flex flex-wrap gap-2">
-            {Array.from({ length: 14 }, (_, i) => i + 1).map((num) => (
-              <button
-                key={num}
-                onClick={() => setSelectedRaceNum(num)}
-                className={`w-14 h-14 text-xl font-black rounded-xl border-2 transition-colors ${
-                  selectedRaceNum === num
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white border-gray-200 hover:border-blue-500 hover:bg-blue-50"
-                }`}
-              >
-                {num}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
 
       {/* Loading state for race entries */}
       {loading && (
