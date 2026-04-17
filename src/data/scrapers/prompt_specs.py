@@ -90,16 +90,14 @@ FEATURE_TO_SPEC: dict[str, str] = {
     "style_x_soft_pace": "equibase_workouts",
     "pace_pressure": "equibase_workouts",
     # Jockey/trainer stats — one unique task per person (deduped at dispatch).
+    # roi and avg_odds are aux metrics rarely available from free public pages;
+    # leave them unmapped so they stay NaN when no prior DB history exists.
     "jockey_win_pct": "jt_stats",
-    "jockey_roi": "jt_stats",
     "jockey_starts": "jt_stats",
     "jockey_top3_pct": "jt_stats",
-    "jockey_avg_odds": "jt_stats",
     "trainer_win_pct": "jt_stats",
-    "trainer_roi": "jt_stats",
     "trainer_starts": "jt_stats",
     "trainer_top3_pct": "jt_stats",
-    "trainer_avg_odds": "jt_stats",
 }
 
 

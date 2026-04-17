@@ -17,9 +17,17 @@ from src.features.prompt_matrix import (
 
 
 class TestFeatureSpecMap:
-    def test_all_prompt_columns_have_spec(self):
-        # Every feature column is either in NEVER_PROMPT or maps to a spec.
-        missing = [c for c in FEATURE_COLS if c not in NEVER_PROMPT and c not in FEATURE_TO_SPEC]
+    # Aux jockey/trainer metrics we choose not to prompt for — rarely
+    # available from free public pages; stay NaN when no DB history.
+    _AUX_NO_PROMPT = {"jockey_roi", "jockey_avg_odds", "trainer_roi", "trainer_avg_odds"}
+
+    def test_prompt_columns_have_spec_or_are_aux(self):
+        missing = [
+            c for c in FEATURE_COLS
+            if c not in NEVER_PROMPT
+            and c not in FEATURE_TO_SPEC
+            and c not in self._AUX_NO_PROMPT
+        ]
         assert missing == [], f"Features without a spec mapping: {missing}"
 
     def test_specs_exist(self):

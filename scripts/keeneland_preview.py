@@ -32,7 +32,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 from sqlalchemy.orm import Session, joinedload
 
 from src.data.database import get_engine, get_session
-from src.data.models import Base, Entry, Race
+from src.data.models import Base, Entry, Horse, Race
 from src.data.scrapers.horseracingnation import scrape_entries
 from src.data.scrapers.ingest_scraped import scraped_to_parsed
 from src.data.ingest import ingest_entry
@@ -44,6 +44,7 @@ from src.agents.dispatcher import (
     write_tasks,
 )
 from src.features.prompt_matrix import build_race_matrix, build_card_matrix
+from src.features.jt_stats_cache import JtStatsCache
 
 
 DATA_SCRAPED = Path("data/scraped")
@@ -139,6 +140,39 @@ def _load_horse_urls(track_code: str, race_date: date) -> dict[str, str]:
     return urls
 
 
+def _load_meet_stats(track_code: str, race_date: date) -> JtStatsCache:
+    """Load meet-level jockey/trainer stats if available, else empty."""
+    stats_path = Path("data/analysis") / f"{track_code.upper()}_{race_date.isoformat()}_meet_stats.json"
+    if stats_path.exists():
+        return JtStatsCache.from_json(stats_path)
+    return JtStatsCache.empty()
+
+
+def _apply_pedigree(session: Session, track_code: str, race_date: date) -> int:
+    """Upsert pedigree + sex + birth year from the meet stats file onto Horse rows."""
+    stats_path = Path("data/analysis") / f"{track_code.upper()}_{race_date.isoformat()}_meet_stats.json"
+    if not stats_path.exists():
+        return 0
+    data = json.loads(stats_path.read_text())
+    ped = data.get("pedigree") or {}
+    updated = 0
+    for name, fields in ped.items():
+        horse = session.query(Horse).filter_by(name=name).first()
+        if not horse:
+            continue
+        for field_ in ("sire", "dam", "dam_sire", "sex"):
+            val = fields.get(field_)
+            if val and not getattr(horse, field_, None):
+                setattr(horse, field_, val)
+                updated += 1
+        by = fields.get("birth_year")
+        if by and not horse.birth_year:
+            horse.birth_year = int(by)
+            updated += 1
+    session.commit()
+    return updated
+
+
 def cmd_export_tasks(args: argparse.Namespace) -> int:
     """Build v0 CSV and emit tasks.jsonl from the matrix's unresolved specs."""
     race_date = datetime.strptime(args.date, "%Y-%m-%d").date()
@@ -150,9 +184,10 @@ def cmd_export_tasks(args: argparse.Namespace) -> int:
             return 1
 
         horse_urls = _load_horse_urls(args.track, race_date)
+        jt_cache = _load_meet_stats(args.track, race_date)
         DATA_PREVIEWS.mkdir(parents=True, exist_ok=True)
         csv_path = DATA_PREVIEWS / f"{args.track.upper()}_{race_date.isoformat()}_v0.csv"
-        df = build_card_matrix(races, session, horse_urls=horse_urls)
+        df = build_card_matrix(races, session, horse_urls=horse_urls, jt_cache=jt_cache)
         # Inject track_code/race_date so the task builder can use them.
         df.insert(0, "track_code", args.track.upper())
         df.insert(1, "race_date", race_date.isoformat())
@@ -169,28 +204,87 @@ def cmd_export_tasks(args: argparse.Namespace) -> int:
 
 
 def cmd_ingest_results(args: argparse.Namespace) -> int:
-    """Apply results.jsonl into the DB and regenerate the CSV."""
+    """Apply results.jsonl into the DB and regenerate the CSV + web JSON."""
     race_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     results_path = DATA_PREVIEWS / f"{args.track.upper()}_{race_date.isoformat()}_results.jsonl"
     session = _prepare_db(args.db)
     try:
         results = read_results(results_path)
-        if not results:
-            print(f"No results found at {results_path}", file=sys.stderr)
-            return 1
-        counts = apply_results(session, results)
-        print(f"Applied {sum(counts.values())} result rows: {counts}")
+        if results:
+            counts = apply_results(session, results)
+            print(f"Applied {sum(counts.values())} result rows: {counts}")
+        else:
+            print(f"No results.jsonl at {results_path} — proceeding with DB as-is")
+
+        # Pedigree/sex/birth-year from the analysis paste.
+        n_ped = _apply_pedigree(session, args.track, race_date)
+        if n_ped:
+            print(f"Applied {n_ped} pedigree fields from meet stats")
+
+        horse_urls = _load_horse_urls(args.track, race_date)
+        jt_cache = _load_meet_stats(args.track, race_date)
 
         races = _races_for(session, args.track.upper(), race_date)
-        out_csv = DATA_PREVIEWS / f"{args.track.upper()}_{race_date.isoformat()}_final.csv"
-        df = build_card_matrix(races, session)
+        df = build_card_matrix(races, session, horse_urls=horse_urls, jt_cache=jt_cache)
         df.insert(0, "track_code", args.track.upper())
         df.insert(1, "race_date", race_date.isoformat())
+
+        out_csv = DATA_PREVIEWS / f"{args.track.upper()}_{race_date.isoformat()}_final.csv"
         df.to_csv(out_csv, index=False)
         print(f"Rebuilt {out_csv}")
+
+        out_json = DATA_PREVIEWS / f"{args.track.upper()}_{race_date.isoformat()}_final.json"
+        _write_web_json(df, out_json, args.track.upper(), race_date)
+        print(f"Wrote {out_json} (web-app consumable)")
+
+        # Copy into the Next.js public/ dir so the web app can serve it.
+        public_dst = Path("web/public/preview") / f"{args.track.upper()}_{race_date.isoformat()}.json"
+        public_dst.parent.mkdir(parents=True, exist_ok=True)
+        public_dst.write_text(out_json.read_text())
+        print(f"Published {public_dst}")
     finally:
         session.close()
     return 0
+
+
+def _write_web_json(df: "pd.DataFrame", out_path: Path, track: str, race_date: date) -> None:
+    import math
+    import pandas as pd
+
+    def _cell(v: object) -> object:
+        if v is None:
+            return None
+        if isinstance(v, float) and math.isnan(v):
+            return None
+        if isinstance(v, str) and v.startswith("PROMPT["):
+            return {"prompt": v}
+        return v
+
+    races: list[dict[str, object]] = []
+    for race_number, group in df.groupby("race_number"):
+        first = group.iloc[0]
+        race_info = {
+            "race_number": int(race_number),
+            "post_time": _cell(first.get("post_time")) or "",
+            "distance": _cell(first.get("distance")) or "",
+            "surface": _cell(first.get("surface")) or "",
+            "race_type": _cell(first.get("race_type")) or "",
+            "purse": _cell(first.get("purse")),
+        }
+        horses = []
+        for _, row in group.iterrows():
+            horse = {c: _cell(row.get(c)) for c in df.columns}
+            horses.append(horse)
+        races.append({"race": race_info, "horses": horses})
+
+    card = {
+        "track_code": track,
+        "race_date": race_date.isoformat(),
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "races": sorted(races, key=lambda r: r["race"]["race_number"]),
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(card, indent=2, default=str))
 
 
 def main() -> int:

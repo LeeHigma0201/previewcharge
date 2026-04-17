@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import type {
   HorseEntry,
   RaceInfo,
@@ -10,8 +11,11 @@ import type {
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
 
-// ── Keeneland April 11, 2026 — Hyper-focused build ──
-const SPLASH_MODE = true; // flip to false when ready
+// ── Keeneland Spring Meet — 2026-04-17 build ──
+// The splash is off. Landing page shows the full feature matrix for today's
+// card at /today; the exotic simulator still lives below via the "Open
+// simulator" button.
+const SPLASH_MODE = false;
 
 export default function Home() {
   if (SPLASH_MODE) {
@@ -21,20 +25,28 @@ export default function Home() {
           HorseGPT
         </h1>
         <p className="text-2xl text-gray-300 mb-8 text-center">
-          Rebuilding for Keeneland &mdash; April 11, 2026
+          Rebuilding for Keeneland
         </p>
-        <div className="text-lg text-gray-500 text-center max-w-md">
-          The exotic engine is being calibrated for Keeneland&rsquo;s spring meet.
-          Check back tomorrow morning for race-by-race analysis.
-        </div>
-        <div className="mt-12 text-sm text-gray-700">
-          Benter logistic + Monte Carlo exotic pricing &middot; Tuned for KEE dirt &amp; turf biases
-        </div>
       </main>
     );
   }
 
-  return <KeenelandApp />;
+  return (
+    <main className="min-h-screen bg-black text-white flex flex-col">
+      <nav className="border-b border-gray-900 px-4 md:px-8 py-3 flex items-center justify-between">
+        <Link href="/today" className="text-lg font-black tracking-tight">
+          HorseGPT <span className="text-gray-500 text-sm font-normal">· Keeneland Spring 2026</span>
+        </Link>
+        <div className="flex items-center gap-4 text-sm">
+          <Link href="/today" className="text-emerald-400 hover:underline">Today&rsquo;s card</Link>
+          <a href="#simulator" className="text-gray-400 hover:text-white">Simulator</a>
+        </div>
+      </nav>
+      <div id="simulator" className="flex-1">
+        <KeenelandApp />
+      </div>
+    </main>
+  );
 }
 
 function KeenelandApp() {

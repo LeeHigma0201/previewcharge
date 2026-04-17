@@ -31,6 +31,7 @@ from src.features.core import (
     _compute_pace_scenario,
     compute_entry_features,
 )
+from src.features.jt_stats_cache import JtStatsCache
 
 # Column groups
 IDENTIFIER_COLS = [
@@ -41,9 +42,13 @@ IDENTIFIER_COLS = [
     "race_type",
     "purse",
     "program_number",
-    "post_position",
+    "pp",
     "horse_name",
     "sire",
+    "dam",
+    "dam_sire",
+    "age",
+    "sex",
     "jockey",
     "trainer",
     "morning_line_odds_raw",
@@ -136,12 +141,26 @@ def _jt_context_for(entry: Entry, role: str) -> dict[str, Any]:
     }
 
 
-def _build_raw_feature_rows(race: Race, session: Session) -> list[dict[str, Any]]:
-    """Compute unscaled per-entry feature dicts, including field-level scenario."""
+def _build_raw_feature_rows(
+    race: Race,
+    session: Session,
+    jt_cache: JtStatsCache | None = None,
+) -> list[dict[str, Any]]:
+    """Compute unscaled per-entry feature dicts, including field-level scenario.
+
+    If ``jt_cache`` is provided, it overrides any null jockey/trainer feature
+    values returned by ``compute_jockey_trainer_features`` — useful when the
+    DB has no prior entries but we have meet-level stats on file.
+    """
     pace_scenario = _compute_pace_scenario(race)
     rows: list[dict[str, Any]] = []
     for entry in race.entries:
         feats = compute_entry_features(entry, race, session)
+        if jt_cache is not None:
+            override = jt_cache.features_for(entry.jockey, entry.trainer)
+            for k, v in override.items():
+                if feats.get(k) is None and v is not None:
+                    feats[k] = v
         feats.update(pace_scenario)
         feats.update(_compute_pace_interactions(entry, pace_scenario))
         feats["__entry_id"] = entry.id
@@ -166,6 +185,7 @@ def build_race_matrix(
     race: Race,
     session: Session,
     horse_urls: dict[str, str] | None = None,
+    jt_cache: JtStatsCache | None = None,
 ) -> pd.DataFrame:
     """Build the value-or-prompt matrix for one race.
 
@@ -174,15 +194,16 @@ def build_race_matrix(
     that lack underlying data contain a PROMPT[...] string; cells that have
     data contain the z-scored numeric value (within this race's field).
 
-    ``horse_urls`` maps horse name → canonical HRN profile URL. Passed through
-    into prompt rendering so subagents can WebFetch a known-good URL.
+    ``horse_urls`` maps horse name → canonical HRN profile URL.
+    ``jt_cache`` optionally supplies meet-level jockey/trainer stats that
+    fill the 10 jockey_/trainer_ features when DB has no prior history.
     """
     # Sort entries by post_position so the CSV reads top-to-bottom by PP.
     entries = sorted(race.entries, key=lambda e: e.post_position or 0)
     if not entries:
         return pd.DataFrame(columns=IDENTIFIER_COLS + FEATURE_COLS + PROVENANCE_COLS)
 
-    raw_rows = _build_raw_feature_rows(race, session)
+    raw_rows = _build_raw_feature_rows(race, session, jt_cache=jt_cache)
     raw_by_id = {r["__entry_id"]: r for r in raw_rows}
 
     ident_rows: list[dict[str, Any]] = []
@@ -193,16 +214,22 @@ def build_race_matrix(
     for entry in entries:
         horse = entry.horse
         ident = {
-            "race_number": race.race_number,
+            "race_number": int(race.race_number) if race.race_number is not None else None,
             "post_time": getattr(race, "post_time", "") or "",
             "distance": getattr(race, "distance", "") or _distance_short(race.distance_yards),
             "surface": race.surface,
             "race_type": race.race_type,
-            "purse": race.purse,
+            "purse": int(race.purse) if race.purse is not None else None,
             "program_number": entry.program_number,
-            "post_position": entry.post_position,
+            # post_position is emitted via FEATURE_COLS (raw, never-z-scored);
+            # keep an identifier alias so the spreadsheet reads naturally.
+            "pp": int(entry.post_position) if entry.post_position is not None else None,
             "horse_name": horse.name if horse else "",
             "sire": horse.sire if horse and horse.sire else "",
+            "dam": horse.dam if horse and horse.dam else "",
+            "dam_sire": horse.dam_sire if horse and horse.dam_sire else "",
+            "age": (race.race_date.year - horse.birth_year) if horse and horse.birth_year and race.race_date else None,
+            "sex": horse.sex if horse and horse.sex else "",
             "jockey": entry.jockey or "",
             "trainer": entry.trainer or "",
             "morning_line_odds_raw": _ml_to_fraction(entry.morning_line_odds),
@@ -289,11 +316,12 @@ def build_card_matrix(
     races: list[Race],
     session: Session,
     horse_urls: dict[str, str] | None = None,
+    jt_cache: JtStatsCache | None = None,
 ) -> pd.DataFrame:
     """Build one combined matrix for a list of races (typically a full card)."""
     frames: list[pd.DataFrame] = []
     for race in sorted(races, key=lambda r: r.race_number):
-        frames.append(build_race_matrix(race, session, horse_urls=horse_urls))
+        frames.append(build_race_matrix(race, session, horse_urls=horse_urls, jt_cache=jt_cache))
     if not frames:
         return pd.DataFrame(columns=IDENTIFIER_COLS + FEATURE_COLS + PROVENANCE_COLS)
     return pd.concat(frames, ignore_index=True)

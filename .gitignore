@@ -28,8 +28,14 @@ credentials.json
 *.db
 *.sqlite3
 
-# Data files (large, not committed)
-/data/
+# Data files (large, not committed) — ignore contents but keep hand-curated
+# meet-stats caches so the pipeline can rebuild the feature matrix on a fresh
+# clone. Use /data/* (not /data/) so git will still recurse and respect the
+# negations below.
+/data/*
+!/data/analysis/
+/data/analysis/*
+!/data/analysis/*.json
 
 # Model artifacts
 artifacts/
