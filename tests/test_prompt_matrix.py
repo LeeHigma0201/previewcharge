@@ -38,6 +38,7 @@ class TestRenderPrompt:
             race_date="2026-04-17",
             horse_query="Secretariat",
             horse_slug="Secretariat",
+            horse_url="https://www.horseracingnation.com/horse/Secretariat",
         )
         assert "Secretariat" in rendered
         assert "Bold Ruler" in rendered
