@@ -1,4 +1,4 @@
-.PHONY: init ingest features predict dashboard test lint all clean scrape query
+.PHONY: init ingest features predict dashboard test lint all clean scrape query preview-keeneland preview-keeneland-ingest
 
 PYTHON ?= python
 DB ?= horsegpt.db
@@ -35,6 +35,12 @@ test:
 lint:
 	ruff check src/ tests/ dashboard/
 	mypy src/
+
+preview-keeneland:
+	$(PYTHON) scripts/keeneland_preview.py --track KEE --date $(DATE) --db sqlite:///$(DB) --export-only
+
+preview-keeneland-ingest:
+	$(PYTHON) scripts/keeneland_preview.py --track KEE --date $(DATE) --db sqlite:///$(DB) --ingest-results
 
 all: init ingest features predict
 

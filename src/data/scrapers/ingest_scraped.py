@@ -7,11 +7,14 @@ existing ingest pipeline (which consumes ParsedEntry objects).
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
-from typing import Iterator
+from typing import Any, Iterator
+
+from sqlalchemy.orm import Session
 
 from src.data.bris_parser import ParsedEntry, ParsedPP, ParsedWorkout
+from src.data.models import Entry, Horse, PastPerformance, Workout
 from src.data.scrapers.equibase import ScrapedCard, ScrapedHorse, ScrapedRace
 
 
@@ -95,6 +98,143 @@ def ingest_scraped_directory(db_url: str, scraped_dir: Path) -> int:
         session.close()
 
     return count
+
+
+def apply_partial_update(
+    session: Session,
+    horse_name: str,
+    payload: dict[str, Any],
+    kind: str,
+) -> int:
+    """Apply a subagent fetch result to the DB.
+
+    ``kind`` controls routing:
+      - ``"pps"``: payload has ``pps: [...]``; insert/replace PastPerformance
+        rows on all entries for this horse that don't already have PPs.
+      - ``"workouts"``: payload has ``workouts: [...]`` plus optional
+        ``weight`` / ``medication`` / ``equipment`` / ``running_style`` /
+        ``dam`` / ``dam_sire`` / ``birth_year`` / ``sex``. Workouts attach
+        to the horse; the scalar fields update the horse and its entries.
+
+    Returns the number of rows affected (inserted + updated).
+    """
+    if not horse_name:
+        return 0
+    horse = session.query(Horse).filter_by(name=horse_name).first()
+    if horse is None:
+        return 0
+
+    affected = 0
+    if kind == "pps":
+        pps_data = payload.get("pps") or []
+        # Attach PPs to every entry for this horse that currently has none.
+        for entry in session.query(Entry).filter_by(horse_id=horse.id).all():
+            if entry.past_performances:
+                continue
+            for i, pp in enumerate(pps_data[:10], start=1):
+                row = PastPerformance(
+                    entry_id=entry.id,
+                    pp_number=i,
+                    race_date=_to_date(pp.get("race_date")),
+                    track_code=pp.get("track_code"),
+                    distance_yards=_to_int(pp.get("distance_yards")),
+                    surface=pp.get("surface"),
+                    track_condition=pp.get("track_condition"),
+                    race_type=pp.get("race_type"),
+                    purse=_to_int(pp.get("purse")),
+                    claiming_price=_to_int(pp.get("claiming_price")),
+                    num_entrants=_to_int(pp.get("num_entrants")),
+                    finish_position=_to_int(pp.get("finish_position")),
+                    final_odds=_to_float(pp.get("final_odds")),
+                    beyer_speed=_to_int(pp.get("beyer_speed")),
+                    e1_pace=_to_int(pp.get("e1_pace")),
+                    e2_pace=_to_int(pp.get("e2_pace")),
+                    late_pace=_to_int(pp.get("late_pace")),
+                    position_1st_call=_to_int(pp.get("position_1st_call")),
+                    position_2nd_call=_to_int(pp.get("position_2nd_call")),
+                    position_stretch=_to_int(pp.get("position_stretch")),
+                    lengths_behind_1st=_to_float(pp.get("lengths_behind_1st")),
+                    lengths_behind_finish=_to_float(pp.get("lengths_behind_finish")),
+                    weight=_to_int(pp.get("weight")),
+                    final_time_seconds=_to_float(pp.get("final_time_seconds")),
+                )
+                session.add(row)
+                affected += 1
+
+    elif kind == "workouts":
+        workouts_data = payload.get("workouts") or []
+        existing_dates = {w.workout_date for w in horse.workouts}
+        for wo in workouts_data[:12]:
+            d = _to_date(wo.get("workout_date"))
+            if d is None or d in existing_dates:
+                continue
+            row = Workout(
+                horse_id=horse.id,
+                workout_date=d,
+                track_code=wo.get("track_code") or "",
+                distance_furlongs=_to_float(wo.get("distance_furlongs")) or 0.0,
+                time_seconds=_to_float(wo.get("time_seconds")) or 0.0,
+                rank=_to_int(wo.get("rank")),
+                total_workers=_to_int(wo.get("total_workers")),
+                surface=wo.get("surface"),
+            )
+            session.add(row)
+            affected += 1
+
+        # Horse-level fields.
+        for field_, value in [
+            ("dam", payload.get("dam")),
+            ("dam_sire", payload.get("dam_sire")),
+            ("birth_year", _to_int(payload.get("birth_year"))),
+            ("sex", payload.get("sex")),
+        ]:
+            if value and not getattr(horse, field_, None):
+                setattr(horse, field_, value)
+                affected += 1
+
+        # Entry-level fields (apply to all entries for this horse).
+        entry_updates = {
+            "weight": _to_int(payload.get("weight")),
+            "medication": payload.get("medication"),
+            "equipment": payload.get("equipment"),
+            "running_style": payload.get("running_style"),
+        }
+        for entry in session.query(Entry).filter_by(horse_id=horse.id).all():
+            for f, v in entry_updates.items():
+                if v is not None and getattr(entry, f, None) in (None, ""):
+                    setattr(entry, f, v)
+                    affected += 1
+
+    return affected
+
+
+def _to_int(v: Any) -> int | None:
+    if v is None or v == "":
+        return None
+    try:
+        return int(v)
+    except (ValueError, TypeError):
+        return None
+
+
+def _to_float(v: Any) -> float | None:
+    if v is None or v == "":
+        return None
+    try:
+        return float(v)
+    except (ValueError, TypeError):
+        return None
+
+
+def _to_date(v: Any) -> date | None:
+    if not v:
+        return None
+    if isinstance(v, date):
+        return v
+    try:
+        return datetime.fromisoformat(str(v)).date()
+    except ValueError:
+        return None
 
 
 def _dict_to_card(data: dict) -> ScrapedCard:
