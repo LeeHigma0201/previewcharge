@@ -11,7 +11,7 @@ import type {
 import { runSimulation } from "./lib/data";
 
 // ── Keeneland April 11, 2026 — Hyper-focused build ──
-const SPLASH_MODE = true; // flip to false when ready
+const SPLASH_MODE = false; // flip to false when ready
 
 export default function Home() {
   if (SPLASH_MODE) {
