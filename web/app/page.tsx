@@ -377,42 +377,58 @@ function KeenelandApp() {
         </div>
       )}
 
-      {/* Show race found + Step 2 only after race is selected */}
-      {race && geminiEntries.length > 0 && !result && (
+      {/* Show race found + Step 2 as soon as race is selected.
+          Gemini lookup may fail; TVG screenshot upload is always available. */}
+      {selectedRaceNum && !result && !loading && (
         <>
-          {/* Race found */}
-          <div className="mb-6 p-5 rounded-xl bg-blue-50 border-2 border-blue-200">
-            <h2 className="text-2xl font-black">
-              {race.trackName || race.track} — Race {race.raceNumber}
-            </h2>
-            <p className="text-base text-gray-600">
-              {race.date} &middot; {race.distance} &middot; {race.surface} &middot; {race.raceType} &middot; ${race.purse.toLocaleString()}
-            </p>
-            <p className="text-base font-semibold text-blue-700 mt-2">
-              {geminiEntries.length} horses found (scratches removed)
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {geminiEntries.map((h) => (
-                <span key={String(h.program_number)} className="px-3 py-1 rounded-lg bg-white border text-sm font-medium">
-                  #{String(h.program_number)} {String(h.name)}
-                </span>
-              ))}
+          {/* Race found (Gemini) or fallback prompt */}
+          {race && geminiEntries.length > 0 ? (
+            <div className="mb-6 p-5 rounded-xl bg-blue-50 border-2 border-blue-200">
+              <h2 className="text-2xl font-black">
+                {race.trackName || race.track} — Race {race.raceNumber}
+              </h2>
+              <p className="text-base text-gray-600">
+                {race.date} &middot; {race.distance} &middot; {race.surface} &middot; {race.raceType} &middot; ${race.purse.toLocaleString()}
+              </p>
+              <p className="text-base font-semibold text-blue-700 mt-2">
+                {geminiEntries.length} horses found (scratches removed)
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {geminiEntries.map((h) => (
+                  <span key={String(h.program_number)} className="px-3 py-1 rounded-lg bg-white border text-sm font-medium">
+                    #{String(h.program_number)} {String(h.name)}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="mb-6 p-5 rounded-xl bg-yellow-50 border-2 border-yellow-300">
+              <h2 className="text-xl font-black text-yellow-900">
+                Gemini lookup unavailable for Race {selectedRaceNum}
+              </h2>
+              <p className="text-base text-yellow-800 mt-2">
+                Upload a <strong>TVG Summary</strong> screenshot below to provide the horse list,
+                then optionally add Speed/Pace/Jockey screenshots for more signal.
+                The model will run on whatever you upload.
+              </p>
+            </div>
+          )}
 
           {/* STEP 2: Upload TVG screenshots */}
-          <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">Step 2 — Add TVG Data (optional)</div>
+          <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">
+            {race && geminiEntries.length > 0 ? "Step 2 — Add TVG Data (optional)" : "Step 2 — Upload TVG Screenshots (required — Summary first)"}
+          </div>
           <div className="mb-6 p-6 rounded-xl border-2 border-gray-200 bg-gray-50">
             <p className="text-sm text-gray-500 mb-4">
-              Upload screenshots from TVG past performances to add real data. Each screenshot adds more signal. Skip this step to run with Gemini data only.
+              Upload screenshots from TVG past performances to add real data. Each screenshot adds more signal.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-4">
               {([
-                { key: "summary" as CatKey, label: "Summary", desc: "Overrides names, odds", required: false },
-                { key: "snapshot" as CatKey, label: "Snapshot", desc: "Ratings, last finish", required: false },
-                { key: "speed" as CatKey, label: "Speed & Class", desc: "Speed figures (35% weight)", required: false },
-                { key: "pace" as CatKey, label: "Pace", desc: "Running style (20% weight)", required: false },
-                { key: "jockey" as CatKey, label: "Jockey/Trainer", desc: "Win %, stats (10% weight)", required: false },
+                { key: "summary" as CatKey, label: "Summary", desc: "Names, odds, horses" },
+                { key: "snapshot" as CatKey, label: "Snapshot", desc: "Ratings, last finish" },
+                { key: "speed" as CatKey, label: "Speed & Class", desc: "Speed figures (35% weight)" },
+                { key: "pace" as CatKey, label: "Pace", desc: "Running style (20% weight)" },
+                { key: "jockey" as CatKey, label: "Jockey/Trainer", desc: "Win %, stats (10% weight)" },
               ]).map(({ key, label, desc }) => (
                 <label key={key}
                   className={`flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-colors ${
@@ -441,7 +457,7 @@ function KeenelandApp() {
             </div>
             {tvgUploaded.size > 0 && (
               <p className="text-sm text-green-700 font-semibold mb-3">
-                {tvgUploaded.size} screenshot(s) parsed — data will be merged with Gemini results
+                {tvgUploaded.size} screenshot(s) parsed
               </p>
             )}
           </div>
@@ -488,15 +504,28 @@ function KeenelandApp() {
             </p>
           </div>
 
+          {/* Run button routes: Gemini path if available, else TVG-only. */}
           <button
-            onClick={handleRunModel}
-            disabled={loading}
+            onClick={() => {
+              if (race && geminiEntries.length > 0) {
+                handleRunModel();
+              } else {
+                runFromTvg();
+              }
+            }}
+            disabled={loading || (!(race && geminiEntries.length > 0) && !tvgUploaded.has("summary"))}
             className="w-full mb-8 px-8 py-5 rounded-xl bg-green-600 text-white font-black text-2xl hover:bg-green-700 disabled:opacity-40 transition-colors"
           >
             Run Exotic Bet Model
             {tvgUploaded.size > 0 && (
               <span className="block text-base font-normal mt-1">
-                Gemini + {tvgUploaded.size} TVG screenshot(s)
+                {race && geminiEntries.length > 0 ? "Gemini + " : "TVG-only: "}
+                {tvgUploaded.size} TVG screenshot(s)
+              </span>
+            )}
+            {!(race && geminiEntries.length > 0) && !tvgUploaded.has("summary") && (
+              <span className="block text-base font-normal mt-1 text-yellow-200">
+                Upload TVG Summary screenshot to enable
               </span>
             )}
           </button>
