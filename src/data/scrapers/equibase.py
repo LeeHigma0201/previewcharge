@@ -80,6 +80,7 @@ class ScrapedHorse:
     sex_age: str = ""  # e.g. "C3" = colt, 3yo
     color: str = ""
     owner: str = ""
+    horse_url: str = ""  # optional: canonical profile URL (used by HRN scraper)
 
 
 @dataclass
