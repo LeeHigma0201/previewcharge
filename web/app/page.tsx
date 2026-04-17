@@ -10,7 +10,7 @@ import type {
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
 
-// ── Keeneland April 11, 2026 — Hyper-focused build ──
+// ── Keeneland April 17, 2026 — Hyper-focused build ──
 const SPLASH_MODE = false; // flip to false when ready
 
 export default function Home() {
@@ -21,7 +21,7 @@ export default function Home() {
           HorseGPT
         </h1>
         <p className="text-2xl text-gray-300 mb-8 text-center">
-          Rebuilding for Keeneland &mdash; April 11, 2026
+          Rebuilding for Keeneland &mdash; April 17, 2026
         </p>
         <div className="text-lg text-gray-500 text-center max-w-md">
           The exotic engine is being calibrated for Keeneland&rsquo;s spring meet.
@@ -222,7 +222,7 @@ function KeenelandApp() {
     setShowResults(false);
     setActualFinish(["", "", "", ""]);
     try {
-      const query = `Keeneland Race ${selectedRaceNum} April 11 2026`;
+      const query = `Keeneland Race ${selectedRaceNum} April 17 2026`;
       const res = await fetch("/api/race", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -344,7 +344,7 @@ function KeenelandApp() {
         HorseGPT <span className="text-blue-600">Keeneland</span>
       </h1>
       <p className="text-gray-500 text-lg mb-8">
-        April 11, 2026 &middot; Monte Carlo exotic pricing &middot; Tuned for KEE spring meet
+        April 17, 2026 &middot; Monte Carlo exotic pricing &middot; Tuned for KEE spring meet
       </p>
 
       {/* Select Race Number */}

@@ -271,15 +271,15 @@ export async function POST(request: NextRequest) {
     const parsed = parseQuery(query);
     if (!parsed) {
       return NextResponse.json(
-        { error: "Could not parse race number. Try: 'Keeneland Race 5 April 11 2026'" },
+        { error: "Could not parse race number. Try: 'Keeneland Race 5 April 17 2026'" },
         { status: 400 },
       );
     }
 
-    // Force Keeneland April 11, 2026
+    // Force Keeneland April 17, 2026
     const trackCode = "KEE";
     const raceNumber = parsed.raceNumber;
-    const isoDate = "2026-04-11";
+    const isoDate = "2026-04-17";
 
     // Check cache first
     const cacheKey = `${trackCode}-${raceNumber}-${isoDate}`;

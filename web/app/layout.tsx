@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "HorseGPT — Keeneland April 11",
+  title: "HorseGPT — Keeneland April 17",
   description:
     "Keeneland-focused horse racing handicapping. Monte Carlo exotic pricing tuned for KEE spring meet.",
 };
