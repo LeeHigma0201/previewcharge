@@ -21,10 +21,11 @@ class Race(Base):
     track_code: Mapped[str] = mapped_column(String(5), index=True)
     race_date: Mapped[date] = mapped_column(Date, index=True)
     race_number: Mapped[int] = mapped_column(Integer)
-    distance_yards: Mapped[int] = mapped_column(Integer)
-    surface: Mapped[str] = mapped_column(String(10))  # D, T, AW
-    race_type: Mapped[str] = mapped_column(String(10))  # MSW, MCL, ALW, STK, CLM
-    purse: Mapped[int] = mapped_column(Integer)
+    # Nullable: ingest refuses to fabricate defaults for missing race attributes.
+    distance_yards: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    surface: Mapped[str | None] = mapped_column(String(10), nullable=True)  # D, T, AW
+    race_type: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    purse: Mapped[int | None] = mapped_column(Integer, nullable=True)
     claiming_price: Mapped[int | None] = mapped_column(Integer, nullable=True)
     track_condition: Mapped[str | None] = mapped_column(String(5), nullable=True)
     num_entrants: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -69,9 +70,10 @@ class Entry(Base):
     race_id: Mapped[int] = mapped_column(ForeignKey("races.id"), index=True)
     horse_id: Mapped[int] = mapped_column(ForeignKey("horses.id"), index=True)
 
-    # Pre-race info
+    # Pre-race info. post_position is required (it's the in-race identifier);
+    # ingest skips entries that lack it rather than coercing to 0.
     post_position: Mapped[int] = mapped_column(Integer)
-    program_number: Mapped[str] = mapped_column(String(5))
+    program_number: Mapped[str | None] = mapped_column(String(5), nullable=True)
     jockey: Mapped[str | None] = mapped_column(String(100), nullable=True)
     trainer: Mapped[str | None] = mapped_column(String(100), nullable=True)
     weight: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -179,8 +181,9 @@ class Workout(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     horse_id: Mapped[int] = mapped_column(ForeignKey("horses.id"), index=True)
+    # Workout requires date, distance, and time; ingest skips rows missing any.
     workout_date: Mapped[date] = mapped_column(Date)
-    track_code: Mapped[str] = mapped_column(String(5))
+    track_code: Mapped[str | None] = mapped_column(String(5), nullable=True)
     distance_furlongs: Mapped[float] = mapped_column(Float)
     time_seconds: Mapped[float] = mapped_column(Float)
     rank: Mapped[int | None] = mapped_column(Integer, nullable=True)

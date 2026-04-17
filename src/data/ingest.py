@@ -53,10 +53,10 @@ def _get_or_create_race(session: Session, parsed: ParsedEntry) -> Race:
             track_code=parsed.track_code,
             race_date=parsed.race_date,
             race_number=parsed.race_number,
-            distance_yards=parsed.distance_yards or 0,
-            surface=parsed.surface or "D",
-            race_type=parsed.race_type or "",
-            purse=parsed.purse or 0,
+            distance_yards=parsed.distance_yards,
+            surface=parsed.surface,
+            race_type=parsed.race_type,
+            purse=parsed.purse,
             claiming_price=parsed.claiming_price_race,
             track_condition=parsed.track_condition,
             num_entrants=parsed.num_entrants,
@@ -67,15 +67,22 @@ def _get_or_create_race(session: Session, parsed: ParsedEntry) -> Race:
     return race
 
 
-def ingest_entry(session: Session, parsed: ParsedEntry) -> Entry:
-    """Ingest a single parsed entry into the database."""
+def ingest_entry(session: Session, parsed: ParsedEntry) -> Entry | None:
+    """Ingest a single parsed entry. Returns None when required fields are missing.
+
+    Post position is the unique identifier for a horse within a race; without it
+    the row cannot be deduplicated and would create phantom entries. We refuse
+    to fabricate a value (the legacy `or 0` default produced post-0 collisions).
+    """
+    if parsed.post_position is None:
+        return None
+
     horse = _get_or_create_horse(session, parsed)
     race = _get_or_create_race(session, parsed)
 
-    # Check for existing entry
     existing = (
         session.query(Entry)
-        .filter_by(race_id=race.id, post_position=parsed.post_position or 0)
+        .filter_by(race_id=race.id, post_position=parsed.post_position)
         .first()
     )
     if existing:
@@ -84,8 +91,8 @@ def ingest_entry(session: Session, parsed: ParsedEntry) -> Entry:
     entry = Entry(
         race_id=race.id,
         horse_id=horse.id,
-        post_position=parsed.post_position or 0,
-        program_number=parsed.program_number or "",
+        post_position=parsed.post_position,
+        program_number=parsed.program_number,
         jockey=parsed.jockey,
         trainer=parsed.trainer,
         morning_line_odds=parsed.morning_line_odds,
@@ -133,19 +140,21 @@ def ingest_entry(session: Session, parsed: ParsedEntry) -> Entry:
         )
         session.add(pp_row)
 
-    # Add workouts
+    # Add workouts. A workout without distance or time is unusable; skip rather
+    # than fabricate zeros that would corrupt workout-derived features.
     for wo in parsed.workouts:
-        if wo.workout_date:
-            workout = Workout(
-                horse_id=horse.id,
-                workout_date=wo.workout_date,
-                track_code=wo.track_code or "",
-                distance_furlongs=wo.distance_furlongs or 0.0,
-                time_seconds=wo.time_seconds or 0.0,
-                rank=wo.rank,
-                total_workers=wo.total_workers,
-            )
-            session.add(workout)
+        if wo.workout_date is None or wo.distance_furlongs is None or wo.time_seconds is None:
+            continue
+        workout = Workout(
+            horse_id=horse.id,
+            workout_date=wo.workout_date,
+            track_code=wo.track_code,
+            distance_furlongs=wo.distance_furlongs,
+            time_seconds=wo.time_seconds,
+            rank=wo.rank,
+            total_workers=wo.total_workers,
+        )
+        session.add(workout)
 
     return entry
 
@@ -159,6 +168,7 @@ def ingest_from_path(db_url: str, input_path: Path) -> int:
     session = get_session(engine)
 
     count = 0
+    skipped = 0
     try:
         if input_path.is_dir():
             entries = parse_bris_directory(input_path)
@@ -166,15 +176,20 @@ def ingest_from_path(db_url: str, input_path: Path) -> int:
             entries = parse_bris_file(input_path)
 
         for parsed in entries:
-            if parsed.horse_name:
-                ingest_entry(session, parsed)
-                count += 1
-                if count % 100 == 0:
-                    session.commit()
-                    print(f"  Ingested {count} entries...")
+            if not parsed.horse_name:
+                skipped += 1
+                continue
+            entry = ingest_entry(session, parsed)
+            if entry is None:
+                skipped += 1
+                continue
+            count += 1
+            if count % 100 == 0:
+                session.commit()
+                print(f"  Ingested {count} entries...")
 
         session.commit()
-        print(f"Ingest complete: {count} entries total")
+        print(f"Ingest complete: {count} entries ingested, {skipped} skipped (incomplete data)")
     except Exception:
         session.rollback()
         raise
