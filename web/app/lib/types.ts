@@ -84,6 +84,22 @@ export interface RankedExoticList {
   costAboveCutoff: number;
 }
 
+// EV-driven bet strategy — model picks the structure (straight/box/key)
+// whose expected value is highest given the per-combo probabilities.
+export interface BetStrategy {
+  betType: "Exacta" | "Trifecta" | "Superfecta";
+  name: string;                 // "4-horse box", "Top 5 straight", "Key favorite over top 3"
+  description: string;          // short rationale
+  tickets: ExoticCombo[];       // combos this strategy covers (sorted by prob)
+  ticketCount: number;
+  unitCost: number;             // per-ticket stake
+  totalCost: number;            // ticketCount × unitCost
+  hitProbability: number;       // P(strategy wins) = sum of covered combo probs
+  expectedPayout: number;       // E[$ | hit] × hitProb
+  expectedValue: number;        // expectedPayout − totalCost
+  expectedRoi: number;          // EV / totalCost (dimensionless)
+}
+
 export interface ExactaRow {
   first: string;
   second: string;
@@ -120,6 +136,7 @@ export interface SimulationResult {
   superfectas: RankedExoticList;
   paceScenario: PaceScenario;
   overlays: OverlayInfo[];
+  strategies: BetStrategy[];   // best-EV recommendation per bet type
   simInfo: {
     totalSims: number;
     batchesRun: number;

@@ -6,6 +6,7 @@ import type {
   RankedExoticList,
   PaceScenario,
   SimulationResult,
+  BetStrategy,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -446,6 +447,183 @@ function estimatePayoff(prob: number): number {
   return (1.0 / prob) * (1.0 - TAKEOUT);
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// EV-driven bet strategy selector.
+//
+// For each bet type (exacta/trifecta/superfecta), enumerates candidate
+// structures — top-N straight, N-horse box, key-horse wheels — and picks
+// the one with highest expected value. "ROI" here is EV / cost so it's
+// comparable across different ticket sizes.
+//
+// Why box sometimes beats straight: when the top 3-4 horses concentrate
+// probability, the box covers ALL orderings of those horses for a cost
+// comparable to playing only 5 specific orderings. Model doesn't need to
+// call the order correctly — just identify the cast.
+//
+// Why key-over sometimes beats both: when one horse dominates (winProb > 0.35
+// roughly), paying to cover just the other slots is cheaper than boxing.
+// ────────────────────────────────────────────────────────────────────────────
+
+function perms<T>(arr: T[]): T[][] {
+  if (arr.length <= 1) return [arr];
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i++) {
+    const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+    for (const p of perms(rest)) out.push([arr[i], ...p]);
+  }
+  return out;
+}
+
+function comboKey(programs: string[]): string {
+  return programs.join(",");
+}
+
+// Build a strategy from a set of ordered combos the bet covers
+function buildStrategy(
+  betType: BetStrategy["betType"],
+  name: string,
+  description: string,
+  unitCost: number,
+  coveredKeys: string[],
+  allCombos: ExoticCombo[],
+): BetStrategy {
+  const comboByKey = new Map(allCombos.map((c) => [comboKey(c.programs), c]));
+  const tickets: ExoticCombo[] = [];
+  for (const k of coveredKeys) {
+    const c = comboByKey.get(k);
+    if (c) tickets.push(c);
+  }
+  tickets.sort((a, b) => b.probability - a.probability);
+  const ticketCount = coveredKeys.length; // even combos with 0 prob cost money
+  const totalCost = Math.round(ticketCount * unitCost * 100) / 100;
+  const hitProbability = tickets.reduce((s, t) => s + t.probability, 0);
+  // E[payout] = Σ prob × payoff per covered combo, then scale by unit stake
+  // estimatePayoff returns $ per $1 bet at fair odds minus takeout
+  const expectedPayout =
+    tickets.reduce((s, t) => s + t.probability * t.estimatedPayoff, 0) * unitCost;
+  const expectedValue = Math.round((expectedPayout - totalCost) * 100) / 100;
+  const expectedRoi = totalCost > 0 ? expectedValue / totalCost : 0;
+  return {
+    betType, name, description, tickets, ticketCount,
+    unitCost, totalCost, hitProbability, expectedPayout,
+    expectedValue, expectedRoi,
+  };
+}
+
+function candidateStrategiesExacta(
+  predictions: PredictionRow[],
+  combos: ExoticCombo[],
+): BetStrategy[] {
+  const unit = 1.0; // $1 minimum at KEE
+  const topProgs = predictions.slice(0, 5).map((p) => p.program);
+  const out: BetStrategy[] = [];
+
+  // Strategy A: top 5 straight
+  out.push(buildStrategy("Exacta", "Top 5 straight", "Play each of the top 5 ordered combos as its own ticket.", unit,
+    combos.slice(0, 5).map((c) => comboKey(c.programs)), combos));
+
+  // Strategy B: 3-horse box (6 combos)
+  const box3 = perms(topProgs.slice(0, 3)).map((p) => p.join(","));
+  out.push(buildStrategy("Exacta", "3-horse box", `Box top 3: #${topProgs.slice(0, 3).join(" / #")} — pays any order of those 3.`, unit, box3, combos));
+
+  // Strategy C: Key favorite over top 4 (fav in 1st, top 4 others in 2nd)
+  const fav = topProgs[0];
+  const others = topProgs.slice(1, 5);
+  const keyOver: string[] = [];
+  for (const o of others) keyOver.push(`${fav},${o}`);
+  out.push(buildStrategy("Exacta", "Key favorite on top", `#${fav} to win over any of #${others.join(" / #")}.`, unit, keyOver, combos));
+
+  return out;
+}
+
+function candidateStrategiesTrifecta(
+  predictions: PredictionRow[],
+  combos: ExoticCombo[],
+): BetStrategy[] {
+  const unit = 0.5;
+  const topProgs = predictions.slice(0, 5).map((p) => p.program);
+  const out: BetStrategy[] = [];
+
+  // A: top 5 straight
+  out.push(buildStrategy("Trifecta", "Top 5 straight", "Play each of the top 5 ordered tri combos as its own $0.50 ticket.", unit,
+    combos.slice(0, 5).map((c) => comboKey(c.programs)), combos));
+
+  // B: 3-horse box (6 combos = $3)
+  const box3 = perms(topProgs.slice(0, 3)).map((p) => p.join(","));
+  out.push(buildStrategy("Trifecta", "3-horse box", `Box top 3: #${topProgs.slice(0, 3).join(" / #")} — hits any order.`, unit, box3, combos));
+
+  // C: 4-horse box (24 combos = $12) — only if hit probability is very high
+  const box4 = perms(topProgs.slice(0, 4)).map((p) => p.join(","));
+  out.push(buildStrategy("Trifecta", "4-horse box", `Box top 4: #${topProgs.slice(0, 4).join(" / #")} — wide net but $12.`, unit, box4, combos));
+
+  // D: Key favorite over top 3 in 2nd & 3rd (choose 2 of 3, ordered = 6 combos)
+  const fav = topProgs[0];
+  const others3 = topProgs.slice(1, 4);
+  const keyOver: string[] = [];
+  for (let i = 0; i < others3.length; i++) {
+    for (let j = 0; j < others3.length; j++) {
+      if (i === j) continue;
+      keyOver.push(`${fav},${others3[i]},${others3[j]}`);
+    }
+  }
+  out.push(buildStrategy("Trifecta", "Key favorite wheel", `#${fav} to win over #${others3.join(" / #")} any order.`, unit, keyOver, combos));
+
+  return out;
+}
+
+function candidateStrategiesSuperfecta(
+  predictions: PredictionRow[],
+  combos: ExoticCombo[],
+): BetStrategy[] {
+  const unit = 0.5;
+  const topProgs = predictions.slice(0, 5).map((p) => p.program);
+  const out: BetStrategy[] = [];
+
+  // A: top 5 straight
+  out.push(buildStrategy("Superfecta", "Top 5 straight", "Play each of the top 5 ordered super combos as its own $0.50 ticket.", unit,
+    combos.slice(0, 5).map((c) => comboKey(c.programs)), combos));
+
+  // B: 4-horse box (24 combos)
+  if (topProgs.length >= 4) {
+    const box4 = perms(topProgs.slice(0, 4)).map((p) => p.join(","));
+    out.push(buildStrategy("Superfecta", "4-horse box", `Box top 4: #${topProgs.slice(0, 4).join(" / #")} — covers all 24 orderings.`, unit, box4, combos));
+  }
+
+  // C: 5-horse box (120 combos = $60 at $0.50)
+  if (topProgs.length >= 5) {
+    const box5 = perms(topProgs.slice(0, 5)).map((p) => p.join(","));
+    out.push(buildStrategy("Superfecta", "5-horse box", `Box top 5 — wide safety net but $60 at $0.50.`, unit, box5, combos));
+  }
+
+  // D: Key favorite over top 4 in 2-3-4 slots (24 combos possible, but only permutations of the other 3 from top 4)
+  if (topProgs.length >= 5) {
+    const fav = topProgs[0];
+    const others4 = topProgs.slice(1, 5);
+    const keyOver: string[] = [];
+    // fav in 1st, any 3 of others4 in positions 2,3,4 in order
+    for (let a = 0; a < others4.length; a++) {
+      for (let b = 0; b < others4.length; b++) {
+        if (b === a) continue;
+        for (let c = 0; c < others4.length; c++) {
+          if (c === a || c === b) continue;
+          keyOver.push(`${fav},${others4[a]},${others4[b]},${others4[c]}`);
+        }
+      }
+    }
+    out.push(buildStrategy("Superfecta", "Key favorite over top 4", `#${fav} to win, any 3 of #${others4.join(" / #")} fill 2-3-4.`, unit, keyOver, combos));
+  }
+
+  return out;
+}
+
+function pickBestStrategy(cands: BetStrategy[]): BetStrategy {
+  // Prefer highest EV. Ties broken by higher hit probability.
+  return cands.slice().sort((a, b) => {
+    if (Math.abs(a.expectedValue - b.expectedValue) > 0.01) return b.expectedValue - a.expectedValue;
+    return b.hitProbability - a.hitProbability;
+  })[0];
+}
+
 export function runSimulation(
   entries: HorseEntry[],
   simCountOverride?: number,
@@ -694,6 +872,19 @@ export function runSimulation(
   // Phase 2: Overlay detection — odds enter ONLY here
   const overlays = detectOverlays(probs, entries);
 
+  // Phase 3: EV-driven strategy selection. For each bet type, enumerate
+  // candidate structures (straight / box / key) and pick highest EV.
+  const strategies: BetStrategy[] = [];
+  if (n >= 2) {
+    strategies.push(pickBestStrategy(candidateStrategiesExacta(predictions, topExactas)));
+  }
+  if (n >= 3) {
+    strategies.push(pickBestStrategy(candidateStrategiesTrifecta(predictions, topTrifectas)));
+  }
+  if (n >= 4) {
+    strategies.push(pickBestStrategy(candidateStrategiesSuperfecta(predictions, topSuperfectas)));
+  }
+
   return {
     predictions,
     exactas: makeList("Exacta", 1.0, topExactas),
@@ -701,6 +892,7 @@ export function runSimulation(
     superfectas: makeList("Superfecta", 0.5, topSuperfectas),
     paceScenario: getPaceScenario(entries),
     overlays,
+    strategies,
     simInfo: {
       totalSims: nSims,
       batchesRun,

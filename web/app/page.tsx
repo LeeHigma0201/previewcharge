@@ -8,6 +8,7 @@ import type {
   SimulationResult,
   RankedExoticList,
   OverlayInfo,
+  BetStrategy,
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
 import { KEENELAND_APR18_2026, KEE_APR18_DATE } from "./lib/keeneland-apr18";
@@ -647,7 +648,22 @@ function KeenelandApp() {
             })}
           </div>
 
-          {/* Exotic Bets */}
+          {/* Recommended Bet Structures — math-picked per race */}
+          {result.strategies && result.strategies.length > 0 && (
+            <div className="mb-10">
+              <h2 className="text-2xl font-black mb-1">Recommended Bets</h2>
+              <p className="text-base text-gray-500 mb-4">
+                Math picks the structure — straight, box, or key-wheel — whose expected value is highest given the model&rsquo;s probabilities.
+              </p>
+              <div className="grid grid-cols-1 gap-3">
+                {result.strategies.map((s) => (
+                  <StrategyCard key={s.betType} strategy={s} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Exotic Bets — full combo tables for reference */}
           <ExoticSection title="EXACTA" cost="$1.00" list={result.exactas} entries={race.entries} />
           <ExoticSection title="TRIFECTA" cost="$0.50" list={result.trifectas} entries={race.entries} />
           <ExoticSection title="SUPERFECTA" cost="$0.50" list={result.superfectas} entries={race.entries} />
@@ -703,6 +719,56 @@ function KeenelandApp() {
         </>
       )}
     </main>
+  );
+}
+
+function StrategyCard({ strategy }: { strategy: BetStrategy }) {
+  const roiPct = Math.round(strategy.expectedRoi * 100);
+  const isPositive = strategy.expectedValue > 0;
+  const tierColor = isPositive
+    ? "bg-emerald-50 border-emerald-400"
+    : strategy.expectedRoi > -0.15
+      ? "bg-amber-50 border-amber-300"
+      : "bg-gray-50 border-gray-300";
+  return (
+    <div className={`p-4 rounded-xl border-2 ${tierColor}`}>
+      <div className="flex items-baseline justify-between mb-1 gap-3">
+        <div>
+          <span className="text-lg font-black">{strategy.betType}</span>
+          <span className="text-gray-500"> &middot; </span>
+          <span className="text-lg font-bold">{strategy.name}</span>
+        </div>
+        <div className="text-right shrink-0">
+          <div className={`text-xl font-black ${isPositive ? "text-emerald-700" : "text-gray-700"}`}>
+            {isPositive ? "+" : ""}{roiPct}% ROI
+          </div>
+          <div className="text-xs text-gray-500">
+            EV {strategy.expectedValue >= 0 ? "+" : ""}${strategy.expectedValue.toFixed(2)}
+          </div>
+        </div>
+      </div>
+      <div className="text-sm text-gray-700 mb-2">{strategy.description}</div>
+      <div className="flex items-center gap-4 text-xs text-gray-600 mb-2">
+        <span><strong>{strategy.ticketCount}</strong> tickets × ${strategy.unitCost.toFixed(2)} = <strong>${strategy.totalCost.toFixed(2)}</strong></span>
+        <span>Hit prob <strong>{(strategy.hitProbability * 100).toFixed(1)}%</strong></span>
+        <span>E[payout] <strong>${strategy.expectedPayout.toFixed(2)}</strong></span>
+      </div>
+      {strategy.tickets.length > 0 && strategy.tickets.length <= 8 && (
+        <div className="mt-2 text-xs font-mono text-gray-700 flex flex-wrap gap-1">
+          {strategy.tickets.map((t, i) => (
+            <span key={i} className="px-2 py-0.5 rounded bg-white border border-gray-200">
+              {t.programs.map((p) => `#${p}`).join("-")}
+              <span className="text-gray-400 ml-1">{(t.probability * 100).toFixed(1)}%</span>
+            </span>
+          ))}
+        </div>
+      )}
+      {strategy.tickets.length > 8 && (
+        <div className="mt-2 text-xs text-gray-500">
+          {strategy.tickets.length} total combos covered (box/wheel).
+        </div>
+      )}
+    </div>
   );
 }
 
