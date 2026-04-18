@@ -16,8 +16,15 @@ import {
   loadResults,
   setRaceFinish,
   clearRaceFinish,
+  saveResults,
   type ResultsMap,
 } from "./lib/results-store";
+import {
+  allRacePicks,
+  computeMultiRaceRec,
+  MULTI_RACE_BETS,
+  type MultiRaceRec,
+} from "./lib/multi-race";
 
 // ── Keeneland April 18, 2026 — Brisnet track-bias build ──
 // Splash is off. Landing page shows the full feature matrix for today's
@@ -383,6 +390,9 @@ function KeenelandApp() {
       <p className="text-gray-500 text-lg mb-8">
         April 18, 2026 &middot; Brisnet track bias loaded &middot; Monte Carlo exotic pricing
       </p>
+
+      {/* Multi-race plays (Pick 3/4/5/6) */}
+      <MultiRacePlaysPanel />
 
       {/* Results tracker */}
       <ResultsPanel />
@@ -858,10 +868,42 @@ function ResultsPanel() {
   const [results, setResults] = useState<ResultsMap>({});
   const [editing, setEditing] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
+  const [fetching, setFetching] = useState(false);
+  const [fetchStatus, setFetchStatus] = useState<string | null>(null);
 
   useEffect(() => {
     setResults(loadResults());
   }, []);
+
+  async function fetchLiveResults() {
+    setFetching(true);
+    setFetchStatus(null);
+    try {
+      const res = await fetch("/api/live-results", { cache: "no-store" });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      const fetched = data.results ?? {};
+      const current = loadResults();
+      let added = 0;
+      const merged: ResultsMap = { ...current };
+      for (const [k, v] of Object.entries(fetched)) {
+        const race = Number(k);
+        if (Array.isArray(v) && v.length > 0 && !merged[race]) {
+          merged[race] = v as string[];
+          added++;
+        }
+      }
+      saveResults(merged);
+      setResults(merged);
+      setFetchStatus(added > 0
+        ? `Added ${added} race${added > 1 ? "s" : ""} from ${data.source ?? "live"}`
+        : `Up to date — no new finishes (${data.source ?? "live"})`);
+    } catch (err: unknown) {
+      setFetchStatus(`Fetch failed: ${err instanceof Error ? err.message : "unknown"}`);
+    } finally {
+      setFetching(false);
+    }
+  }
 
   function startEdit(race: number) {
     setEditing(race);
@@ -893,13 +935,23 @@ function ResultsPanel() {
 
   return (
     <div className="mb-8 p-5 rounded-xl border-2 border-amber-200 bg-amber-50">
-      <div className="flex items-center justify-between mb-3">
-        <div>
+      <div className="flex items-center justify-between mb-3 gap-3">
+        <div className="min-w-0">
           <h2 className="text-lg font-black text-amber-900">Race-Day Results</h2>
           <p className="text-xs text-amber-700">
             {filledCount} of 11 logged &middot; enter finishing order as &quot;1st 2nd 3rd 4th&quot;
           </p>
+          {fetchStatus && (
+            <p className="text-xs text-emerald-700 font-semibold mt-1">{fetchStatus}</p>
+          )}
         </div>
+        <button
+          onClick={fetchLiveResults}
+          disabled={fetching}
+          className="shrink-0 px-4 py-2 rounded-lg bg-amber-700 hover:bg-amber-800 disabled:bg-amber-400 text-white text-sm font-bold transition-colors"
+        >
+          {fetching ? "Fetching..." : "Fetch Live Results"}
+        </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {Array.from({ length: 11 }, (_, i) => i + 1).map((race) => {
@@ -979,6 +1031,123 @@ function ResultsPanel() {
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// MultiRacePlaysPanel — Pick 3/4/5/6 recommendations across the card.
+// For each offered multi-race bet, the model runs the ability score per
+// leg and returns:
+//   - single ticket: top pick per leg (cheapest, e.g. $0.50 Pick 5)
+//   - coverage ticket: backup on the most chaotic leg(s), 2×-8× cost
+// Live results are honored — finished legs turn green/red based on the
+// recorded winner vs the model's pick.
+// ─────────────────────────────────────────────────────────────────────────
+function MultiRacePlaysPanel() {
+  const [recs, setRecs] = useState<MultiRaceRec[]>([]);
+  const [results, setResults] = useState<ResultsMap>({});
+
+  useEffect(() => {
+    const picks = allRacePicks();
+    const computed = MULTI_RACE_BETS.map((bet) => computeMultiRaceRec(bet, picks));
+    setRecs(computed);
+    setResults(loadResults());
+    // Refresh on localStorage updates (e.g. after Fetch Live)
+    const handler = () => setResults(loadResults());
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, []);
+
+  // Split into active (at least 1 leg unfinished) and done
+  const active = recs.filter((r) => r.bet.legs.some((leg) => !results[leg]));
+  const done = recs.filter((r) => r.bet.legs.every((leg) => !!results[leg]));
+
+  if (recs.length === 0) return null;
+
+  return (
+    <div className="mb-8 p-5 rounded-xl border-2 border-indigo-200 bg-indigo-50">
+      <div className="flex items-baseline justify-between mb-3 gap-3">
+        <div>
+          <h2 className="text-lg font-black text-indigo-900">Multi-Race Plays</h2>
+          <p className="text-xs text-indigo-700">
+            Pick 3/4/5/6 — top pick per leg, with coverage on the most chaotic races.
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {active.map((r) => <MultiRaceCard key={r.bet.id} rec={r} results={results} />)}
+      </div>
+      {done.length > 0 && (
+        <details className="mt-4">
+          <summary className="text-xs font-bold text-indigo-800 cursor-pointer">
+            Concluded bets ({done.length})
+          </summary>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-2">
+            {done.map((r) => <MultiRaceCard key={r.bet.id} rec={r} results={results} />)}
+          </div>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function MultiRaceCard({ rec, results }: { rec: MultiRaceRec; results: ResultsMap }) {
+  const bet = rec.bet;
+  const aliveLegs = bet.legs.filter((leg) => {
+    const actual = results[leg];
+    if (!actual || actual.length === 0) return true;
+    const legRec = rec.legs.find((l) => l.race === leg);
+    if (!legRec) return true;
+    const winner = actual[0];
+    return winner === legRec.primary || winner === legRec.backup;
+  });
+  const alive = aliveLegs.length === bet.legs.length;
+  const hasAnyResult = bet.legs.some((leg) => results[leg]);
+  const borderColor = hasAnyResult
+    ? alive ? "border-emerald-400" : "border-red-400"
+    : "border-indigo-200";
+  return (
+    <div className={`p-3 rounded-xl bg-white border-2 ${borderColor}`}>
+      <div className="flex items-baseline justify-between mb-1">
+        <span className="font-black text-indigo-900">{bet.label}</span>
+        <span className="text-xs text-gray-500 font-mono">
+          R{bet.legs.join(" · R")}
+        </span>
+      </div>
+      <div className="text-xs space-y-1.5">
+        <div>
+          <div className="font-bold text-gray-700 mb-0.5">
+            Single ${rec.singleCost.toFixed(2)} &middot; hit {rec.singleHitPct.toFixed(2)}%
+          </div>
+          <div className="font-mono text-gray-800 break-words">{rec.singleTicket}</div>
+        </div>
+        {rec.coverageCost > rec.singleCost && (
+          <div className="pt-1 border-t border-gray-100">
+            <div className="font-bold text-gray-700 mb-0.5">
+              Coverage ${rec.coverageCost.toFixed(2)} &middot; hit {rec.coverageHitPct.toFixed(2)}%
+            </div>
+            <div className="font-mono text-gray-800 break-words">{rec.coverageTicket}</div>
+          </div>
+        )}
+        {/* Per-leg result markers */}
+        <div className="flex flex-wrap gap-1 pt-1 mt-1 border-t border-gray-100">
+          {bet.legs.map((leg) => {
+            const actual = results[leg];
+            const legRec = rec.legs.find((l) => l.race === leg);
+            const winner = actual?.[0];
+            const ours = legRec?.primary;
+            const backup = legRec?.backup;
+            const hit = winner && (winner === ours || winner === backup);
+            const color = !winner ? "bg-gray-100 text-gray-500" : hit ? "bg-emerald-100 text-emerald-900" : "bg-red-100 text-red-900";
+            return (
+              <span key={leg} className={`px-2 py-0.5 rounded text-[11px] font-mono ${color}`}>
+                R{leg}{winner ? ` → #${winner}` : " pending"}
+              </span>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
