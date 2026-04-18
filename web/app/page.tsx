@@ -648,9 +648,9 @@ function KeenelandApp() {
           </div>
 
           {/* Exotic Bets */}
-          <ExoticSection title="EXACTA" cost="$2.00" list={result.exactas} entries={race.entries} />
-          <ExoticSection title="TRIFECTA" cost="$1.00" list={result.trifectas} entries={race.entries} />
-          <ExoticSection title="SUPERFECTA" cost="$0.10" list={result.superfectas} entries={race.entries} />
+          <ExoticSection title="EXACTA" cost="$1.00" list={result.exactas} entries={race.entries} />
+          <ExoticSection title="TRIFECTA" cost="$0.50" list={result.trifectas} entries={race.entries} />
+          <ExoticSection title="SUPERFECTA" cost="$0.50" list={result.superfectas} entries={race.entries} />
 
           {/* Results Tracking */}
           <div className="mt-10 p-6 rounded-xl bg-gray-50 border-2 border-gray-200">
@@ -710,15 +710,21 @@ function ExoticSection({ title, cost, list, entries }: {
   title: string; cost: string; list: RankedExoticList; entries: HorseEntry[];
 }) {
   if (!list.combos.length) return null;
+  const unit = list.unitCost.toFixed(2);
   return (
     <div className="mb-10">
       <div className="flex items-baseline gap-3 mb-2">
         <h3 className="text-2xl font-black">{title}</h3>
         <span className="text-gray-500 text-lg">{cost} per combo</span>
       </div>
-      <p className="text-base text-gray-500 mb-4">
-        {list.totalAboveCutoff} playable combos &middot; Cost: ${list.costAboveCutoff.toFixed(2)}
-      </p>
+      <div className="mb-4 p-3 rounded-xl bg-green-50 border-2 border-green-400">
+        <div className="text-sm font-bold text-green-900 uppercase tracking-wide">
+          5-ticket play &middot; ${unit} each &middot; ${list.costAboveCutoff.toFixed(2)} total
+        </div>
+        <div className="text-xs text-green-800 mt-0.5">
+          Top 5 {title.toLowerCase()}s by model probability. Play each as its own ticket rather than one large box.
+        </div>
+      </div>
       <div className="space-y-2">
         {list.combos.slice(0, 15).map((c) => (
           <div key={c.rank}

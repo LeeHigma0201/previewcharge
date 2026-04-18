@@ -604,13 +604,16 @@ export function runSimulation(
         names: [entries[i].name, entries[j].name],
         probability: prob,
         estimatedPayoff: estimatePayoff(prob),
-        unitCost: 2.0,
-        aboveCutoff: prob >= 0.01,
+        unitCost: 1.0,
+        aboveCutoff: false, // set below — top 5 at $1 = $5 play
       });
     }
   }
   exactaCombos.sort((a, b) => b.probability - a.probability);
-  exactaCombos.forEach((c, i) => (c.rank = i + 1));
+  exactaCombos.forEach((c, i) => {
+    c.rank = i + 1;
+    c.aboveCutoff = i < 5; // top 5 × $1 = $5 play
+  });
   const topExactas = exactaCombos.slice(0, 50);
 
   // --- Ranked Trifectas ---
@@ -627,14 +630,17 @@ export function runSimulation(
           names: [entries[i].name, entries[j].name, entries[k].name],
           probability: prob,
           estimatedPayoff: estimatePayoff(prob),
-          unitCost: 1.0,
-          aboveCutoff: prob >= 0.003,
+          unitCost: 0.5,
+          aboveCutoff: false, // set below — top 5 at $0.50 = $2.50 play
         });
       }
     }
   }
   trifectaCombos.sort((a, b) => b.probability - a.probability);
-  trifectaCombos.forEach((c, i) => (c.rank = i + 1));
+  trifectaCombos.forEach((c, i) => {
+    c.rank = i + 1;
+    c.aboveCutoff = i < 5; // top 5 × $0.50 = $2.50 play
+  });
   const topTrifectas = trifectaCombos.slice(0, 50);
 
   // --- Ranked Superfectas ---
@@ -659,12 +665,15 @@ export function runSimulation(
       ],
       probability: prob,
       estimatedPayoff: estimatePayoff(prob),
-      unitCost: 0.1,
-      aboveCutoff: prob >= 0.001,
+      unitCost: 0.5,
+      aboveCutoff: false, // set below — top 5 at $0.50 = $2.50 play
     });
   }
   superfectaCombos.sort((a, b) => b.probability - a.probability);
-  superfectaCombos.forEach((c, i) => (c.rank = i + 1));
+  superfectaCombos.forEach((c, i) => {
+    c.rank = i + 1;
+    c.aboveCutoff = i < 5; // top 5 × $0.50 = $2.50 play
+  });
   const topSuperfectas = superfectaCombos.slice(0, 100);
 
   const makeList = (
@@ -687,9 +696,9 @@ export function runSimulation(
 
   return {
     predictions,
-    exactas: makeList("Exacta", 2.0, topExactas),
-    trifectas: makeList("Trifecta", 1.0, topTrifectas),
-    superfectas: makeList("Superfecta", 0.1, topSuperfectas),
+    exactas: makeList("Exacta", 1.0, topExactas),
+    trifectas: makeList("Trifecta", 0.5, topTrifectas),
+    superfectas: makeList("Superfecta", 0.5, topSuperfectas),
     paceScenario: getPaceScenario(entries),
     overlays,
     simInfo: {
