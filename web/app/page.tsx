@@ -9,24 +9,20 @@ import type {
   OverlayInfo,
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
+import { KEENELAND_APR18_2026, KEE_APR18_DATE } from "./lib/keeneland-apr18";
 
-// ── Keeneland April 11, 2026 — Hyper-focused build ──
+// ── Keeneland April 18, 2026 — Brisnet track-bias build ──
 const SPLASH_MODE = true; // flip to false to remove gate entirely
 
-// Tomorrow's confirmed card
-const KEE_CARD = [
-  { race: 1, type: "MCL", surface: "Dirt", purse: "$53K", distance: "6f" },
-  { race: 2, type: "MCL", surface: "Dirt", purse: "$48K", distance: "6f" },
-  { race: 3, type: "ALW", surface: "Dirt", purse: "$50K", distance: "6.5f" },
-  { race: 4, type: "MSW", surface: "Dirt", purse: "$110K", distance: "1 1/16m" },
-  { race: 5, type: "MSW", surface: "Turf", purse: "$110K", distance: "1m" },
-  { race: 6, type: "ALW", surface: "Dirt", purse: "$130K", distance: "7f" },
-  { race: 7, type: "ALW", surface: "Turf", purse: "$120K", distance: "1 1/16m" },
-  { race: 8, type: "MSW", surface: "Dirt", purse: "$110K", distance: "6.5f" },
-  { race: 9, type: "STK", surface: "Turf", purse: "$650K", distance: "1 1/16m", name: "Jenny Wiley S. (G1)" },
-  { race: 10, type: "STK", surface: "Dirt", purse: "$400K", distance: "1 1/16m", name: "Stonestreet Lexington S. (G3)" },
-  { race: 11, type: "MSW", surface: "Turf", purse: "$110K", distance: "1 1/16m" },
-];
+// Today's confirmed card — pulled from the Brisnet Race Summary PDF
+const KEE_CARD = KEENELAND_APR18_2026.map((r) => ({
+  race: r.raceNumber,
+  type: r.raceType.split(" ")[0],
+  surface: r.surface,
+  purse: `$${Math.round(r.purse / 1000)}K`,
+  distance: r.distance,
+  name: r.name,
+}));
 
 export default function Home() {
   const [authed, setAuthed] = useState(false);
@@ -61,17 +57,17 @@ export default function Home() {
           HorseGPT
         </h1>
         <p className="text-2xl text-gray-300 mb-6 text-center">
-          Rebuilding for Keeneland &mdash; April 11, 2026
+          Keeneland &mdash; Saturday, April 18, 2026
         </p>
         <div className="text-lg text-gray-500 text-center max-w-md mb-10">
-          The exotic engine is being calibrated for Keeneland&rsquo;s spring meet.
-          Check back tomorrow morning for race-by-race analysis.
+          Live Brisnet track bias loaded. Each race is tuned to the actual
+          weekly runstyle and post-position impact values at Keeneland.
         </div>
 
-        {/* Tomorrow's card preview */}
+        {/* Today's card */}
         <div className="w-full max-w-lg mb-10">
           <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3 text-center">
-            Tomorrow&rsquo;s Card &mdash; 11 Races
+            Today&rsquo;s Card &mdash; 11 Races
           </h2>
           <div className="grid grid-cols-1 gap-1.5">
             {KEE_CARD.map((r) => (
@@ -315,28 +311,45 @@ function KeenelandApp() {
     setShowResults(false);
     setActualFinish(["", "", "", ""]);
     try {
-      const query = `Keeneland Race ${selectedRaceNum} April 11 2026`;
-      const res = await fetch("/api/race", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      // Use static Brisnet data for KEE Apr 18 2026 — no Gemini latency, no bot blocking
+      const staticRace = KEENELAND_APR18_2026.find((r) => r.raceNumber === selectedRaceNum);
+      if (!staticRace) throw new Error(`Race ${selectedRaceNum} not found in static card`);
 
-      const horses = data.horses as Record<string, unknown>[];
-      setGeminiEntries(horses);
+      // Shape the static horses like the Gemini response so downstream merge logic works
+      const horseRecords: Record<string, unknown>[] = staticRace.horses.map((sh) => ({
+        program_number: sh.program,
+        post_position: Number(sh.program) || 0,
+        name: sh.name,
+        morning_line_odds: sh.mlOdds,
+        running_style: sh.style,
+        last_3_beyer: sh.last3Beyer,
+        days_since_last: sh.daysSinceLast,
+        weight: sh.weight,
+        prime_power: sh.primePower ?? 0,
+        current_class: sh.currentClass ?? 0,
+        avg_class_last_3: sh.avgClassLast3 ?? 0,
+        early_pace_last: sh.earlyPaceLast ?? 0,
+        late_pace_last: sh.latePaceLast ?? 0,
+        mud_pct: sh.mudPct ?? 0,
+        is_class_drop: sh.isClassDrop ?? false,
+        jockey: "",
+        trainer: "",
+      }));
+      setGeminiEntries(horseRecords);
 
       const raceInfo: RaceInfo = {
-        track: String(data.track_code ?? selectedTrack.code),
-        trackName: String(data.track_name ?? selectedTrack.name),
-        date: String(data.race_date ?? ""),
+        track: selectedTrack.code,
+        trackName: selectedTrack.name,
+        date: KEE_APR18_DATE,
         raceNumber: selectedRaceNum,
-        distance: String(data.distance ?? ""),
-        surface: String(data.surface ?? ""),
-        raceType: String(data.race_type ?? ""),
-        purse: Number(data.purse ?? 0),
-        condition: String(data.condition ?? ""),
+        distance: staticRace.distance,
+        surface: staticRace.surface,
+        raceType: staticRace.raceType,
+        purse: staticRace.purse,
+        condition: staticRace.condition,
+        name: staticRace.name,
+        postTime: staticRace.postTime,
+        trackBias: staticRace.trackBias,
         entries: [],
       };
       setRace(raceInfo);
@@ -437,7 +450,7 @@ function KeenelandApp() {
         HorseGPT <span className="text-blue-600">Keeneland</span>
       </h1>
       <p className="text-gray-500 text-lg mb-8">
-        April 11, 2026 &middot; Monte Carlo exotic pricing &middot; Tuned for KEE spring meet
+        April 18, 2026 &middot; Brisnet track bias loaded &middot; Monte Carlo exotic pricing
       </p>
 
       {/* Select Race Number */}
@@ -466,7 +479,7 @@ function KeenelandApp() {
           <div className="text-xl font-bold mb-2">
             Loading {selectedTrack?.name} Race {selectedRaceNum}...
           </div>
-          <div className="text-base text-gray-500">Gemini is searching for entries and checking scratches</div>
+          <div className="text-base text-gray-500">Brisnet static data — track bias + 50 features</div>
         </div>
       )}
 

@@ -26,6 +26,19 @@ export interface HorseEntry {
   weight?: number;
 }
 
+export interface RaceTrackBias {
+  // Week-level Brisnet track bias stats for this surface+distance
+  speedBiasPct: number;     // % of recent races where speed held
+  railBias: string;         // "+", "0", "-"
+  eIV: number;              // runstyle impact values
+  epIV: number;
+  pIV: number;
+  sIV: number;
+  post1to3IV: number;       // post position impact values
+  post4to7IV: number;
+  post8plusIV: number;
+}
+
 export interface RaceInfo {
   track: string;
   trackName?: string;
@@ -37,6 +50,9 @@ export interface RaceInfo {
   purse: number;
   condition: string;
   entries: HorseEntry[];
+  trackBias?: RaceTrackBias;   // optional — present for KEE Apr 18 2026
+  postTime?: string;           // display only
+  name?: string;               // stakes name if applicable
 }
 
 export interface PredictionRow {

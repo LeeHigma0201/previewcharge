@@ -111,13 +111,13 @@ export function getPaceScenario(entries: HorseEntry[]): PaceScenario {
 // ===========================================================================
 
 const WEIGHTS = {
-  speed: 0.30,
-  pace: 0.20,
-  class: 0.15,
-  form: 0.15,
-  connections: 0.10,
+  speed: 0.28,
+  pace: 0.18,
+  class: 0.14,
+  form: 0.14,
+  connections: 0.09,
   post: 0.05,
-  trackBias: 0.05, // KEE surface/condition effect (0 for non-KEE)
+  trackBias: 0.12, // KEE real Brisnet IVs — stronger signal than generic heuristic
 };
 
 // Z-score a numeric array within the field (mean=0, std=1)
@@ -315,25 +315,56 @@ function parseDistanceFurlongs(dist: string): number {
 function keenelandConditionAdj(entries: HorseEntry[], race?: RaceInfo): number[] {
   if (race?.track !== "KEE") return entries.map(() => 0);
 
+  // PREFERRED PATH: real Brisnet track bias for this specific surface+distance.
+  // Convert impact values (IV) to z-scored adjustments.
+  // IV of 1.0 = neutral (expected); > 1.0 = outperforming; < 1.0 = underperforming.
+  // We cap the adjustment range so it doesn't swamp the 7% weight.
+  if (race.trackBias) {
+    const tb = race.trackBias;
+    const n = entries.length;
+
+    // Style IVs → additive adjustment centered at IV=1.0
+    const styleAdj = (style: string): number => {
+      const s = (style || "P").toUpperCase();
+      // Map style code to IV slot. "C" (deep closer) uses S slot.
+      const iv =
+        s === "E"  ? tb.eIV :
+        s === "EP" ? tb.epIV :
+        s === "P"  ? tb.pIV :
+        /* S/C */    tb.sIV;
+      // Center at 1.0 and compress — IV of 2.6 → +0.8, IV of 0 → -0.6
+      return Math.max(-0.8, Math.min(0.9, (iv - 1.0) * 0.5));
+    };
+
+    // Post IVs — inside (1-3), middle (4-7), outside (8+)
+    const postAdj = (pp: number): number => {
+      const iv =
+        pp <= 3 ? tb.post1to3IV :
+        pp <= 7 ? tb.post4to7IV :
+                  tb.post8plusIV;
+      return Math.max(-0.8, Math.min(0.9, (iv - 1.0) * 0.4));
+    };
+
+    return entries.map((e) => {
+      const sa = styleAdj(e.style);
+      const pa = postAdj(e.pp);
+      // Modest weight on post (already covered partly by postScores)
+      return sa + pa * 0.5;
+    });
+  }
+
+  // FALLBACK PATH: generic surface heuristic when no real bias data is present.
   const isDirt = !race.surface || race.surface.toLowerCase().includes("dirt");
   const condition = (race.condition || "").toLowerCase();
   const isWet = ["muddy", "sloppy", "good", "yielding", "soft"].some((c) => condition.includes(c));
 
   return entries.map((e) => {
     if (!isDirt) return 0;
-
     const style = e.style || "P";
-
-    // These scores are on the same scale as paceScores, but capture
-    // the TRACK-SPECIFIC surface effect, not the field pace dynamic.
-    // paceScores measures "lone speed vs speed duel" (field composition).
-    // This measures "does KEE dirt help speed horses hold?" (track surface).
     if (isWet) {
-      // KEE wet dirt: surface becomes deeper, tiring for front-runners
       if (["S", "C"].includes(style)) return 0.6;
       if (["E", "EP"].includes(style)) return -0.5;
     } else {
-      // KEE fast dirt: firm surface helps speed maintain
       if (["E", "EP"].includes(style)) return 0.3;
       if (["S", "C"].includes(style)) return -0.15;
     }
