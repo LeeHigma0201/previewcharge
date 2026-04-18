@@ -12,7 +12,15 @@
       "Bash(npm run:*)",
       "Bash(pkill -f \"next dev\")",
       "Bash(python generate_infographic_v2.py)",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "WebFetch(domain:www.equibase.com)",
+      "WebFetch(domain:www.twinspires.com)",
+      "Bash(awk '/^const race3: StaticRace/,/^};$/' /Users/jason/previewcharge/.claude/worktrees/pensive-villani-67adc5/web/app/lib/keeneland-apr18.ts)",
+      "Bash(awk '/^const race[0-9]+: StaticRace/,/^};$/' /Users/jason/previewcharge/.claude/worktrees/pensive-villani-67adc5/web/app/lib/keeneland-apr18.ts)",
+      "Bash(awk ' *)",
+      "Bash(awk '$1>1')",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__get_page_text"
     ]
   }
 }

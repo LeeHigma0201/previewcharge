@@ -7,7 +7,10 @@ import type { StaticRace, StaticHorse } from "./keeneland-apr18";
 import { KEENELAND_APR18_2026 } from "./keeneland-apr18";
 
 function staticToEntries(race: StaticRace): { horses: HorseEntry[]; raceInfo: RaceInfo } {
-  const horses: HorseEntry[] = race.horses.map((sh: StaticHorse) => ({
+  const scratched = new Set(race.scratches ?? []);
+  const horses: HorseEntry[] = race.horses
+    .filter((sh: StaticHorse) => !scratched.has(sh.program))
+    .map((sh: StaticHorse) => ({
     pp: Number(sh.program) || 0,
     program: sh.program,
     name: sh.name,
@@ -22,7 +25,10 @@ function staticToEntries(race: StaticRace): { horses: HorseEntry[]; raceInfo: Ra
     daysSinceLast: sh.daysSinceLast,
     weight: sh.weight,
     isClassDrop: sh.isClassDrop,
-  }));
+    // Carry Prime Power via an augmented field so abilitySoftmax can pick it up
+    // without widening the global HorseEntry interface mid-session.
+    ...(sh.primePower !== undefined ? { primePower: sh.primePower } : {}),
+  } as HorseEntry & { primePower?: number }));
   const raceInfo: RaceInfo = {
     track: "KEE",
     trackName: "Keeneland",
@@ -88,13 +94,14 @@ function abilitySoftmax(horses: HorseEntry[], race: RaceInfo): number[] {
         s === "EP" ? tb.epIV :
         s === "P"  ? tb.pIV :
                      tb.sIV;
-      const styleA = Math.max(-0.8, Math.min(0.9, (iv - 1.0) * 0.5));
+      // Learning (R2): tighter clamp on small-sample weekly IVs
+      const styleA = Math.max(-0.5, Math.min(0.6, (iv - 1.0) * 0.35));
       const pp = h.pp;
       const pIv =
         pp <= 3 ? tb.post1to3IV :
         pp <= 7 ? tb.post4to7IV :
                   tb.post8plusIV;
-      const postA = Math.max(-0.8, Math.min(0.9, (pIv - 1.0) * 0.4));
+      const postA = Math.max(-0.5, Math.min(0.6, (pIv - 1.0) * 0.30));
       return styleA + postA * 0.5;
     });
   }
@@ -102,19 +109,52 @@ function abilitySoftmax(horses: HorseEntry[], race: RaceInfo): number[] {
   // Class movement (drop = bump)
   const classAdj = horses.map((h) => (h.isClassDrop ? 0.6 : 0));
 
+  // Learning (R1): softer layoff penalty when peak Beyer shows class is intact
+  const layoffAdj = horses.map((h) => {
+    const d = h.daysSinceLast ?? 0;
+    if (d >= 14 && d <= 35) return 0.15;
+    if (d > 60) {
+      const peak = h.last3Beyer && h.last3Beyer.length > 0 ? Math.max(...h.last3Beyer) : 0;
+      return peak >= 82 ? -0.08 : -0.22;
+    }
+    if (d > 0 && d < 7) return -0.25;
+    return 0;
+  });
+
+  // Prime Power — Brisnet composite (previously unused, now z-scored in)
+  const ppVals = horses.map((h) => {
+    const raw = (h as unknown as { primePower?: number }).primePower;
+    return typeof raw === "number" && raw > 0 ? raw : 0;
+  });
+  const ppKnown = ppVals.filter((v) => v > 0);
+  const ppMean = ppKnown.length ? ppKnown.reduce((a, b) => a + b, 0) / ppKnown.length : 100;
+  const ppSd = ppKnown.length
+    ? Math.sqrt(ppKnown.reduce((a, v) => a + (v - ppMean) ** 2, 0) / ppKnown.length) || 1
+    : 1;
+  const primePowerZ = ppVals.map((v) => (v > 0 ? (v - ppMean) / ppSd : 0));
+
   // Composite ability with same weights as runSimulation
   const abilities = horses.map((_, i) =>
-    0.28 * speedZ[i] +
+    0.22 * speedZ[i] +
     0.18 * paceAdj[i] +
     0.14 * classAdj[i] +
-    0.12 * biasAdj[i]
+    0.12 * biasAdj[i] +
+    0.08 * layoffAdj[i] +
+    0.10 * primePowerZ[i]
   );
 
   // Softmax
   const maxA = Math.max(...abilities);
   const exps = abilities.map((a) => Math.exp(a - maxA));
   const sum = exps.reduce((a, b) => a + b, 0);
-  return exps.map((e) => Math.max(e / sum, 1e-6));
+  const modelProbs = exps.map((e) => Math.max(e / sum, 1e-6));
+
+  // Learning (R1-R5): blend 70/30 model/market — public priced 4 of 5 winners
+  // reasonably. ML odds carry info our ability features miss.
+  const marketRaw = horses.map((h) => 1.0 / (h.mlOdds + 1.0));
+  const marketSum = marketRaw.reduce((a, b) => a + b, 0);
+  const marketProbs = marketRaw.map((p) => (marketSum > 0 ? p / marketSum : 1 / n));
+  return modelProbs.map((mp, i) => Math.max(0.70 * mp + 0.30 * marketProbs[i], 1e-6));
 }
 
 export interface RacePick {

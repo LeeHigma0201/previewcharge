@@ -46,10 +46,14 @@ function cleanJson(raw: string): string {
 export async function GET() {
   const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   if (!apiKey) {
-    return NextResponse.json(
-      { error: "GEMINI_API_KEY not configured", results: {}, source: "none" },
-      { status: 500 },
-    );
+    // Return 200 with a flag so the UI can show a helpful message instead of
+    // appearing to silently fail. The bet sheet still works without Gemini.
+    return NextResponse.json({
+      results: {},
+      source: "none",
+      gemini_disabled: true,
+      message: "Live results unavailable — GEMINI_API_KEY not set on Vercel. Log finishes manually.",
+    });
   }
 
   try {

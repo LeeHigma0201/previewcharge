@@ -213,10 +213,18 @@ function formScores(entries: HorseEntry[]): number[] {
       if (recent > avg + 3) score += 0.6;  // improving
       if (recent < avg - 3) score -= 0.6;  // declining
     }
-    // Rest pattern
+    // Rest pattern — layoff penalty softens for high-class horses
+    // Learning (KEE Apr 18 R1): Reality Star won at 6/1 with 98d layoff; my
+    // flat −0.5 penalty pushed him from win-pick to 3rd. Check back-speed:
+    // if the horse's peak recent Beyer is strong, the layoff is intentional
+    // (trainer freshened), not decline.
     if (e.daysSinceLast) {
       if (e.daysSinceLast >= 14 && e.daysSinceLast <= 35) score += 0.3;
-      if (e.daysSinceLast > 60) score -= 0.5;
+      if (e.daysSinceLast > 60) {
+        const peakBeyer = e.last3Beyer && e.last3Beyer.length > 0 ? Math.max(...e.last3Beyer) : 0;
+        // Soften penalty if peakBeyer >= 82 (quality horse who ran well recently)
+        score -= peakBeyer >= 82 ? 0.2 : 0.5;
+      }
       if (e.daysSinceLast < 7) score -= 0.6;
     }
     // Last finish position — recent winner/placer is in better form
@@ -333,8 +341,11 @@ function keenelandConditionAdj(entries: HorseEntry[], race?: RaceInfo): number[]
         s === "EP" ? tb.epIV :
         s === "P"  ? tb.pIV :
         /* S/C */    tb.sIV;
-      // Center at 1.0 and compress — IV of 2.6 → +0.8, IV of 0 → -0.6
-      return Math.max(-0.8, Math.min(0.9, (iv - 1.0) * 0.5));
+      // Learning (KEE Apr 18 R2): Week bias with <5 race samples overfit —
+      // it called a closer race, #5 Consolidated (EP, 65d) won at 6/1
+      // bucking the 0% week speed bias. Clamp IV impact tighter so weekly
+      // noise doesn't override meet-level priors. IV of 2.6 → +0.56, IV 0 → -0.35.
+      return Math.max(-0.5, Math.min(0.6, (iv - 1.0) * 0.35));
     };
 
     // Post IVs — inside (1-3), middle (4-7), outside (8+)
@@ -343,7 +354,7 @@ function keenelandConditionAdj(entries: HorseEntry[], race?: RaceInfo): number[]
         pp <= 3 ? tb.post1to3IV :
         pp <= 7 ? tb.post4to7IV :
                   tb.post8plusIV;
-      return Math.max(-0.8, Math.min(0.9, (iv - 1.0) * 0.4));
+      return Math.max(-0.5, Math.min(0.6, (iv - 1.0) * 0.30));
     };
 
     return entries.map((e) => {

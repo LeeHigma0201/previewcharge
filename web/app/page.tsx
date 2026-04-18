@@ -254,7 +254,10 @@ function KeenelandApp() {
       if (!staticRace) throw new Error(`Race ${selectedRaceNum} not found in static card`);
 
       // Shape the static horses like the Gemini response so downstream merge logic works
-      const horseRecords: Record<string, unknown>[] = staticRace.horses.map((sh) => ({
+      const scratchedSet = new Set(staticRace.scratches ?? []);
+      const horseRecords: Record<string, unknown>[] = staticRace.horses
+        .filter((sh) => !scratchedSet.has(sh.program))
+        .map((sh) => ({
         program_number: sh.program,
         post_position: Number(sh.program) || 0,
         name: sh.name,
@@ -322,6 +325,10 @@ function KeenelandApp() {
         body: JSON.stringify({ query }),
       });
       const data = await res.json();
+      if (data.gemini_disabled) {
+        setLiveStatus(`⚠ ${data.message ?? "Gemini not available — using Brisnet baseline"}`);
+        return;
+      }
       if (data.error) throw new Error(data.error);
       const liveHorses = (data.horses ?? []) as Record<string, unknown>[];
       if (liveHorses.length === 0) throw new Error("No live entries found");
@@ -449,9 +456,21 @@ function KeenelandApp() {
       <h1 className="text-5xl font-black tracking-tight mb-1">
         HorseGPT <span className="text-blue-600">Keeneland</span>
       </h1>
-      <p className="text-gray-500 text-lg mb-8">
+      <p className="text-gray-500 text-lg mb-4">
         April 18, 2026 &middot; Brisnet track bias loaded &middot; Monte Carlo exotic pricing
       </p>
+
+      {/* Bet Sheet CTA — the new primary UX */}
+      <Link
+        href="/bets"
+        className="mb-8 flex items-center justify-between gap-3 px-6 py-5 rounded-xl border-2 border-emerald-500 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+      >
+        <div>
+          <div className="text-xl font-black text-emerald-900">Bet Sheet &rarr;</div>
+          <div className="text-sm text-emerald-800">All 11 races' small-wager exotic tickets, one scroll.</div>
+        </div>
+        <div className="text-emerald-700 text-2xl">&rarr;</div>
+      </Link>
 
       {/* Multi-race plays (Pick 3/4/5/6) */}
       <MultiRacePlaysPanel />
@@ -961,6 +980,10 @@ function ResultsPanel() {
     try {
       const res = await fetch("/api/live-results", { cache: "no-store" });
       const data = await res.json();
+      if (data.gemini_disabled) {
+        setFetchStatus(`⚠ ${data.message ?? "Gemini unavailable — log finishes manually"}`);
+        return;
+      }
       if (data.error) throw new Error(data.error);
       const fetched = data.results ?? {};
       const current = loadResults();
