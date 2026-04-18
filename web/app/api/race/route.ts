@@ -276,10 +276,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Force Keeneland April 11, 2026
+    // Force Keeneland April 18, 2026 (today's card)
     const trackCode = "KEE";
     const raceNumber = parsed.raceNumber;
-    const isoDate = "2026-04-11";
+    const isoDate = "2026-04-18";
 
     // Check cache first
     const cacheKey = `${trackCode}-${raceNumber}-${isoDate}`;

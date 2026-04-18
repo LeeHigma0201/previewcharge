@@ -305,6 +305,68 @@ function KeenelandApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTrack, selectedRaceNum]);
 
+  // Live Gemini refresh — hits /api/race (web search) and merges live odds
+  // + scratches on top of the static Brisnet baseline. Static speed/class
+  // numbers stay intact; only odds, jockey, and scratches get refreshed.
+  const [liveRefreshing, setLiveRefreshing] = useState(false);
+  const [liveStatus, setLiveStatus] = useState<string | null>(null);
+  async function refreshLiveFromGemini() {
+    if (!selectedRaceNum) return;
+    setLiveRefreshing(true);
+    setLiveStatus(null);
+    try {
+      const query = `Keeneland Race ${selectedRaceNum} April 18 2026`;
+      const res = await fetch("/api/race", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      const liveHorses = (data.horses ?? []) as Record<string, unknown>[];
+      if (liveHorses.length === 0) throw new Error("No live entries found");
+
+      // Merge: for each static entry, find a matching live entry by program OR name.
+      // Overwrite only live-relevant fields (odds, jockey, trainer). Keep static
+      // numerical features (last_3_beyer, prime_power, etc.) because they're
+      // higher-quality than Gemini's search-guessed equivalents.
+      const liveByProg = new Map(liveHorses.map((h) => [String(h.program_number), h]));
+      const liveByName = new Map(
+        liveHorses.map((h) => [String(h.name ?? "").toLowerCase().trim(), h]),
+      );
+
+      const merged = geminiEntries.map((h) => {
+        const prog = String(h.program_number ?? "");
+        const name = String(h.name ?? "").toLowerCase().trim();
+        const live = liveByProg.get(prog) ?? liveByName.get(name);
+        if (!live) return h; // no live match — keep static
+        return {
+          ...h,
+          morning_line_odds: live.morning_line_odds ?? h.morning_line_odds,
+          jockey: live.jockey ?? h.jockey ?? "",
+          trainer: live.trainer ?? h.trainer ?? "",
+        };
+      });
+
+      // Apply scratches if Gemini reports any
+      const scratches = String(data._scratches ?? "").toLowerCase();
+      const remaining = scratches
+        ? merged.filter((h) => !scratches.includes(String(h.name ?? "").toLowerCase()))
+        : merged;
+
+      setGeminiEntries(remaining);
+      setLiveStatus(
+        `Synced — ${remaining.length} horses, odds/jockey from ${data._dataSource ?? "gemini"}${
+          scratches ? ` · scratches applied` : ""
+        }`,
+      );
+    } catch (err: unknown) {
+      setLiveStatus(`Live sync failed: ${err instanceof Error ? err.message : "unknown"}`);
+    } finally {
+      setLiveRefreshing(false);
+    }
+  }
+
   // Step 3: Run the model — merges Gemini base data + TVG screenshot data
   function handleRunModel() {
     if (!race || geminiEntries.length === 0) return;
@@ -432,19 +494,37 @@ function KeenelandApp() {
         <>
           {/* Race found */}
           <div className="mb-6 p-5 rounded-xl bg-blue-50 border-2 border-blue-200">
-            <h2 className="text-2xl font-black">
-              {race.trackName || race.track} — Race {race.raceNumber}
-            </h2>
-            <p className="text-base text-gray-600">
-              {race.date} &middot; {race.distance} &middot; {race.surface} &middot; {race.raceType} &middot; ${race.purse.toLocaleString()}
-            </p>
-            <p className="text-base font-semibold text-blue-700 mt-2">
-              {geminiEntries.length} horses found (scratches removed)
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="min-w-0">
+                <h2 className="text-2xl font-black">
+                  {race.trackName || race.track} — Race {race.raceNumber}
+                </h2>
+                <p className="text-base text-gray-600">
+                  {race.date} &middot; {race.distance} &middot; {race.surface} &middot; {race.raceType} &middot; ${race.purse.toLocaleString()}
+                </p>
+              </div>
+              <button
+                onClick={refreshLiveFromGemini}
+                disabled={liveRefreshing}
+                className="shrink-0 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-bold transition-colors"
+                title="Fetch live odds/scratches via Gemini web search and merge onto Brisnet baseline"
+              >
+                {liveRefreshing ? "Syncing..." : "Sync live from Google"}
+              </button>
+            </div>
+            {liveStatus && (
+              <p className={`text-sm font-semibold mb-2 ${
+                liveStatus.includes("failed") ? "text-red-600" : "text-emerald-700"
+              }`}>{liveStatus}</p>
+            )}
+            <p className="text-base font-semibold text-blue-700">
+              {geminiEntries.length} horses loaded (Brisnet baseline{liveStatus?.includes("Synced") ? " + live sync" : ""})
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {geminiEntries.map((h) => (
                 <span key={String(h.program_number)} className="px-3 py-1 rounded-lg bg-white border text-sm font-medium">
                   #{String(h.program_number)} {String(h.name)}
+                  {h.morning_line_odds ? <span className="text-gray-400 ml-1">{String(h.morning_line_odds)}/1</span> : null}
                 </span>
               ))}
             </div>
