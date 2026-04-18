@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "HorseGPT — Keeneland April 11",
+  title: "HorseGPT — Keeneland April 18, 2026",
   description:
-    "Keeneland-focused horse racing handicapping. Monte Carlo exotic pricing tuned for KEE spring meet.",
+    "Data-first horse racing handicapping. Monte Carlo + EV overlay + A/B/C exotic tiering. Tuned for Keeneland spring meet.",
 };
 
 export default function RootLayout({

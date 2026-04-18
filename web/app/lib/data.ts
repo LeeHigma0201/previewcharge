@@ -6,7 +6,59 @@ import type {
   RankedExoticList,
   PaceScenario,
   SimulationResult,
+  TicketSpec,
 } from "./types";
+import type { KeeneHorse, KeeneRace } from "./keeneland-apr18";
+
+// Convert Brisnet Ultimate PP data → HorseEntry (model input).
+// Scratches are filtered out. Prime Power is the primary speed signal.
+export function keeneHorseToEntry(h: KeeneHorse): HorseEntry {
+  return {
+    pp: h.post,
+    program: h.program,
+    name: h.name,
+    jockey: h.jockey,
+    trainer: h.trainer,
+    mlOdds: h.mlOdds,
+    style: h.style === "?" ? "P" : h.style,
+    // Use Prime Power as the primary speed input since it's a Brisnet
+    // composite (speed + pace + class + pedigree in one number).
+    speed: h.primePower,
+    e1Pace: h.paceE1 ?? 0,
+    latePace: h.paceLate ?? 0,
+    // Last 3 speed figures for form-cycle trend
+    last3Beyer: h.last3Speeds?.length ? h.last3Speeds : undefined,
+    wins: h.wins,
+    starts: h.starts,
+    jockeyWinPct: h.jockeyWinPct,
+    trainerWinPct: h.trainerWinPct,
+    daysSinceLast: h.daysSinceLast,
+    lastFinishPosition: h.lastFinishPosition,
+    weight: h.weight,
+    // Class drop: horse has higher avg class than today's class rating
+    isClassDrop: Boolean(h.classLast3 && h.classRating && h.classLast3 > h.classRating + 2),
+    isClassRaise: Boolean(h.classLast3 && h.classRating && h.classLast3 < h.classRating - 2),
+  };
+}
+
+// Given a KeeneRace, build a RaceInfo the simulation can consume.
+export function keeneRaceToRaceInfo(r: KeeneRace): RaceInfo {
+  const entries = r.horses
+    .filter((h) => !h.scratched)
+    .map(keeneHorseToEntry);
+  return {
+    track: "KEE",
+    trackName: "Keeneland",
+    date: "2026-04-18",
+    raceNumber: r.raceNumber,
+    distance: r.distance,
+    surface: r.surface,
+    raceType: r.raceType,
+    purse: r.purse,
+    condition: "fast",  // Keeneland default unless wet
+    entries,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Probit (inverse normal CDF) — same as Python's norm.ppf
@@ -60,8 +112,50 @@ function probit(p: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// Pace scenario analysis — adjusts raw probabilities
+// Pace Pressure Score (PPS) — continuous 0-100 score from Exotic Bet Algo §3.1
+//
+// Traditional handicapping uses discrete labels ("E", "EP", "P", "S"). That's
+// mathematically imprecise. This function analyzes E1 velocity (early pace
+// figures) to produce a continuous Pace Pressure Score.
+//
+// PPS > 80  → Pace Meltdown — extreme early friction; closers get boost
+// PPS 40-60 → Honest pace — runs to baseline ability
+// PPS < 30  → Lone Speed — uncontested front; speed horse gets massive boost
 // ---------------------------------------------------------------------------
+
+function computePPS(entries: HorseEntry[]): number {
+  // Count horses with early intent AND decent E1 pace figures
+  const earlyHorses = entries.filter((e) => ["E", "EP"].includes(e.style));
+  const eCount = entries.filter((e) => e.style === "E").length;
+  const epCount = entries.filter((e) => e.style === "EP").length;
+
+  // Base: each E is 25 pts, each EP is 15 pts of pressure
+  let pps = eCount * 25 + epCount * 15;
+
+  // Adjust by E1 pace strength: if the early horses have similar E1 figures,
+  // they'll actually duel. If one has 105 vs others at 85, it's lone speed.
+  if (earlyHorses.length >= 2) {
+    const e1s = earlyHorses
+      .map((e) => e.e1Pace || 0)
+      .filter((v) => v > 0)
+      .sort((a, b) => b - a);
+    if (e1s.length >= 2) {
+      const topGap = e1s[0] - e1s[1];
+      if (topGap >= 15) pps -= 30;       // dominant lone speed even with multiple Es
+      else if (topGap >= 8) pps -= 10;   // slight edge, some pressure relief
+      // tight gap → pressure stays high
+    }
+  }
+
+  // Sprint distances (≤7f) amplify pace friction
+  // Route distances (≥1 1/16m) dilute it (more time to recover)
+  // We can't access race from here, so we approximate with field size:
+  // denser fields create more friction.
+  if (entries.length >= 10) pps += 5;
+  if (entries.length <= 6) pps -= 5;
+
+  return Math.max(0, Math.min(100, pps));
+}
 
 export function getPaceScenario(entries: HorseEntry[]): PaceScenario {
   const earlyCount = entries.filter((e) =>
@@ -72,27 +166,33 @@ export function getPaceScenario(entries: HorseEntry[]): PaceScenario {
     ["S", "C"].includes(e.style),
   ).length;
 
+  const pps = computePPS(entries);
+
   let scenario: string;
   let description: string;
-  if (earlyCount >= 3) {
+  if (pps > 80) {
+    scenario = "Pace Meltdown";
+    description =
+      `PPS ${pps}. Extreme early friction expected. Closers/stalkers favored, speed penalized.`;
+  } else if (pps >= 60) {
     scenario = "Speed Duel";
     description =
-      "3+ early speed types contest the pace. Hot pace benefits closers/stalkers.";
-  } else if (earlyCount === 2) {
-    scenario = "Contested Pace";
+      `PPS ${pps}. Multiple speed types contest the lead. Hot pace benefits late runners.`;
+  } else if (pps >= 40) {
+    scenario = "Honest Pace";
     description =
-      "Two speed types push each other. Moderate closer advantage.";
-  } else if (earlyCount === 1) {
+      `PPS ${pps}. Fair tempo. Horses run to baseline ability — no pace-based edge.`;
+  } else if (pps >= 20) {
+    scenario = "Soft Pace";
+    description =
+      `PPS ${pps}. Moderate early pressure. Tactical speed and stalkers advantaged.`;
+  } else {
     scenario = "Lone Speed";
     description =
-      "Single speed horse controls pace unchallenged. ~35% win rate historically.";
-  } else {
-    scenario = "No Speed";
-    description =
-      "No committed speed. Slow pace, sprint finish. Tactical speed is key.";
+      `PPS ${pps}. Uncontested front. Primary speed horse gets major boost (+40% historically).`;
   }
 
-  return { scenario, earlyCount, presserCount, closerCount, description };
+  return { scenario, earlyCount, presserCount, closerCount, description, pps };
 }
 
 // ===========================================================================
@@ -159,27 +259,44 @@ function speedScores(entries: HorseEntry[]): number[] {
   return zScore(imputed);
 }
 
-// Score 2: PACE FIT — running style × field pace scenario
+// Score 2: PACE FIT — running style × continuous Pace Pressure Score (PPS)
+// Uses Exotic Bet Algorithm §3.1 thresholds:
+//   PPS > 80 → Pace Meltdown: E/EP −0.9, S/C +0.9
+//   PPS < 30 → Lone Speed: E/EP +1.2 (if truly alone), S/C −0.7
+//   Continuous interpolation in between.
 function paceScores(entries: HorseEntry[]): number[] {
-  const pace = getPaceScenario(entries);
+  const pps = computePPS(entries);
   return entries.map((e) => {
     const style = e.style || "P";
-    if (pace.scenario === "Speed Duel") {
-      if (["E", "EP"].includes(style)) return -0.8; // speed duel hurts speed
-      if (["S", "C"].includes(style)) return 0.8;   // closers benefit
-      if (style === "P") return 0.3;
-    } else if (pace.scenario === "Lone Speed") {
-      if (["E", "EP"].includes(style)) {
+
+    // Normalize PPS to a pressure coefficient: 0 at PPS=50 (neutral),
+    // +1 at PPS=100 (meltdown), -1 at PPS=0 (lone speed).
+    const pressure = (pps - 50) / 50;
+
+    if (style === "E" || style === "EP") {
+      // High pressure hurts early horses. Very low pressure helps them.
+      // But lone-speed bonus requires genuine isolation.
+      if (pressure < -0.4) {
         const otherSpeed = entries.filter(
           (x) => x.name !== e.name && ["E", "EP"].includes(x.style || "P"),
         ).length;
-        if (otherSpeed === 0) return 1.2; // massive advantage
+        if (otherSpeed === 0) return 1.2;       // genuine lone speed
+        if (otherSpeed === 1 && pressure < -0.5) return 0.6;
       }
-      if (["S", "C"].includes(style)) return -0.6;
-    } else if (pace.scenario === "Contested Pace") {
-      if (["S", "C"].includes(style)) return 0.4;
-      if (["E", "EP"].includes(style)) return -0.4;
+      return -pressure * 0.9;  // 0 at neutral, -0.9 at meltdown
     }
+
+    if (style === "S" || style === "C") {
+      // Closers benefit from high pressure, suffer in lone-speed scenarios.
+      return pressure * 0.9;
+    }
+
+    if (style === "P") {
+      // Stalkers/pressers — the sweet spot. Positive in meltdowns,
+      // still OK in honest pace, slightly negative in pure lone speed.
+      return pressure * 0.4 + 0.1;
+    }
+
     return 0;
   });
 }
@@ -371,48 +488,610 @@ function computeAbilityProbs(entries: HorseEntry[], race?: RaceInfo): number[] {
 }
 
 // ===========================================================================
-// PHASE 2: OVERLAY DETECTION — odds enter ONLY here
+// PHASE 2: EV EDGE + A/B/C TIERING — odds enter ONLY here
 //
-// After the ability model produces probabilities, compare to market odds.
-// Flag when model probability >> market-implied probability.
+// THIS IS THE ONLY PLACE ODDS TOUCH THE MODEL.
+//
+// The ability model (Phase 1) produces a raw win probability from data alone.
+// Phase 2 compares that to the market's implied probability (from ML odds)
+// and calculates the Expected Value edge:
+//
+//   EV = (P_model / P_market) × (1 - takeout)
+//
+// EV > 1.0 means positive expected value — the model sees more win equity
+// than the public does. These are the horses to anchor exotic tickets on.
+//
+// Tier assignment (Exotic Bet Algorithm §10; relaxed per session 2026-04-18):
+//   A (Primary Anchor)    — winPct ≥ 22% OR (ratio ≥ 1.15 AND winPct ≥ 8%)
+//   B (Defensive)         — winPct ≥ 5% AND ratio ≥ 0.85 (fair-priced contender)
+//   C (Variance Longshot) — ratio ≥ 1.15 AND 3% ≤ winPct ≤ 12% AND marketProb < 0.12
+//   Exclude               — ratio < 0.80 AND marketProb > 0.15 (false favorite) OR winPct < 2%
 // ===========================================================================
+
+const TAKEOUT_EXOTIC = 0.22;  // typical exotic takeout (~18-24%)
 
 interface OverlayInfo {
   modelProb: number;
   marketProb: number;
-  overlay: number;     // ratio: model/market (>1 = value)
-  isOverlay: boolean;  // model sees more value than market
-  overlayPct: number;  // percentage above market
+  overlay: number;      // ratio: model/market
+  isOverlay: boolean;   // EV > 1.10 (not just >1.0 — MLs are noisy)
+  overlayPct: number;   // percentage above market
+  evEdge: number;       // (model/market) × (1 - takeout)
+  tier: "A" | "B" | "C" | "exclude";
+  tierReason: string;
+}
+
+function classifyTier(
+  modelProb: number,
+  marketProb: number,
+  winPct: number,
+): { tier: "A" | "B" | "C" | "exclude"; reason: string; evEdge: number } {
+  const ratio = modelProb / (marketProb + 1e-10);
+  const evEdge = ratio * (1 - TAKEOUT_EXOTIC);
+
+  // A-tier: primary anchor
+  // PDF doctrine: A-tier = highest +EV OR overwhelming baseline win probability (OR, not AND).
+  // In large fields (14+ horses) the best horse may only hit 8-10% win prob,
+  // so we scale the floor with field size.
+  if (winPct >= 22) {
+    return { tier: "A", reason: `Dominant ability (${winPct.toFixed(0)}% win prob)`, evEdge };
+  }
+  if (ratio >= 1.15 && winPct >= 8) {
+    return { tier: "A", reason: `+EV anchor (model ${(modelProb*100).toFixed(0)}% vs market ${(marketProb*100).toFixed(0)}%, edge ${((ratio-1)*100).toFixed(0)}%)`, evEdge };
+  }
+  // Large-field catch: 12+ horse races with strong edge but low abs win prob.
+  // Capturing (10.6% / 8-1 ML → ratio 1.1) in a 16-horse field deserves A-tier respect.
+  if (ratio >= 1.30 && winPct >= 6) {
+    return { tier: "A", reason: `Big-field +EV (model ${(modelProb*100).toFixed(0)}% vs market ${(marketProb*100).toFixed(0)}%, edge ${((ratio-1)*100).toFixed(0)}%)`, evEdge };
+  }
+
+  // Exclude: severely overbet favorites
+  if (ratio < 0.80 && marketProb > 0.15) {
+    return { tier: "exclude", reason: `False favorite — market ${(marketProb*100).toFixed(0)}% but model only ${(modelProb*100).toFixed(0)}%`, evEdge };
+  }
+  if (winPct < 2) {
+    return { tier: "exclude", reason: `No chance (${winPct.toFixed(1)}% win prob)`, evEdge };
+  }
+
+  // C-tier: variance longshot with value
+  if (ratio >= 1.15 && winPct >= 3 && winPct <= 12 && marketProb < 0.12) {
+    return { tier: "C", reason: `Longshot overlay (${(winPct).toFixed(0)}% model vs ${(marketProb*100).toFixed(0)}% market)`, evEdge };
+  }
+
+  // B-tier: fair-priced contender
+  if (winPct >= 5 && ratio >= 0.85) {
+    return { tier: "B", reason: `Defensive coverage (${winPct.toFixed(0)}% win prob, fair price)`, evEdge };
+  }
+
+  // Everything else — low-probability, unclear value
+  return { tier: "exclude", reason: `Below playable threshold`, evEdge };
 }
 
 function detectOverlays(
   modelProbs: number[],
   entries: HorseEntry[],
+  winPcts: number[],
 ): OverlayInfo[] {
   return entries.map((e, i) => {
     const marketProb = 1.0 / (e.mlOdds + 1.0);
     const overlay = modelProbs[i] / (marketProb + 1e-10);
+    const { tier, reason, evEdge } = classifyTier(modelProbs[i], marketProb, winPcts[i]);
     return {
       modelProb: modelProbs[i],
       marketProb,
       overlay,
-      // Morning line odds have ~30-50% noise vs true market (Marcus Chen critique).
-      // Require 40%+ edge to flag as VALUE, not 20%, to avoid false positives.
-      isOverlay: overlay > 1.40,
+      isOverlay: overlay > 1.10,
       overlayPct: Math.round((overlay - 1) * 100),
+      evEdge,
+      tier,
+      tierReason: reason,
     };
   });
 }
+
+// ===========================================================================
+// PHASE 3: TICKET CONSTRUCTION — build staggered A/B/C exotic tickets
+// From Exotic Bet Algorithm §10.2.
+// ===========================================================================
+
+// ===========================================================================
+// TICKET MATH — hit probability + payoff estimation for any bet structure
+//
+// For a ticket covering a SET of winning combos:
+//   hitProbability = sum over covered combos of (combo count / total sims)
+//   expectedPayoff ≈ (1 / avgIndividualComboProb) × (1 - takeout)
+//   EV = hitProb × totalPayoffIfHit - totalCost
+//
+// Takeout varies by bet type — exotic pools are typically 18-25%.
+// ===========================================================================
+
+const TAKEOUT = {
+  exacta: 0.20,      // most tracks 20-22%
+  trifecta: 0.22,    // 22-24% typical
+  superfecta: 0.24,  // 24-25% typical, sometimes higher
+};
+
+// Calculate hit probability for an EXACTA covering programs (winProgs × placeProgs).
+// Uses the Monte Carlo exactaCounts[i][j] matrix.
+function exactaHitProb(
+  winProgs: number[], placeProgs: number[],
+  exactaCounts: number[][], nSims: number,
+): { prob: number; combos: number } {
+  let count = 0;
+  let combos = 0;
+  for (const i of winProgs) {
+    for (const j of placeProgs) {
+      if (i === j) continue;
+      combos++;
+      count += exactaCounts[i]?.[j] ?? 0;
+    }
+  }
+  return { prob: count / nSims, combos };
+}
+
+function trifectaHitProb(
+  winProgs: number[], placeProgs: number[], showProgs: number[],
+  trifectaCounts: number[][][], nSims: number,
+): { prob: number; combos: number } {
+  let count = 0;
+  let combos = 0;
+  for (const i of winProgs) {
+    for (const j of placeProgs) {
+      if (i === j) continue;
+      for (const k of showProgs) {
+        if (k === i || k === j) continue;
+        combos++;
+        count += trifectaCounts[i]?.[j]?.[k] ?? 0;
+      }
+    }
+  }
+  return { prob: count / nSims, combos };
+}
+
+function superfectaHitProb(
+  winProgs: number[], placeProgs: number[], showProgs: number[], fourthProgs: number[],
+  superfectaMap: Map<string, number>, nSims: number,
+): { prob: number; combos: number } {
+  let count = 0;
+  let combos = 0;
+  for (const i of winProgs) {
+    for (const j of placeProgs) {
+      if (i === j) continue;
+      for (const k of showProgs) {
+        if (k === i || k === j) continue;
+        for (const l of fourthProgs) {
+          if (l === i || l === j || l === k) continue;
+          combos++;
+          count += superfectaMap.get(`${i},${j},${k},${l}`) ?? 0;
+        }
+      }
+    }
+  }
+  return { prob: count / nSims, combos };
+}
+
+// Parimutuel EV math:
+//   Payout per $1 ticket = (1 - takeout) / marketHitProb
+//   (the track takes its cut, remainder is split proportionally to bets on winning combo)
+//   EV per $1 = modelHitProb × payoff - 1 = (modelHitProb / marketHitProb) × (1 - takeout) - 1
+//
+// So EV is POSITIVE when modelHitProb / marketHitProb > 1 / (1 - takeout) ≈ 1.28 for exacta.
+// This is why you need a real edge — the takeout means a "fair" bet always has EV = -takeout.
+function computeTicketEV(
+  modelHitProb: number,
+  marketHitProb: number,
+  combos: number,
+  unitCost: number,
+  pool: keyof typeof TAKEOUT,
+): { totalCost: number; payoff: number; ev: number; breakeven: number } {
+  const totalCost = combos * unitCost;
+  if (modelHitProb <= 0 || marketHitProb <= 0) {
+    return { totalCost, payoff: 0, ev: -totalCost, breakeven: 1 };
+  }
+  // Payout per $1 bet if ticket hits (parimutuel formula)
+  const payoffPerDollar = (1 - TAKEOUT[pool]) / marketHitProb;
+  const payoff = payoffPerDollar * totalCost;  // total dollar return if hits
+  const ev = modelHitProb * payoff - totalCost;
+  // Breakeven model hit prob = cost / (expected payoff if hit × ways_to_win)
+  const breakeven = 1 / payoffPerDollar;  // model hit prob needed for EV = 0
+  return { totalCost, payoff, ev, breakeven };
+}
+
+// Harville-style market hit probability: assume market's implied probs are the truth
+// and compute joint probabilities as conditional products.
+// For the exacta A-B: p_market(A wins AND B 2nd) = p_A × p_B / (1 - p_A)
+function marketExactaProb(iA: number, iB: number, marketProbs: number[]): number {
+  const pA = marketProbs[iA], pB = marketProbs[iB];
+  if (pA <= 0 || 1 - pA <= 0) return 0;
+  return pA * (pB / (1 - pA));
+}
+
+// Floor denominators at 0.05 to prevent Harville explosion in chalk-heavy fields.
+// Without this floor, when pA + pB approaches 1.0 (two favorites = 90% of market),
+// pC / (1 - pA - pB) can blow up 20-100x, inflating marketHitProb and crushing EV.
+// The floor trades a tiny approximation error for stability.
+const HARVILLE_FLOOR = 0.05;
+
+function marketTrifectaProb(iA: number, iB: number, iC: number, marketProbs: number[]): number {
+  const pA = marketProbs[iA], pB = marketProbs[iB], pC = marketProbs[iC];
+  if (pA <= 0 || pB <= 0 || pC <= 0) return 0;
+  const d1 = Math.max(1 - pA, HARVILLE_FLOOR);
+  const d2 = Math.max(1 - pA - pB, HARVILLE_FLOOR);
+  return pA * (pB / d1) * (pC / d2);
+}
+
+function marketSuperfectaProb(iA: number, iB: number, iC: number, iD: number, marketProbs: number[]): number {
+  const pA = marketProbs[iA], pB = marketProbs[iB], pC = marketProbs[iC], pD = marketProbs[iD];
+  if (pA <= 0 || pB <= 0 || pC <= 0 || pD <= 0) return 0;
+  const d1 = Math.max(1 - pA, HARVILLE_FLOOR);
+  const d2 = Math.max(1 - pA - pB, HARVILLE_FLOOR);
+  const d3 = Math.max(1 - pA - pB - pC, HARVILLE_FLOOR);
+  return pA * (pB / d1) * (pC / d2) * (pD / d3);
+}
+
+// Aggregate market hit prob over all combos in a ticket
+function aggregateMarketProb(
+  winProgs: number[], placeProgs: number[], marketProbs: number[],
+  showProgs?: number[], fourthProgs?: number[],
+): number {
+  let total = 0;
+  for (const i of winProgs) for (const j of placeProgs) {
+    if (i === j) continue;
+    if (showProgs) {
+      for (const k of showProgs) {
+        if (k === i || k === j) continue;
+        if (fourthProgs) {
+          for (const l of fourthProgs) {
+            if (l === i || l === j || l === k) continue;
+            total += marketSuperfectaProb(i, j, k, l, marketProbs);
+          }
+        } else {
+          total += marketTrifectaProb(i, j, k, marketProbs);
+        }
+      }
+    } else {
+      total += marketExactaProb(i, j, marketProbs);
+    }
+  }
+  return total;
+}
+
+function buildStrategicTickets(
+  predictions: PredictionRow[],
+  entries: HorseEntry[],
+  exactaCounts: number[][],
+  trifectaCounts: number[][][],
+  superfectaMap: Map<string, number>,
+  nSims: number,
+): TicketSpec[] {
+  const tickets: TicketSpec[] = [];
+  if (predictions.length < 2) return tickets;
+
+  // Map program string → entry index (for looking up in count matrices)
+  const idxByProgram = new Map<string, number>();
+  entries.forEach((e, i) => idxByProgram.set(e.program, i));
+  const toIdx = (progs: string[]) => progs.map((p) => idxByProgram.get(p) ?? -1).filter((i) => i >= 0);
+
+  // Market-implied probabilities, normalized to sum to 1 (track takeout already in pool).
+  // These are used to compute parimutuel payouts via Harville conditional formula.
+  const rawMarket = entries.map((e) => 1.0 / (e.mlOdds + 1.0));
+  const marketSum = rawMarket.reduce((a, b) => a + b, 0);
+  const marketProbs = rawMarket.map((p) => p / marketSum);
+
+  // Helper: given the args that went into hitProb, also compute market hit prob
+  // and run EV math. Returns all fields needed for a TicketSpec.
+  const evFor = (
+    pool: keyof typeof TAKEOUT,
+    unitCost: number,
+    prob: number,
+    combos: number,
+    winProgs: number[], placeProgs: number[],
+    showProgs?: number[], fourthProgs?: number[],
+  ) => {
+    const marketProb = aggregateMarketProb(winProgs, placeProgs, marketProbs, showProgs, fourthProgs);
+    return computeTicketEV(prob, marketProb, combos, unitCost, pool);
+  };
+
+  // Work across ALL predictions so we catch A-tier overlays that rank lower
+  // by ability (common when public favorites dominate the top).
+  const aTier = predictions.filter((p) => p.tier === "A");
+  const bTier = predictions.filter((p) => p.tier === "B");
+  const cTier = predictions.filter((p) => p.tier === "C");
+
+  // Contenders = anyone not excluded, ordered by ability (already sorted)
+  const contenders = predictions.filter((p) => p.tier !== "exclude");
+  if (contenders.length === 0) return tickets;
+
+  // TWO DIFFERENT ANCHORS for two different betting mindsets:
+  //   primaryAnchor  = A-tier horse with HIGHEST win probability (most likely to actually win)
+  //   varianceAnchor = A-tier horse with HIGHEST evEdge (biggest mathematical overlay, usually longshot)
+  // If these are the same horse, great. If different, we build one ticket each way.
+  const aByWin = [...aTier].sort((a, b) => b.winPct - a.winPct);
+  const aByEdge = [...aTier].sort((a, b) => b.evEdge - a.evEdge);
+  const primaryAnchor = aByWin[0] ?? contenders[0];
+  const varianceAnchor = aByEdge[0] && aByEdge[0].program !== primaryAnchor.program
+    ? aByEdge[0]
+    : null;
+  const anchorIdx = idxByProgram.get(primaryAnchor.program)!;
+
+  // STRAIGHT bets key the primary anchor over the next best contender
+  // (NOT the top-ability horse if that horse is excluded as a false favorite).
+  const straightSecond = contenders.find((p) => p.program !== primaryAnchor.program);
+  const top3 = contenders.slice(0, 3);
+  const top3Idxs = top3.map((p) => idxByProgram.get(p.program)!);
+
+  // ========= EXACTAS =========
+  // 1. STRAIGHT Exacta — primary anchor / next best contender in exact order
+  if (straightSecond) {
+    const i1 = idxByProgram.get(primaryAnchor.program)!;
+    const i2 = idxByProgram.get(straightSecond.program)!;
+    const { prob, combos } = exactaHitProb([i1], [i2], exactaCounts, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("exacta", 2.00, prob, combos, [i1], [i2]);
+    tickets.push({
+      label: `Exacta STRAIGHT: #${primaryAnchor.program} / #${straightSecond.program}`,
+      pool: "exacta",
+      structure: "straight",
+      legs: [[primaryAnchor.program], [straightSecond.program]],
+      combinations: combos,
+      unitCost: 2.00,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Primary anchor over next best contender. Max conviction, lowest cost — only hits if finish order is exact.`,
+      risk: "aggressive",
+    });
+  }
+
+  // 2. KEY Exacta — anchor wins, top 3 others for 2nd (part-wheel)
+  if (contenders.length >= 3) {
+    const placeProgs = contenders.filter((p) => p.program !== primaryAnchor.program).slice(0, 3);
+    const placeIdxs = placeProgs.map((p) => idxByProgram.get(p.program)!);
+    const { prob, combos } = exactaHitProb([anchorIdx], placeIdxs, exactaCounts, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("exacta", 2.00, prob, combos, [anchorIdx], placeIdxs);
+    tickets.push({
+      label: `Exacta KEY: #${primaryAnchor.program} over #${placeProgs.map((p) => p.program).join(",#")}`,
+      pool: "exacta",
+      structure: "key",
+      keyPositions: [{ slot: 1, programs: [primaryAnchor.program] }],
+      legs: [[primaryAnchor.program], placeProgs.map((p) => p.program)],
+      combinations: combos,
+      unitCost: 2.00,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Key anchor to win, part-wheel top 3 contenders for 2nd. Anchor must win.`,
+      risk: "balanced",
+    });
+  }
+
+  // 3. BOX Exacta — top 3 in any order (6 combos)
+  if (top3.length >= 3) {
+    const { prob, combos } = exactaHitProb(top3Idxs, top3Idxs, exactaCounts, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("exacta", 2.00, prob, combos, top3Idxs, top3Idxs);
+    tickets.push({
+      label: `Exacta BOX: #${top3.map((p) => p.program).join(",#")}`,
+      pool: "exacta",
+      structure: "box",
+      wheelPrograms: top3.map((p) => p.program),
+      combinations: combos,
+      unitCost: 2.00,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Top 3 boxed — wins if any two of the three finish 1-2 in either order.`,
+      risk: "balanced",
+    });
+  }
+
+  // ========= TRIFECTAS =========
+  // 4. STRAIGHT Trifecta — primary anchor / next best two contenders
+  if (contenders.length >= 3) {
+    const p1 = primaryAnchor;
+    const others = contenders.filter((p) => p.program !== p1.program).slice(0, 2);
+    const p2 = others[0], p3 = others[1];
+    const i1 = idxByProgram.get(p1.program)!;
+    const i2 = idxByProgram.get(p2.program)!;
+    const i3 = idxByProgram.get(p3.program)!;
+    const { prob, combos } = trifectaHitProb([i1], [i2], [i3], trifectaCounts, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("trifecta", 1.00, prob, combos, [i1], [i2], [i3]);
+    tickets.push({
+      label: `Trifecta STRAIGHT: #${p1.program}-${p2.program}-${p3.program}`,
+      pool: "trifecta",
+      structure: "straight",
+      legs: [[p1.program], [p2.program], [p3.program]],
+      combinations: combos,
+      unitCost: 1.00,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Primary anchor / next best two in exact order. Max conviction, lowest cost.`,
+      risk: "aggressive",
+    });
+  }
+
+  // 5. KEY-BOX Trifecta — anchor wins, top 3 others boxed in 2nd/3rd
+  if (contenders.length >= 4) {
+    const boxProgs = contenders.filter((p) => p.program !== primaryAnchor.program).slice(0, 3);
+    const boxIdxs = boxProgs.map((p) => idxByProgram.get(p.program)!);
+    const { prob, combos } = trifectaHitProb([anchorIdx], boxIdxs, boxIdxs, trifectaCounts, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("trifecta", 1.00, prob, combos, [anchorIdx], boxIdxs, boxIdxs);
+    tickets.push({
+      label: `Trifecta KEY-BOX: #${primaryAnchor.program} / BOX #${boxProgs.map((p) => p.program).join(",#")}`,
+      pool: "trifecta",
+      structure: "key-box",
+      keyPositions: [{ slot: 1, programs: [primaryAnchor.program] }],
+      wheelPrograms: boxProgs.map((p) => p.program),
+      combinations: combos,
+      unitCost: 1.00,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Anchor must win, then top 3 can finish 2nd/3rd in either order. Balanced structure.`,
+      risk: "balanced",
+    });
+  }
+
+  // 6. BOX Trifecta top 3 — 6 combos
+  if (top3.length >= 3) {
+    const { prob, combos } = trifectaHitProb(top3Idxs, top3Idxs, top3Idxs, trifectaCounts, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("trifecta", 1.00, prob, combos, top3Idxs, top3Idxs, top3Idxs);
+    tickets.push({
+      label: `Trifecta BOX: #${top3.map((p) => p.program).join(",#")}`,
+      pool: "trifecta",
+      structure: "box",
+      wheelPrograms: top3.map((p) => p.program),
+      combinations: combos,
+      unitCost: 1.00,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Top 3 boxed — catches any 1-2-3 order among the three. Classic balanced play.`,
+      risk: "balanced",
+    });
+  }
+
+  // ========= SUPERFECTAS =========
+  // 7. SUPERFECTA PART-WHEEL — anchor / top 3 / top 3 / top 3
+  if (contenders.length >= 4) {
+    const othersIdxs = contenders.filter((p) => p.program !== primaryAnchor.program).slice(0, 3).map((p) => idxByProgram.get(p.program)!);
+    const { prob, combos } = superfectaHitProb([anchorIdx], othersIdxs, othersIdxs, othersIdxs, superfectaMap, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("superfecta", 0.10, prob, combos, [anchorIdx], othersIdxs, othersIdxs, othersIdxs);
+    const othersProgs = contenders.filter((p) => p.program !== primaryAnchor.program).slice(0, 3).map((p) => p.program);
+    tickets.push({
+      label: `Superfecta PART-WHEEL: #${primaryAnchor.program} / #${othersProgs.join(",#")} / #${othersProgs.join(",#")} / #${othersProgs.join(",#")}`,
+      pool: "superfecta",
+      structure: "part-wheel",
+      keyPositions: [{ slot: 1, programs: [primaryAnchor.program] }],
+      legs: [[primaryAnchor.program], othersProgs, othersProgs, othersProgs],
+      combinations: combos,
+      unitCost: 0.10,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Anchor to win, top 3 fill 2nd/3rd/4th in any order. Small cost, big upside.`,
+      risk: "balanced",
+    });
+  }
+
+  // 8. SUPERFECTA KEY-BOX — anchor + top 4 boxed in 2/3/4
+  if (contenders.length >= 5) {
+    const boxProgs = contenders.filter((p) => p.program !== primaryAnchor.program).slice(0, 4);
+    const boxIdxs = boxProgs.map((p) => idxByProgram.get(p.program)!);
+    const { prob, combos } = superfectaHitProb([anchorIdx], boxIdxs, boxIdxs, boxIdxs, superfectaMap, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("superfecta", 0.10, prob, combos, [anchorIdx], boxIdxs, boxIdxs, boxIdxs);
+    tickets.push({
+      label: `Superfecta KEY-BOX: #${primaryAnchor.program} / BOX #${boxProgs.map((p) => p.program).join(",#")}`,
+      pool: "superfecta",
+      structure: "key-box",
+      keyPositions: [{ slot: 1, programs: [primaryAnchor.program] }],
+      wheelPrograms: boxProgs.map((p) => p.program),
+      combinations: combos,
+      unitCost: 0.10,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Anchor must win; top 4 fill 2nd/3rd/4th in any order. Wider coverage for ~$2-3.`,
+      risk: "balanced",
+    });
+  }
+
+  // 9. VARIANCE TRIFECTA — the longshot +EV horse keyed to win over anchors
+  // This is the "lottery ticket" — varianceAnchor has the highest EV edge
+  // (usually a longshot with a big overlay). Small cost, giant payoff if it hits.
+  if (varianceAnchor) {
+    const vIdx = idxByProgram.get(varianceAnchor.program)!;
+    // Structure: varianceAnchor wins, primary + top contenders in 2/3
+    const backers = [primaryAnchor, ...contenders.filter((p) =>
+      p.program !== primaryAnchor.program && p.program !== varianceAnchor.program
+    )].slice(0, 3);
+    const backerIdxs = backers.map((p) => idxByProgram.get(p.program)!);
+    const { prob, combos } = trifectaHitProb([vIdx], backerIdxs, backerIdxs, trifectaCounts, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("trifecta", 1.00, prob, combos, [vIdx], backerIdxs, backerIdxs);
+    tickets.push({
+      label: `Trifecta VARIANCE: #${varianceAnchor.program} (${(varianceAnchor.mlOdds).toFixed(0)}/1) / BOX #${backers.map((p) => p.program).join(",#")}`,
+      pool: "trifecta",
+      structure: "key-box",
+      keyPositions: [{ slot: 1, programs: [varianceAnchor.program] }],
+      wheelPrograms: backers.map((p) => p.program),
+      combinations: combos,
+      unitCost: 1.00,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Longshot +EV play. #${varianceAnchor.program} at ${varianceAnchor.mlOdds.toFixed(0)}/1 has the highest EV edge (${varianceAnchor.evEdge.toFixed(2)}) but low win prob (${varianceAnchor.winPct.toFixed(0)}%). Low hit rate, massive payoff if it lands.`,
+      risk: "variance",
+    });
+  }
+
+  // C-tier variance boost: if there's a C-tier longshot, also include an
+  // anchor + C-tier superfecta ticket (small bet, huge payout potential).
+  if (cTier.length >= 1 && contenders.length >= 4) {
+    const cProg = cTier[0];
+    const cIdx = idxByProgram.get(cProg.program)!;
+    const midProgs = contenders.filter((p) =>
+      p.program !== primaryAnchor.program && p.program !== cProg.program
+    ).slice(0, 3);
+    const midIdxs = midProgs.map((p) => idxByProgram.get(p.program)!);
+    const othersIdxs = [cIdx, ...midIdxs];
+    const { prob, combos } = superfectaHitProb([anchorIdx], othersIdxs, othersIdxs, othersIdxs, superfectaMap, nSims);
+    const { totalCost, payoff, ev, breakeven } = evFor("superfecta", 0.10, prob, combos, [anchorIdx], othersIdxs, othersIdxs, othersIdxs);
+    const allOthers = [cProg.program, ...midProgs.map((p) => p.program)];
+    tickets.push({
+      label: `Superfecta C-INJECT: #${primaryAnchor.program} / #${allOthers.join(",#")} (C-tier #${cProg.program} included)`,
+      pool: "superfecta",
+      structure: "part-wheel",
+      keyPositions: [{ slot: 1, programs: [primaryAnchor.program] }],
+      legs: [[primaryAnchor.program], allOthers, allOthers, allOthers],
+      combinations: combos,
+      unitCost: 0.10,
+      totalCost,
+      hitProbability: prob,
+      estimatedPayoff: payoff,
+      expectedValue: ev,
+      breakevenOdds: breakeven,
+      rationale: `Anchor wins; C-tier overlay #${cProg.program} (${cProg.mlOdds.toFixed(0)}/1) boxed in 2/3/4 slots. Catches variance when the board collapses.`,
+      risk: "variance",
+    });
+  }
+
+  // Sort tickets by EV-per-dollar (small-bet efficiency).
+  // Higher ratio = more expected value per dollar wagered → best use of small bankroll.
+  tickets.sort((a, b) => {
+    const effA = a.expectedValue / Math.max(a.totalCost, 0.01);
+    const effB = b.expectedValue / Math.max(b.totalCost, 0.01);
+    return effB - effA;
+  });
+
+  return tickets;
+}
+
 
 // ---------------------------------------------------------------------------
 // Henery Monte Carlo simulation — full exotic engine
 // ---------------------------------------------------------------------------
 
-const TAKEOUT = 0.22;
-
 function estimatePayoff(prob: number): number {
   if (prob <= 0) return 0;
-  return (1.0 / prob) * (1.0 - TAKEOUT);
+  // Average takeout across exotic pools (~22%)
+  return (1.0 / prob) * (1.0 - 0.22);
 }
 
 export function runSimulation(
@@ -532,13 +1211,20 @@ export function runSimulation(
   const nSims = totalSims;
 
   // --- Predictions ---
-  const predictions: PredictionRow[] = entries
-    .map((e, i) => ({
+  // Raw win/place/show percentages come from ability-based Monte Carlo.
+  // Odds enter ONLY in the overlay/tier layer below.
+  const rawWinPcts = entries.map((_, i) => (finishCounts[i][0] / nSims) * 100);
+
+  const predictionsUnsorted: PredictionRow[] = entries.map((e, i) => {
+    const marketProb = 1.0 / (e.mlOdds + 1.0);
+    const modelProb = finishCounts[i][0] / nSims;
+    const { tier, reason, evEdge } = classifyTier(modelProb, marketProb, rawWinPcts[i]);
+    return {
       name: e.name,
       program: e.program,
       mlOdds: e.mlOdds,
       style: e.style,
-      winPct: (finishCounts[i][0] / nSims) * 100,
+      winPct: rawWinPcts[i],
       placePct:
         ((finishCounts[i][0] + finishCounts[i][1]) / nSims) * 100,
       showPct:
@@ -546,8 +1232,14 @@ export function runSimulation(
           nSims) *
         100,
       adjustedProb: probs[i],
-    }))
-    .sort((a, b) => b.winPct - a.winPct);
+      marketProb,
+      evEdge,
+      tier,
+      tierReason: reason,
+    };
+  });
+  // Sorted by ability (winPct), NOT by odds
+  const predictions = [...predictionsUnsorted].sort((a, b) => b.winPct - a.winPct);
 
   // --- Ranked Exactas (with pace-correlation penalty) ---
   // Speed-duel correlation: two E/EP horses in 1-2 positions tire each other
@@ -652,7 +1344,13 @@ export function runSimulation(
   };
 
   // Phase 2: Overlay detection — odds enter ONLY here
-  const overlays = detectOverlays(probs, entries);
+  const overlays = detectOverlays(probs, entries, rawWinPcts);
+
+  // Phase 3: Ticket construction — proper STRAIGHT/KEY/BOX/WHEEL/PART-WHEEL
+  // with hit probability, EV, and breakeven computed from the MC count matrices.
+  const tickets = buildStrategicTickets(
+    predictions, entries, exactaCounts, trifectaCounts, superfectaMap, nSims,
+  );
 
   return {
     predictions,
@@ -661,6 +1359,7 @@ export function runSimulation(
     superfectas: makeList("Superfecta", 0.1, topSuperfectas),
     paceScenario: getPaceScenario(entries),
     overlays,
+    tickets,
     simInfo: {
       totalSims: nSims,
       batchesRun,
