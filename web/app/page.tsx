@@ -11,6 +11,12 @@ import type {
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
 import { KEENELAND_APR18_2026, KEE_APR18_DATE } from "./lib/keeneland-apr18";
+import {
+  loadResults,
+  setRaceFinish,
+  clearRaceFinish,
+  type ResultsMap,
+} from "./lib/results-store";
 
 // ── Keeneland April 18, 2026 — Brisnet track-bias build ──
 // Splash is off. Landing page shows the full feature matrix for today's
@@ -376,6 +382,9 @@ function KeenelandApp() {
       <p className="text-gray-500 text-lg mb-8">
         April 18, 2026 &middot; Brisnet track bias loaded &middot; Monte Carlo exotic pricing
       </p>
+
+      {/* Results tracker */}
+      <ResultsPanel />
 
       {/* Select Race Number */}
       <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">
@@ -766,4 +775,139 @@ function computeStats(history: HistoryEntry[]) {
     topPickWins,
     topPickWinPct: withResults.length > 0 ? Math.round((topPickWins / withResults.length) * 100) : 0,
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// ResultsPanel — race-day ingest for actual finishing order.
+// Paste "3 4 5 2" or fill 4 boxes; persists to localStorage. R1 is preloaded
+// from CONFIRMED_RESULTS so the panel always reflects verified track results.
+// ─────────────────────────────────────────────────────────────────────────
+function ResultsPanel() {
+  const [results, setResults] = useState<ResultsMap>({});
+  const [editing, setEditing] = useState<number | null>(null);
+  const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    setResults(loadResults());
+  }, []);
+
+  function startEdit(race: number) {
+    setEditing(race);
+    const existing = results[race] ?? [];
+    setDraft(existing.join(" "));
+  }
+
+  function saveEdit(race: number) {
+    // Parse "3 4 5 2", "3,4,5,2", or "3-4-5-2" into program strings
+    const programs = draft
+      .split(/[\s,\-/]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (programs.length < 1) return;
+    const updated = setRaceFinish(race, programs.slice(0, 4));
+    setResults(updated);
+    setEditing(null);
+    setDraft("");
+  }
+
+  function clearEdit(race: number) {
+    const updated = clearRaceFinish(race);
+    setResults(updated);
+    setEditing(null);
+    setDraft("");
+  }
+
+  const filledCount = Object.keys(results).length;
+
+  return (
+    <div className="mb-8 p-5 rounded-xl border-2 border-amber-200 bg-amber-50">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-lg font-black text-amber-900">Race-Day Results</h2>
+          <p className="text-xs text-amber-700">
+            {filledCount} of 11 logged &middot; enter finishing order as &quot;1st 2nd 3rd 4th&quot;
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {Array.from({ length: 11 }, (_, i) => i + 1).map((race) => {
+          const finish = results[race];
+          const isEditing = editing === race;
+          return (
+            <div
+              key={race}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg border ${
+                finish ? "bg-white border-amber-300" : "bg-amber-100/40 border-amber-200"
+              }`}
+            >
+              <span className="w-7 h-7 rounded-full bg-amber-900 text-white flex items-center justify-center text-sm font-black shrink-0">
+                {race}
+              </span>
+              {isEditing ? (
+                <>
+                  <input
+                    type="text"
+                    autoFocus
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveEdit(race);
+                      if (e.key === "Escape") { setEditing(null); setDraft(""); }
+                    }}
+                    placeholder="e.g. 3 4 5 2"
+                    className="flex-1 px-2 py-1 rounded border border-amber-400 text-sm font-mono focus:outline-none focus:border-amber-600"
+                  />
+                  <button
+                    onClick={() => saveEdit(race)}
+                    className="px-3 py-1 text-xs font-bold rounded bg-amber-700 text-white hover:bg-amber-800"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => { setEditing(null); setDraft(""); }}
+                    className="px-2 py-1 text-xs font-bold text-amber-700 hover:text-amber-900"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : finish ? (
+                <>
+                  <span className="flex-1 font-mono text-sm">
+                    {finish.map((p, i) => (
+                      <span key={i} className={i === 0 ? "font-black text-amber-900" : "text-gray-700"}>
+                        {i > 0 && <span className="text-gray-400 mx-1">/</span>}
+                        #{p}
+                      </span>
+                    ))}
+                  </span>
+                  <button
+                    onClick={() => startEdit(race)}
+                    className="text-xs font-bold text-amber-700 hover:text-amber-900"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => clearEdit(race)}
+                    className="text-xs font-bold text-red-600 hover:text-red-800"
+                  >
+                    ✕
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="flex-1 text-sm text-amber-700 italic">not logged</span>
+                  <button
+                    onClick={() => startEdit(race)}
+                    className="px-3 py-1 text-xs font-bold rounded bg-amber-200 text-amber-900 hover:bg-amber-300"
+                  >
+                    Log finish
+                  </button>
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
