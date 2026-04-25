@@ -25,6 +25,7 @@ import {
   MULTI_RACE_BETS,
   type MultiRaceRec,
 } from "./lib/multi-race";
+import { isFalseFavorite, type HorseProbs } from "./lib/ev-math";
 
 // ── Keeneland April 18, 2026 — Brisnet track-bias build ──
 // Splash is off. Landing page shows the full feature matrix for today's
@@ -700,6 +701,30 @@ function KeenelandApp() {
               // Find this horse's overlay info
               const progIdx = race.entries.findIndex((e) => e.program === p.program);
               const ov = progIdx >= 0 ? result.overlays[progIdx] : null;
+              // FADE badge: ML favorite that ranks outside model top 3
+              const allHorses: HorseProbs[] = result.overlays.map((o, idx) => ({
+                program: race.entries[idx]?.program ?? "",
+                name: race.entries[idx]?.name ?? "",
+                modelProb: o.modelProb,
+                marketProb: o.marketProb,
+                simWinProb: o.modelProb,
+              }));
+              const thisHorse: HorseProbs | null = ov
+                ? {
+                    program: p.program,
+                    name: p.name,
+                    modelProb: ov.modelProb,
+                    marketProb: ov.marketProb,
+                    simWinProb: ov.modelProb,
+                  }
+                : null;
+              const isFade = thisHorse
+                ? isFalseFavorite(thisHorse, allHorses, i + 1)
+                : false;
+              const fadeRatio =
+                thisHorse && thisHorse.marketProb > 0
+                  ? thisHorse.modelProb / thisHorse.marketProb
+                  : 0;
               return (
               <div key={p.program}
                 className={`flex items-center gap-5 p-5 rounded-xl border-2 ${
@@ -732,6 +757,18 @@ function KeenelandApp() {
                     P {p.placePct.toFixed(0)}% &middot; S {p.showPct.toFixed(0)}%
                   </div>
                 </div>
+                {isFade && (
+                  <div className="shrink-0 text-right">
+                    <span className="inline-block px-3 py-1 rounded-lg bg-red-600 text-white text-sm font-bold">
+                      FADE
+                    </span>
+                    <div className="text-xs text-red-700 mt-1">
+                      ML #1 &rarr; Model #{i + 1}
+                      <br />
+                      Ratio {fadeRatio.toFixed(2)}
+                    </div>
+                  </div>
+                )}
                 {ov && (
                   <div className="shrink-0 text-right">
                     {ov.isOverlay ? (
