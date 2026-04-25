@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "cortex": {
+      "command": "npx",
+      "args": ["tsx", "/Users/jason/cortex/mcp-server.ts"],
+      "cwd": "/Users/jason/cortex"
+    }
+  }
+}
