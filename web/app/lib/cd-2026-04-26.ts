@@ -51,9 +51,11 @@ const race1: StaticRace = {
 // Post 1:14 PM. Dirt sprint. WEEK (N=28): Speed bias 66%, Rail +,
 // E 1.20++ / EP 0.92 / P 1.23+ / S 0.57. Posts 1-3 IV 0.29, 4-7 IV 0.95, 8+ IV 1.52.
 // MAIDEN race — most horses have NA across all stat columns (first start).
+// Day-of scratches (per TwinSpires final board): #3, #4, #8, #9.
 const race2: StaticRace = {
   raceNumber: 2, postTime: "1:14 PM",
   raceType: "MSW 92k", distance: "4 1/2f", surface: "Dirt", purse: 92000, condition: "Fast",
+  scratches: ["3", "4", "8", "9"],
   trackBias: {
     surface: "Dirt", distanceLabel: "4.5f",
     speedBiasPct: 66, railBias: "+",

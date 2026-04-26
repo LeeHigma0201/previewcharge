@@ -239,6 +239,92 @@ function computeRaceProbs(race: StaticRace): RaceProbs {
   };
 }
 
+/** Smart part-wheel recommendation. Picks top horses for each finish slot
+ * based on their marginal probability of landing in that slot, then computes
+ * valid 4-horse permutations + total Harville hit probability.
+ *
+ * Output mirrors TwinSpires part-wheel notation: "A,B,C / D,E,F / G,H,I,J / K,L,M"
+ * Cheap and high-coverage — much better $/hit-prob than single-line straights.
+ */
+export interface PartWheel {
+  slotPrograms: string[][];   // 4 arrays of program numbers (slot 1, 2, 3, 4)
+  ticketStr: string;          // "2,5,7,11 / 5,7,11 / 2,10,11 / 1,6,10,11"
+  unitCost: number;
+  validCombos: number;
+  totalCost: number;
+  hitProbability: number;     // sum of Plackett-Luce probs for all valid combos
+  expectedRoi: number;
+}
+
+function buildPartWheel(rp: RaceProbs): PartWheel {
+  const n = rp.winProbs.length;
+  if (n < 4) {
+    return {
+      slotPrograms: [],
+      ticketStr: "",
+      unitCost: 0.10,
+      validCombos: 0,
+      totalCost: 0,
+      hitProbability: 0,
+      expectedRoi: 0,
+    };
+  }
+
+  // Rank horses by each marginal slot prob
+  const idx = Array.from({ length: n }, (_, i) => i);
+  const byWin   = [...idx].sort((a, b) => rp.winProbs[b]   - rp.winProbs[a]);
+  const byPlace = [...idx].sort((a, b) => rp.placeProbs[b] - rp.placeProbs[a]);
+  const byShow  = [...idx].sort((a, b) => rp.showProbs[b]  - rp.showProbs[a]);
+
+  // Slot picks — tuned for ~$3-8 ticket cost at $0.10 unit
+  const s1 = byWin.slice(0, 3);                              // 3 horses for 1st
+  const s2 = byPlace.slice(0, 4);                            // 4 for 2nd
+  const s3 = byShow.slice(0, 4);                             // 4 for 3rd
+  const s4 = byShow.slice(0, Math.min(5, n));                // 5 for 4th (spreader)
+
+  // Count valid permutations + Harville hit prob
+  let validCombos = 0;
+  let hitProb = 0;
+  for (const a of s1) {
+    for (const b of s2) {
+      if (b === a) continue;
+      for (const c of s3) {
+        if (c === a || c === b) continue;
+        for (const d of s4) {
+          if (d === a || d === b || d === c) continue;
+          validCombos++;
+          const wA = rp.winProbs[a];
+          const wB = rp.winProbs[b];
+          const wC = rp.winProbs[c];
+          const wD = rp.winProbs[d];
+          const d2 = 1 - wA;
+          const d3 = 1 - wA - wB;
+          const d4 = 1 - wA - wB - wC;
+          if (d2 > 1e-9 && d3 > 1e-9 && d4 > 1e-9) {
+            hitProb += wA * (wB / d2) * (wC / d3) * (wD / d4);
+          }
+        }
+      }
+    }
+  }
+
+  const slotPrograms = [s1, s2, s3, s4].map((slot) => slot.map((i) => rp.programs[i]));
+  const ticketStr = slotPrograms.map((s) => s.join(",")).join(" / ");
+  const unitCost = 0.10;
+  const totalCost = Math.round(validCombos * unitCost * 100) / 100;
+  const expectedPayout = hitProb > 0 ? estimatePayoff(hitProb) * unitCost : 0;
+  const expectedRoi = totalCost > 0 ? (expectedPayout - totalCost) / totalCost : 0;
+  return {
+    slotPrograms,
+    ticketStr,
+    unitCost,
+    validCombos,
+    totalCost,
+    hitProbability: Math.min(1, hitProb),
+    expectedRoi,
+  };
+}
+
 /** Build the public-facing per-horse W/P/S table from a RaceProbs. */
 function buildHorseSim(rp: RaceProbs): HorseSim[] {
   const minMl = Math.min(...rp.mlOdds);
@@ -370,6 +456,7 @@ export interface RaceExoticRecs {
   trifecta: BetStrategy;
   superfecta: BetStrategy;
   horses: HorseSim[];        // per-horse W/P/S sim + overlay flags (sorted by model win)
+  partWheel: PartWheel;      // smart part-wheel super recommendation
 }
 
 export function computeExoticsAnalytic(race: StaticRace): RaceExoticRecs {
@@ -485,6 +572,7 @@ export function computeExoticsAnalytic(race: StaticRace): RaceExoticRecs {
   }
 
   const horses = buildHorseSim(rp).sort((a, b) => a.rank - b.rank);
+  const partWheel = buildPartWheel(rp);
 
   return {
     raceNumber: race.raceNumber,
@@ -492,6 +580,7 @@ export function computeExoticsAnalytic(race: StaticRace): RaceExoticRecs {
     trifecta: pickBest(triCands),
     superfecta: pickBest(superCands.length > 0 ? superCands : exactaCands),
     horses,
+    partWheel,
   };
 }
 
