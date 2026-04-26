@@ -197,9 +197,18 @@ function computeRaceProbs(race: StaticRace): RaceProbs {
   const marketRaw = horses.map((h) => 1.0 / (h.mlOdds + 1.0));
   const marketSum = marketRaw.reduce((a, b) => a + b, 0);
   const marketProbs = marketRaw.map((p) => (marketSum > 0 ? p / marketSum : 1 / n));
-  const winProbs = modelProbs.map((mp, i) =>
-    Math.max(0.70 * mp + 0.30 * marketProbs[i], 1e-6),
-  );
+  // Learning (CD Apr 26): heavy chalk + heavy model agreement on sub-2.0 ML
+  // horses busted 3 times — Epic Summer 1.6, Calling On Heaven 1.4, Stompin
+  // Grapes 1.8. False-favorite penalty: dampen 15% when both signals stack.
+  let winProbs = modelProbs.map((mp, i) => {
+    const blend = 0.70 * mp + 0.30 * marketProbs[i];
+    const ml = horses[i].mlOdds ?? 99;
+    const isFalseFavorite = ml < 2.0 && blend > 0.25;
+    return Math.max(blend * (isFalseFavorite ? 0.85 : 1.0), 1e-6);
+  });
+  // Renormalize so probs sum to 1 after the dampen
+  const wpSum = winProbs.reduce((a, b) => a + b, 0) || 1;
+  winProbs = winProbs.map((p) => p / wpSum);
 
   // Harville place/show probabilities. P(i in top 2) = winProb_i + sum_{j!=i} P(j wins) * P(i wins | j out)
   const placeProbs = winProbs.map((wi, i) => {

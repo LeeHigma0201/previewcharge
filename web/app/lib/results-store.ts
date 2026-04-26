@@ -4,13 +4,10 @@
 export type RaceFinish = string[]; // program numbers in finishing order: ["3","4","5","2"]
 export type ResultsMap = Record<number, RaceFinish>;
 
-export const RESULTS_STORAGE_KEY = "horsegpt_results_2026-04-26";
+export const RESULTS_STORAGE_KEY = "horsegpt_results_sa_2026-04-26";
 
-// Confirmed CD Apr 26 results (append as races finalize).
-export const CONFIRMED_RESULTS: ResultsMap = {
-  1: ["3", "2", "5", "4", "6"],       // R1 ALW 50000s 1 1/16m: Different Gravy, Bourbon Flight, Nogradi, Midway Munny, Cant Stop Munnings. Time 1:43.42.
-  2: ["6", "7", "5", "2", "1"],       // R2 MSW 92k 4.5f 2yo F: Valkyrie, Cardio Cat, Go New York Go, Storm Diva, Respected Mind. Time 51.53. SCRs: 3, 4, 8, 9.
-};
+// SA Apr 26 evening card. Append finishes as they come in.
+export const CONFIRMED_RESULTS: ResultsMap = {};
 
 export function loadResults(): ResultsMap {
   if (typeof window === "undefined") return { ...CONFIRMED_RESULTS };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CD_APR26_2026 as CARD, CD_APR26_DATE as CARD_DATE } from "../lib/cd-2026-04-26";
+import { SA_APR26_2026 as CARD, SA_APR26_DATE as CARD_DATE } from "../lib/sa-2026-04-26";
 import { computeExoticsAnalytic, type RaceExoticRecs } from "../lib/bet-sheet";
 import {
   loadResults,
@@ -75,7 +75,7 @@ export default function BetSheet() {
           <div className="min-w-0">
             <h1 className="text-lg font-black truncate">HorseGPT &middot; Bet Sheet</h1>
             <p className="text-xs text-gray-400">
-              Churchill Downs {CARD_DATE} &middot; {filledCount}/{CARD.length} done
+              {CARD_DATE} &middot; {filledCount}/{CARD.length} done
               {nextRace && <span> &middot; next R{nextRace.raceNumber} {nextRace.postTime}</span>}
             </p>
           </div>
