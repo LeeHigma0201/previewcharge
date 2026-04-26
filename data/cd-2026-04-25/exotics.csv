@@ -1,0 +1,11 @@
+race,race_type,structure,tickets,unit_cost,total_cost,hit_prob_est_pct,rationale
+1,MSW,Superfecta 4-horse box,6-5-3-2 BOX,0.1,2.4,48.0,Top 4 cover 87% — cheap super box catches any order.
+2,MSW,Trifecta 3-horse box,5-1-3 BOX,0.5,3.0,37.0,Top 3 cover 67% — tri box at $0.50.
+3,CLM 30000,Trifecta key 1st OVER top 3,"3 / 2,5,1 / 2,5,1",0.5,3.0,30.3,"#3 Lady Orient dominates at 38%. Single on top, spread under."
+4,CLM 12500,Superfecta 5-horse box (chaos play),1-5-4-8-2 BOX,0.1,12.0,36.6,Wide-open. Top 5 = 81%. Chaos super box.
+5,ALW,Trifecta key 1st OVER top 3,"1 / 3,2,6 / 3,2,6",0.5,3.0,27.9,"#1 Wistucky dominates at 35%. Single on top, spread under."
+6,MCL 12500,Superfecta 5-horse box (chaos play),2-13-7-8-1 BOX,0.1,12.0,27.2,Wide-open. Top 5 = 61%. Chaos super box.
+7,CLM 40000,Superfecta 5-horse box (chaos play),4-7-9-2-3 BOX,0.1,12.0,36.1,Wide-open. Top 5 = 80%. Chaos super box.
+8,CLM 16000,Superfecta 5-horse box (chaos play),3-6-2-10-7 BOX,0.1,12.0,30.9,Wide-open. Top 5 = 69%. Chaos super box.
+9,Stakes,Superfecta 5-horse box (chaos play),1-4-7-6-2 BOX,0.1,12.0,36.0,Wide-open. Top 5 = 80%. Chaos super box.
+10,ALW,Trifecta key 1st OVER top 3,"3 / 2,8,5 / 2,8,5",0.5,3.0,20.7,"#3 Without (IRE) dominates at 34%. Single on top, spread under."
