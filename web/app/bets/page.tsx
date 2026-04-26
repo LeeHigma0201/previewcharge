@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { KEENELAND_APR18_2026, KEE_APR18_DATE } from "../lib/keeneland-apr18";
+import { CD_APR26_2026 as CARD, CD_APR26_DATE as CARD_DATE } from "../lib/cd-2026-04-26";
 import { computeExoticsAnalytic, type RaceExoticRecs } from "../lib/bet-sheet";
 import {
   allRacePicks,
@@ -29,7 +29,7 @@ export default function BetSheet() {
   }, []);
 
   const allRecs = useMemo<RaceExoticRecs[]>(
-    () => KEENELAND_APR18_2026.map(computeExoticsAnalytic),
+    () => CARD.map(computeExoticsAnalytic),
     [],
   );
 
@@ -76,7 +76,7 @@ export default function BetSheet() {
 
   const filledCount = Object.keys(results).length;
   const nextRace = useMemo(() => {
-    return KEENELAND_APR18_2026.find((r) => !results[r.raceNumber]);
+    return CARD.find((r) => !results[r.raceNumber]);
   }, [results]);
 
   return (
@@ -87,7 +87,7 @@ export default function BetSheet() {
           <div className="min-w-0">
             <h1 className="text-lg font-black truncate">HorseGPT &middot; Bet Sheet</h1>
             <p className="text-xs text-gray-400">
-              Keeneland {KEE_APR18_DATE} &middot; {filledCount}/11 done
+              Churchill Downs {CARD_DATE} &middot; {filledCount}/{CARD.length} done
               {nextRace && <span> &middot; next R{nextRace.raceNumber} {nextRace.postTime}</span>}
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function BetSheet() {
 
         {/* Race cards */}
         <div className="space-y-3">
-          {KEENELAND_APR18_2026.map((race) => {
+          {CARD.map((race) => {
             const recs = allRecs.find((r) => r.raceNumber === race.raceNumber);
             if (!recs) return null;
             const finish = results[race.raceNumber];
@@ -207,7 +207,7 @@ export default function BetSheet() {
 // ───────────────────────────── components ─────────────────────────────
 
 function RaceCard({ race, recs, finish, isNext, onLogFinish, onClearFinish }: {
-  race: (typeof KEENELAND_APR18_2026)[number];
+  race: (typeof CARD)[number];
   recs: RaceExoticRecs;
   finish?: string[];
   isNext: boolean;

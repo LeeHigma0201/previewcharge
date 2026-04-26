@@ -7,10 +7,10 @@
 
 ## Pick 4 (R6-R9)
 - Structure: Top + cover
-- Ticket: `3,2 / 4,3 / 2,3 / 3,1`
+- Ticket: `1,2 / 4,2 / 2,3 / 3,2`
 - Unit: $0.50  →  **Cost: $8.00**
 
 ## Late Pick 5 (R5-R9)
 - Structure: Top + cover (chaotic legs only)
-- Ticket: `3 / 3,2 / 4 / 2,3 / 3,1`
-- Unit: $0.50  →  **Cost: $4.00**
+- Ticket: `3,9 / 1,2 / 4,2 / 2,3 / 3,2`
+- Unit: $0.50  →  **Cost: $16.00**

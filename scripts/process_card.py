@@ -23,6 +23,7 @@ Usage: python3 scripts/process_card.py 2026-04-26
 import csv
 import json
 import math
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -327,17 +328,26 @@ def write_races_csv(processed_races: list, out_path: Path):
 
 
 def write_picks_md(processed_races: list, date: str, out_path: Path):
+    has_pp = any(h.get("primePower", 0) > 0 for r in processed_races for h in r["scored"])
+    mode = "Round 2 (Brisnet PPs)" if has_pp else "Limited-data (ML + post + tier only)"
     lines = [
         f"# CD {date} — Algo Picks & Exotic Recommendations",
         "",
-        f"_Generated {datetime.now().isoformat(timespec='seconds')} • Limited-data mode (no Beyer/PP/class)._",
-        "",
-        "Scoring inputs available: ML odds, post position, jockey tier, trainer tier, CD track-bias defaults.",
-        "**Missing**: Beyer speed figures, Prime Power, class ratings, days-since-last-race, runstyle, mud %.",
-        "",
-        "---",
+        f"_Generated {datetime.now().isoformat(timespec='seconds')} • Mode: **{mode}**_",
         "",
     ]
+    if has_pp:
+        lines += [
+            "Inputs: Prime Power, current/avg-class, last-3 Beyers, runstyle, days-since-last,",
+            "mud %, plus per-race track-bias IVs (week totals, fallback to meet where N<5).",
+            "Scoring: 70/30 model/market blend (shifts toward market in sparse-data races).",
+        ]
+    else:
+        lines += [
+            "Scoring inputs: ML odds, post position, jockey tier, trainer tier, CD track-bias defaults.",
+            "**Missing**: Beyer speed figures, Prime Power, class ratings, days-since-last-race, runstyle.",
+        ]
+    lines += ["", "---", ""]
     for r in processed_races:
         lines.append(f"## R{r['raceNumber']} — {r['postTime']} • {r['distance']} {r['surface']} • ${r['purse']:,} • {r['raceType']}")
         if r.get("stakesName"):
@@ -569,6 +579,244 @@ def write_backtest_md(processed_races: list, results: dict, date: str, out_path:
     out_path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def parse_ts_card(ts_path: Path) -> dict | None:
+    """Extract StaticRace[] from a cd-YYYY-MM-DD.ts file via regex parsing.
+    Returns the same structure as raw-entries.json so the rest of the pipeline
+    works unchanged. Returns None if file not found."""
+    if not ts_path.exists():
+        return None
+    txt = ts_path.read_text()
+
+    # Find race blocks: `// ── Rn ──` / `const raceN: StaticRace = { ... };`
+    race_blocks = re.split(r"//\s*── R(\d+) — ([^\n]*?) ──\n", txt)
+    races = []
+    for i in range(1, len(race_blocks), 3):
+        rnum = int(race_blocks[i])
+        header = race_blocks[i + 1].strip()
+        body = race_blocks[i + 2]
+        # Stop at next race or export
+        body = re.split(r"//\s*── R\d+ —|^export\s+const", body, maxsplit=1, flags=re.MULTILINE)[0]
+
+        # Race-level fields
+        rt = re.search(r'raceNumber:\s*(\d+),\s*postTime:\s*"([^"]+)"', body)
+        rttype = re.search(r'raceType:\s*"([^"]+)",\s*distance:\s*"([^"]+)",\s*surface:\s*"([^"]+)",\s*purse:\s*(\d+),\s*condition:\s*"([^"]+)"', body)
+        # Track bias
+        tb = re.search(
+            r'speedBiasPct:\s*([\d.]+),\s*railBias:\s*"([^"]+)",\s*'
+            r"eIV:\s*([\d.]+),\s*epIV:\s*([\d.]+),\s*pIV:\s*([\d.]+),\s*sIV:\s*([\d.]+),\s*"
+            r"post1to3IV:\s*([\d.]+),\s*post4to7IV:\s*([\d.]+),\s*post8plusIV:\s*([\d.]+)",
+            body,
+        )
+        scratches_m = re.search(r"scratches:\s*\[([^\]]*)\]", body)
+        scratches = [s.strip().strip('"') for s in scratches_m.group(1).split(",")] if scratches_m and scratches_m.group(1).strip() else []
+
+        # Horses: each h(...) call
+        horses = []
+        for hm in re.finditer(
+            r'h\(\s*"(?P<prog>[^"]+)",\s*"(?P<name>[^"]+)",\s*(?P<ml>[\d.]+),\s*"(?P<style>[^"]+)",\s*'
+            r"\[(?P<beyers>[^\]]*)\],\s*(?P<days>\d+),\s*(?P<weight>\d+)"
+            r"(?:,\s*\{(?P<extras>[^}]*)\})?",
+            body,
+        ):
+            beyers = [int(b.strip()) for b in hm.group("beyers").split(",") if b.strip().lstrip("-").isdigit()]
+            extras = {}
+            if hm.group("extras"):
+                for em in re.finditer(r"(\w+):\s*([\d.]+)", hm.group("extras")):
+                    extras[em.group(1)] = float(em.group(2)) if "." in em.group(2) else int(em.group(2))
+            horses.append({
+                "program": hm.group("prog"),
+                "name": hm.group("name"),
+                "mlOdds": float(hm.group("ml")),
+                "style": hm.group("style"),
+                "last3Beyer": beyers,
+                "daysSinceLast": int(hm.group("days")),
+                "weight": int(hm.group("weight")),
+                "primePower": extras.get("primePower", 0),
+                "currentClass": extras.get("currentClass", 0),
+                "avgClassLast3": extras.get("avgClassLast3", 0),
+                "earlyPaceLast": extras.get("earlyPaceLast", 0),
+                "latePaceLast": extras.get("latePaceLast", 0),
+                "mudPct": extras.get("mudPct", 0),
+                "isClassDrop": (
+                    extras.get("currentClass", 0) > 0
+                    and extras.get("avgClassLast3", 0) > 0
+                    and extras.get("currentClass", 0) < extras.get("avgClassLast3", 0)
+                ),
+            })
+
+        race = {
+            "raceNumber": int(rt.group(1)) if rt else rnum,
+            "postTime": rt.group(2) if rt else "",
+            "raceType": rttype.group(1) if rttype else "",
+            "distance": rttype.group(2) if rttype else "",
+            "surface": rttype.group(3) if rttype else "",
+            "purse": int(rttype.group(4)) if rttype else 0,
+            "condition": rttype.group(5) if rttype else "Fast",
+            "trackBias": {
+                "speedBiasPct": float(tb.group(1)),
+                "railBias": tb.group(2),
+                "eIV": float(tb.group(3)), "epIV": float(tb.group(4)),
+                "pIV": float(tb.group(5)), "sIV": float(tb.group(6)),
+                "post1to3IV": float(tb.group(7)),
+                "post4to7IV": float(tb.group(8)),
+                "post8plusIV": float(tb.group(9)),
+            } if tb else None,
+            "horses": horses,
+            "scratches": scratches,
+        }
+        races.append(race)
+
+    return {"track": "CD", "date": ts_path.stem.replace("cd-", ""), "races": races, "source": "ts"}
+
+
+def normalize_within_race(values: list, fallback: float = 0.05) -> list:
+    """Normalize a list of values to sum to 1.0. Zeros get fallback share."""
+    nonzero = [v for v in values if v and v > 0]
+    if not nonzero:
+        return [1.0 / len(values)] * len(values)
+    mean_nz = sum(nonzero) / len(nonzero)
+    adj = [v if v and v > 0 else mean_nz * fallback for v in values]
+    total = sum(adj) or 1.0
+    return [v / total for v in adj]
+
+
+def score_horses_full(horses: list, race: dict) -> list:
+    """Round 2 scoring with full Brisnet fields.
+    Inputs per horse: primePower, currentClass, avgClassLast3, last3Beyer[],
+                      earlyPaceLast, latePaceLast, daysSinceLast, mudPct, style.
+    Race-level: trackBias from PDF (eIV/epIV/pIV/sIV, post1to3IV, post4to7IV, post8plusIV)
+    """
+    bias = race.get("trackBias")
+    if not bias:
+        # Fall back to CD defaults
+        bias_key = classify_race(race["distance"], race["surface"])
+        bias = CD_BIASES[bias_key]
+
+    enriched = []
+    n = len(horses)
+
+    # 1. Market-implied prob
+    market_raw = [market_prob(h.get("mlOdds")) for h in horses]
+    market_norm = normalize_within_race(market_raw)
+
+    # 2. Prime Power normalized within race (model ability prob)
+    pp_raw = [h.get("primePower") or 0 for h in horses]
+    pp_known = sum(1 for p in pp_raw if p > 0)
+    # Maiden / sparse-data fallback: if <60% of field has PP data, blend toward market.
+    # Pure ability scoring doesn't make sense when most horses are first-time starters.
+    if pp_known == 0:
+        pp_norm = market_norm[:]
+        sparse_factor = 0.0  # no model signal
+    else:
+        pp_norm = normalize_within_race(pp_raw)
+        coverage = pp_known / n
+        sparse_factor = min(1.0, coverage / 0.6)  # full weight at >=60% coverage
+
+    for i, h in enumerate(horses):
+        # 3. Class signal (drop = bonus, raise = penalty)
+        cc = h.get("currentClass") or 0
+        ac3 = h.get("avgClassLast3") or 0
+        class_delta = (cc - ac3) if (cc and ac3) else 0
+        class_bonus = 0
+        if h.get("isClassDrop"):
+            class_bonus = min(0.10, abs(class_delta) * 0.02)
+        elif class_delta > 1.0:
+            class_bonus = -min(0.05, class_delta * 0.01)
+
+        # 4. Form signal — best of last 3 Beyers
+        beyers = h.get("last3Beyer") or [0, 0, 0]
+        nonzero_beyers = [b for b in beyers if b and b > 0]
+        best_beyer = max(nonzero_beyers) if nonzero_beyers else 0
+
+        # 5. Layoff penalty (Apr 18 cortex rule: halve if peak Beyer >= 82)
+        days = h.get("daysSinceLast") or 0
+        layoff_pen = 0
+        if days > 60:
+            layoff_pen = -0.5
+            if best_beyer >= 82:
+                layoff_pen = -0.25  # halved for quality horses
+
+        # 6. Track-bias adj
+        style = (h.get("style") or "P").upper()
+        style_iv = {"E": bias["eIV"], "EP": bias["epIV"], "P": bias["pIV"],
+                    "S": bias["sIV"], "C": bias["sIV"]}.get(style, 1.0)
+        # Post position not in PDF — skip post-IV since we don't have draws
+        # (will be added when scratches/draws are confirmed day-of)
+        bias_factor = 1.0 + 0.35 * (style_iv - 1.0)
+        bias_factor = max(0.5, min(1.6, bias_factor))
+
+        # 7. Combine: ability (PP) × bias × (1 + class) × (1 + layoff_pen/10)
+        ability = pp_norm[i] * bias_factor * (1.0 + class_bonus + layoff_pen / 10.0)
+        ability = max(0.001, ability)
+
+        enriched.append({
+            **h,
+            "market_prob": market_norm[i],
+            "pp_prob_raw": pp_norm[i],
+            "best_beyer": best_beyer,
+            "class_delta": class_delta,
+            "class_bonus": class_bonus,
+            "layoff_penalty": layoff_pen,
+            "style_iv": style_iv,
+            "bias_factor": bias_factor,
+            "ability_raw": ability,
+        })
+
+    # 8. Renormalize ability scores
+    abilities = [e["ability_raw"] for e in enriched]
+    a_total = sum(abilities) or 1.0
+    for e in enriched:
+        e["model_prob"] = e["ability_raw"] / a_total
+
+    # 9. Final blend — Round 2 is 0.7 model + 0.3 market when data is full,
+    # but for maiden/sparse races we shift toward market to avoid overweighting
+    # the few horses that happen to have PP data.
+    model_weight = 0.7 * sparse_factor
+    market_weight = 1.0 - model_weight
+    for e in enriched:
+        e["score"] = model_weight * e["model_prob"] + market_weight * e["market_prob"]
+
+    # 10. Re-normalize final score to sum=1.0
+    s_total = sum(e["score"] for e in enriched) or 1.0
+    for e in enriched:
+        e["score"] = e["score"] / s_total
+
+    # Sort + rank
+    enriched.sort(key=lambda x: -x["score"])
+    for i, e in enumerate(enriched):
+        e["rank"] = i + 1
+    return enriched
+
+
+def write_horses_csv_full(processed_races: list, out_path: Path):
+    """Richer horses.csv with Brisnet columns."""
+    with open(out_path, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "race", "post_time", "distance", "surface", "purse", "race_type",
+            "program", "name", "ml_odds", "style", "days_since_last",
+            "prime_power", "current_class", "avg_class_last3", "class_drop",
+            "last3_beyer_best", "early_pace_last", "late_pace_last", "mud_pct",
+            "market_prob_pct", "pp_prob_pct", "model_prob_pct", "score_pct",
+            "rank", "is_top_pick",
+        ])
+        for r in processed_races:
+            for h in r["scored"]:
+                w.writerow([
+                    r["raceNumber"], r["postTime"], r["distance"], r["surface"], r["purse"],
+                    r.get("raceType", ""),
+                    h["program"], h["name"], h.get("mlOdds", ""), h.get("style", ""), h.get("daysSinceLast", ""),
+                    h.get("primePower", ""), h.get("currentClass", ""), h.get("avgClassLast3", ""),
+                    "Y" if h.get("isClassDrop") else "",
+                    h.get("best_beyer", ""), h.get("earlyPaceLast", ""), h.get("latePaceLast", ""), h.get("mudPct", ""),
+                    f"{h['market_prob']*100:.1f}",
+                    f"{h.get('pp_prob_raw', 0)*100:.1f}",
+                    f"{h.get('model_prob', 0)*100:.1f}",
+                    f"{h['score']*100:.1f}",
+                    h["rank"], "YES" if h["rank"] == 1 else "",
+                ])
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python3 process_card.py YYYY-MM-DD")
@@ -576,21 +824,31 @@ def main():
     date = sys.argv[1]
     repo = Path(__file__).resolve().parent.parent
     in_dir = repo / "data" / f"cd-{date}"
-    in_path = in_dir / "raw-entries.json"
-    if not in_path.exists():
-        print(f"ERROR: {in_path} not found")
-        sys.exit(2)
-    raw = json.loads(in_path.read_text())
+
+    # Prefer the TS card (full Brisnet data) if present
+    ts_path = repo / "web" / "app" / "lib" / f"cd-{date}.ts"
+    raw = parse_ts_card(ts_path)
+    score_fn = score_horses_full if raw else score_horses
+    write_horses_csv_fn = write_horses_csv_full if raw else write_horses_csv
+
+    if not raw:
+        in_path = in_dir / "raw-entries.json"
+        if not in_path.exists():
+            print(f"ERROR: neither {ts_path} nor {in_path} found")
+            sys.exit(2)
+        raw = json.loads(in_path.read_text())
+
     track = raw.get("track", "CD")
+    print(f"Source: {raw.get('source', 'json')} ({len(raw['races'])} races)")
 
     processed = []
     for race in raw["races"]:
-        scored = score_horses(race["horses"], race)
+        scored = score_fn(race["horses"], race)
         exotic = best_exotic_strategy(scored, race.get("raceType", "") + " " + (race.get("stakesName") or ""))
         processed.append({**race, "scored": scored, "exotic": exotic})
 
     # Outputs
-    write_horses_csv(processed, in_dir / "horses.csv")
+    write_horses_csv_fn(processed, in_dir / "horses.csv")
     write_races_csv(processed, in_dir / "races.csv")
     write_exotics_csv(processed, in_dir / "exotics.csv")
     write_picks_md(processed, date, in_dir / "picks.md")
@@ -606,8 +864,10 @@ def main():
         multi_lines.append("")
     (in_dir / "multi-race.md").write_text("\n".join(multi_lines), encoding="utf-8")
 
-    # TS static data file
-    write_ts_static(processed, date, track, repo / "web" / "app" / "lib" / f"cd-{date}.ts")
+    # TS static data file — only generate if we DON'T have a hand-written .ts already
+    # (parsing the .ts produces raw with source="ts" — skip overwrite)
+    if raw.get("source") != "ts":
+        write_ts_static(processed, date, track, repo / "web" / "app" / "lib" / f"cd-{date}.ts")
 
     # Backtest if results exist
     res_path = in_dir / "results.json"

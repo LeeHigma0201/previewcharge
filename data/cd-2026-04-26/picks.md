@@ -1,195 +1,198 @@
 # CD 2026-04-26 — Algo Picks & Exotic Recommendations
 
-_Generated 2026-04-25T23:49:44 • Limited-data mode (no Beyer/PP/class)._
+_Generated 2026-04-26T10:00:21 • Mode: **Round 2 (Brisnet PPs)**_
 
-Scoring inputs available: ML odds, post position, jockey tier, trainer tier, CD track-bias defaults.
-**Missing**: Beyer speed figures, Prime Power, class ratings, days-since-last-race, runstyle, mud %.
+Inputs: Prime Power, current/avg-class, last-3 Beyers, runstyle, days-since-last,
+mud %, plus per-race track-bias IVs (week totals, fallback to meet where N<5).
+Scoring: 70/30 model/market blend (shifts toward market in sparse-data races).
 
 ---
 
-## R1 — 12:45 PM • 1 1/16M Dirt • $83,000 • Starter Allowance
+## R1 — 12:45 PM • 1 1/16m Dirt • $83,000 • ALW 50000s
 
 | Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
 |---|---|---|---|---|---|---|
-| 1 | 5 | Nogradi | Jose L. Ortiz / Keri Brion | 5 | 1.8 | **27.5%** |
-| 2 | 6 | Cant Stop Munnings | Tyler Gaffalione / Saffie A. Joseph, Jr. | 6 | 3.5 | **16.9%** |
-| 3 | 3 | Different Gravy | Ben Curtis / Eddie Kenneally | 3 | 4.5 | **14.5%** |
-| 4 | 2 | Bourbon Flight | Irad Ortiz, Jr. / Ian R. Wilkes | 2 | 5.0 | **14.0%** |
-| 5 | 1 | C McGriff | Joel Rosario / Robert Medina | 1 | 6.0 | **12.0%** |
-| 6 | 7 | Six String Prince | Luis Saez / Ron Moquett | 7 | 8.0 | **8.5%** |
+| 1 | 5 | Nogradi | ? / ? | ? | 1.8 | **18.7%** |
+| 2 | 3 | Different Gravy | ? / ? | ? | 4.5 | **17.4%** |
+| 3 | 7 | Six String Prince | ? / ? | ? | 8.0 | **15.3%** |
+| 4 | 6 | Cant Stop Munnings | ? / ? | ? | 3.5 | **13.6%** |
+| 5 | 2 | Bourbon Flight | ? / ? | ? | 5.0 | **12.5%** |
+| 6 | 1 | C McGriff | ? / ? | ? | 6.0 | **12.0%** |
 
 **Primary play:** Superfecta 5-horse box (chaos play)
-- Ticket: `5-6-3-2-1 BOX` @ $0.1 = **$12.0**
-_Wide-open. Top 5 = 85%. Chaos super box._
+- Ticket: `5-3-7-6-2 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 78%. Chaos super box._
 
 **Alternates:**
-- Exacta 3-horse box: `5-6-3 BOX` @ $1.00 = $6.00
-- Trifecta 4-horse box: `5-6-3-2 BOX` @ $0.50 = $12.00
+- Exacta 3-horse box: `5-3-7 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `5-3-7-6 BOX` @ $0.50 = $12.00
 
 ---
 
-## R2 — 1:14 PM • 4 1/2F Dirt • $92,000 • MSW
+## R2 — 1:14 PM • 4 1/2f Dirt • $92,000 • MSW 92k
 
 | Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
 |---|---|---|---|---|---|---|
-| 1 | 7 | Cardio Cat | Irad Ortiz, Jr. / Steven M. Asmussen | 7 | 3.0 | **20.8%** |
-| 2 | 5 | Go New York Go | Luis Saez / Chad Summers | 5 | 4.5 | **14.3%** |
-| 3 | 8 | She's Toasty | Ben Curtis / Eddie Kenneally | 8 | 4.0 | **13.1%** |
-| 4 | 6 | Valkyrie | Declan Cannon / Kenneth G. McPeek | 6 | 5.0 | **13.1%** |
-| 5 | 2 | Storm Diva | Jose L. Ortiz / Mark E. Casse | 2 | 8.0 | **10.5%** |
-| 6 | 9 | Lady Lux | Victor R. Carrasco / Genaro Garcia | 9 | 6.0 | **9.4%** |
+| 1 | 7 | Cardio Cat | ? / ? | ? | 3.0 | **15.8%** |
+| 2 | 1 | Respected Mind | ? / ? | ? | 20.0 | **12.8%** |
+| 3 | 8 | She's Toasty | ? / ? | ? | 4.0 | **12.7%** |
+| 4 | 5 | Go New York Go | ? / ? | ? | 4.5 | **11.6%** |
+| 5 | 6 | Valkyrie | ? / ? | ? | 5.0 | **10.7%** |
+| 6 | 9 | Lady Lux | ? / ? | ? | 6.0 | **9.2%** |
 
 **Primary play:** Superfecta 5-horse box (chaos play)
-- Ticket: `7-5-8-6-2 BOX` @ $0.1 = **$12.0**
-_Wide-open. Top 5 = 72%. Chaos super box._
+- Ticket: `7-1-8-5-6 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 64%. Chaos super box._
 
 **Alternates:**
-- Exacta 3-horse box: `7-5-8 BOX` @ $1.00 = $6.00
-- Trifecta 4-horse box: `7-5-8-6 BOX` @ $0.50 = $12.00
+- Exacta 3-horse box: `7-1-8 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `7-1-8-5 BOX` @ $0.50 = $12.00
 
 ---
 
-## R3 — 1:43 PM • 6 1/2F Dirt • $48,000 • MCL
+## R3 — 1:43 PM • 6 1/2f Dirt • $48,000 • MCL 20000
 
 | Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
 |---|---|---|---|---|---|---|
-| 1 | 1 | Juanita Mychiquita | Edgar Morales / Genaro Garcia | 1 | 4.0 | **18.6%** |
-| 2 | 10 | State Charmer | Luis Saez / Timothy E. Hamm | 10 | 3.0 | **17.5%** |
-| 3 | 7 | Gladly | Jaime A. Torres / Caio Caramori | 7 | 5.0 | **13.0%** |
-| 4 | 8 | Will Believe | Irving Moncada / Michael E. Lauer | 8 | 4.5 | **12.3%** |
-| 5 | 9 | Flashy Aviator | Ben Curtis / Rohan G. Crichton | 9 | 6.0 | **9.6%** |
-| 6 | 2 | Rocky World | Summer Pauly / Ed Moger, Jr. | 2 | 10.0 | **8.4%** |
+| 1 | 10 | State Charmer | ? / ? | ? | 3.0 | **16.1%** |
+| 2 | 1 | Juanita Mychiquita | ? / ? | ? | 4.0 | **13.9%** |
+| 3 | 2 | Rocky World | ? / ? | ? | 10.0 | **13.5%** |
+| 4 | 4 | High Grace | ? / ? | ? | 15.0 | **11.5%** |
+| 5 | 6 | Betty Hello | ? / ? | ? | 15.0 | **11.1%** |
+| 6 | 8 | Will Believe | ? / ? | ? | 4.5 | **10.8%** |
 
 **Primary play:** Superfecta 5-horse box (chaos play)
-- Ticket: `1-10-7-8-9 BOX` @ $0.1 = **$12.0**
-_Wide-open. Top 5 = 71%. Chaos super box._
+- Ticket: `10-1-2-4-6 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 66%. Chaos super box._
 
 **Alternates:**
-- Exacta 3-horse box: `1-10-7 BOX` @ $1.00 = $6.00
-- Trifecta 4-horse box: `1-10-7-8 BOX` @ $0.50 = $12.00
+- Exacta 3-horse box: `10-1-2 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `10-1-2-4 BOX` @ $0.50 = $12.00
 
 ---
 
-## R4 — 2:14 PM • 7F Dirt • $78,000 • CLM
+## R4 — 2:14 PM • 7f Dirt • $78,000 • CLM 40000
 
 | Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
 |---|---|---|---|---|---|---|
-| 1 | 8 | Epic Summer | Joel Rosario / George Weaver | 8 | 1.6 | **26.5%** |
-| 2 | 5 | Mischief Mania | Irad Ortiz, Jr. / Ed Moger, Jr. | 5 | 3.5 | **17.7%** |
-| 3 | 1 | Nuck Chorris | Tyler Gaffalione / Michael J. Maker | 1 | 5.0 | **15.7%** |
-| 4 | 7 | Kid Twist | Adam Beschizza / John Ennis | 7 | 4.5 | **13.8%** |
-| 5 | 6 | Sonic Surge | Luis Saez / Bobby S. Dibona | 6 | 8.0 | **8.8%** |
-| 6 | 4 | Perfect Audible | Jose L. Ortiz / Steven M. Asmussen | 4 | 10.0 | **7.6%** |
+| 1 | 8 | Epic Summer | ? / ? | ? | 1.6 | **18.4%** |
+| 2 | 7 | Kid Twist | ? / ? | ? | 4.5 | **13.8%** |
+| 3 | 5 | Mischief Mania | ? / ? | ? | 3.5 | **13.6%** |
+| 4 | 1 | Nuck Chorris | ? / ? | ? | 3.0 | **12.5%** |
+| 5 | 6 | Sonic Surge | ? / ? | ? | 8.0 | **12.1%** |
+| 6 | 4 | Perfect Audible | ? / ? | ? | 10.0 | **10.4%** |
 
 **Primary play:** Superfecta 5-horse box (chaos play)
-- Ticket: `8-5-1-7-6 BOX` @ $0.1 = **$12.0**
-_Wide-open. Top 5 = 82%. Chaos super box._
+- Ticket: `8-7-5-1-6 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 70%. Chaos super box._
 
 **Alternates:**
-- Exacta 3-horse box: `8-5-1 BOX` @ $1.00 = $6.00
-- Trifecta 4-horse box: `8-5-1-7 BOX` @ $0.50 = $12.00
+- Exacta 3-horse box: `8-7-5 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `8-7-5-1 BOX` @ $0.50 = $12.00
 
 ---
 
-## R5 — 2:47 PM • 6F Dirt • $35,000 • MCL
+## R5 — 2:47 PM • 6f Dirt • $35,000 • MCL 12500
 
 | Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
 |---|---|---|---|---|---|---|
-| 1 | 3 | Calling On Heaven | Tyler Gaffalione / Michael J. Maker | 3 | 1.4 | **37.1%** |
-| 2 | 6 | Impavido | Luis Saez / Albert M. Stall, Jr. | 6 | 3.5 | **16.6%** |
-| 3 | 7 | Next Time | Gerardo Corrales / David Jacobson | 7 | 4.5 | **13.1%** |
-| 4 | 2 | Richeztoo | Evin A. Roman / Joel Zawitz | 2 | 8.0 | **9.5%** |
-| 5 | 10 | Grab the Spark | Irad Ortiz, Jr. / Ron Moquett | 10 | 6.0 | **9.3%** |
-| 6 | 8 | Blazing | Danny Sheehy / Michelle Lovell | 8 | 15.0 | **3.9%** |
-
-**Primary play:** Trifecta key 1st OVER top 3
-- Ticket: `3 / 6,7,2 / 6,7,2` @ $0.5 = **$3.0**
-_#3 Calling On Heaven dominates at 37%. Single on top, spread under._
-
-**Alternates:**
-- Exacta 3-horse box: `3-6-7 BOX` @ $1.00 = $6.00
-
----
-
-## R6 — 3:20 PM • 5 1/2F Turf • $141,000 • AOC
-
-| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
-|---|---|---|---|---|---|---|
-| 1 | 3 | Run Curtis Run | Tyler Gaffalione / Michael J. Maker | 3 | 3.0 | **22.4%** |
-| 2 | 2 | Autodrive | Brian Joseph Hernandez, Jr. / W. Bret Calhoun | 2 | 4.0 | **17.2%** |
-| 3 | 1 | Golden Afternoon | Irad Ortiz, Jr. / Nicholas Vaccarezza | 1 | 4.5 | **16.4%** |
-| 4 | 8 | Step Forward | Joel Rosario / Michael J. Maker | 8 | 3.5 | **13.3%** |
-| 5 | 4 | Amoudi Bay | James Graham / Lindsay Schultz | 4 | 5.0 | **11.6%** |
-| 6 | 7 | Sine Qua Non | Luis Saez / James P. DiVito | 7 | 8.0 | **8.0%** |
+| 1 | 3 | Calling On Heaven | ? / ? | ? | 1.4 | **18.7%** |
+| 2 | 9 | Next Time | ? / ? | ? | 4.5 | **13.3%** |
+| 3 | 10 | Grab the Spark | ? / ? | ? | 6.0 | **12.7%** |
+| 4 | 7 | Impavido | ? / ? | ? | 7.0 | **10.7%** |
+| 5 | 2 | Richeztoo | ? / ? | ? | 8.0 | **10.3%** |
+| 6 | 8 | Blazing | ? / ? | ? | 15.0 | **9.0%** |
 
 **Primary play:** Superfecta 5-horse box (chaos play)
-- Ticket: `3-2-1-8-4 BOX` @ $0.1 = **$12.0**
-_Wide-open. Top 5 = 81%. Chaos super box._
+- Ticket: `3-9-10-7-2 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 66%. Chaos super box._
+
+**Alternates:**
+- Exacta 3-horse box: `3-9-10 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `3-9-10-7 BOX` @ $0.50 = $12.00
+
+---
+
+## R6 — 3:20 PM • 5 1/2f Turf • $141,000 • OC 100000n3x
+
+| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
+|---|---|---|---|---|---|---|
+| 1 | 1 | Golden Afternoon | ? / ? | ? | 4.5 | **15.1%** |
+| 2 | 2 | Autodrive | ? / ? | ? | 4.0 | **15.0%** |
+| 3 | 3 | Run Curtis Run | ? / ? | ? | 3.0 | **13.3%** |
+| 4 | 8 | Step Forward | ? / ? | ? | 7.0 | **13.0%** |
+| 5 | 6 | T Kraft | ? / ? | ? | 10.0 | **11.9%** |
+| 6 | 4 | Amoudi Bay | ? / ? | ? | 5.0 | **11.2%** |
+
+**Primary play:** Superfecta 5-horse box (chaos play)
+- Ticket: `1-2-3-8-6 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 68%. Chaos super box._
+
+**Alternates:**
+- Exacta 3-horse box: `1-2-3 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `1-2-3-8 BOX` @ $0.50 = $12.00
+
+---
+
+## R7 — 3:51 PM • 6f Dirt • $36,000 • CLM 16000n2L
+
+| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
+|---|---|---|---|---|---|---|
+| 1 | 4 | Sweet Bebsi | ? / ? | ? | 1.6 | **15.6%** |
+| 2 | 2 | I'm a Cookie Lover | ? / ? | ? | 3.5 | **12.1%** |
+| 3 | 9 | Loving Mischief | ? / ? | ? | 4.5 | **12.0%** |
+| 4 | 10 | Waffle House Gang | ? / ? | ? | 6.0 | **11.0%** |
+| 5 | 3 | Ride the Broom | ? / ? | ? | 7.0 | **9.8%** |
+| 6 | 1 | Mamarsha | ? / ? | ? | 15.0 | **9.2%** |
+
+**Primary play:** Superfecta 5-horse box (chaos play)
+- Ticket: `4-2-9-10-3 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 61%. Chaos super box._
+
+**Alternates:**
+- Exacta 3-horse box: `4-2-9 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `4-2-9-10 BOX` @ $0.50 = $12.00
+
+---
+
+## R8 — 4:24 PM • 1 1/4m Dirt • $120,000 • MSW 92k
+
+| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
+|---|---|---|---|---|---|---|
+| 1 | 2 | Stompin Grapes | ? / ? | ? | 1.8 | **17.2%** |
+| 2 | 3 | Tiernanogue | ? / ? | ? | 3.5 | **12.9%** |
+| 3 | 9 | Silver Shot | ? / ? | ? | 6.0 | **12.3%** |
+| 4 | 1 | King of Heat | ? / ? | ? | 6.0 | **11.9%** |
+| 5 | 4 | Still Sober | ? / ? | ? | 20.0 | **11.0%** |
+| 6 | 6 | Sartorial | ? / ? | ? | 8.0 | **9.7%** |
+
+**Primary play:** Superfecta 5-horse box (chaos play)
+- Ticket: `2-3-9-1-4 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 65%. Chaos super box._
+
+**Alternates:**
+- Exacta 3-horse box: `2-3-9 BOX` @ $1.00 = $6.00
+- Trifecta 4-horse box: `2-3-9-1 BOX` @ $0.50 = $12.00
+
+---
+
+## R9 — 4:56 PM • 1 1/16m Turf • $127,000 • ALW 127000n1x
+
+| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
+|---|---|---|---|---|---|---|
+| 1 | 3 | Brilliantly | ? / ? | ? | 3.0 | **12.5%** |
+| 2 | 2 | Faithful Departed | ? / ? | ? | 5.0 | **11.8%** |
+| 3 | 1 | Midway Memories | ? / ? | ? | 4.0 | **11.8%** |
+| 4 | 10 | Totally Justified | ? / ? | ? | 6.0 | **11.4%** |
+| 5 | 4 | Olivia Valentina | ? / ? | ? | 10.0 | **9.7%** |
+| 6 | 5 | Snipsnippitysnip | ? / ? | ? | 9.5 | **9.5%** |
+
+**Primary play:** Superfecta 5-horse box (chaos play)
+- Ticket: `3-2-1-10-4 BOX` @ $0.1 = **$12.0**
+_Wide-open. Top 5 = 57%. Chaos super box._
 
 **Alternates:**
 - Exacta 3-horse box: `3-2-1 BOX` @ $1.00 = $6.00
-- Trifecta 4-horse box: `3-2-1-8 BOX` @ $0.50 = $12.00
-
----
-
-## R7 — 3:51 PM • 6F Dirt • $36,000 • CLM
-
-| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
-|---|---|---|---|---|---|---|
-| 1 | 4 | Sweet Bebsi | Irad Ortiz, Jr. / Rodolphe Brisset | 4 | 1.6 | **31.3%** |
-| 2 | 3 | Ride the Broom | Adam Beschizza / Joe Blair Roberts | 3 | 3.5 | **20.5%** |
-| 3 | 9 | Loving Mischief | Edgar Morales / Genaro Garcia | 9 | 4.5 | **12.2%** |
-| 4 | 10 | Waffle House Gang | Gerardo Corrales / Keith Kinmon | 10 | 6.0 | **9.6%** |
-| 5 | 5 | Mo Indian Lady | Gabriel Saez / Eric N. Foster | 5 | 12.0 | **6.0%** |
-| 6 | 2 | I'm a Cookie Lover | Ben Curtis / Lacy Pierce | 2 | 15.0 | **5.8%** |
-
-**Primary play:** Trifecta 3-horse box
-- Ticket: `4-3-9 BOX` @ $0.5 = **$3.0**
-_Top 3 cover 64% — tri box at $0.50._
-
-**Alternates:**
-- Exacta 3-horse box: `4-3-9 BOX` @ $1.00 = $6.00
-
----
-
-## R8 — 4:24 PM • 1 1/4M Dirt • $120,000 • MSW
-
-| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
-|---|---|---|---|---|---|---|
-| 1 | 2 | Stompin Grapes | Brian Joseph Hernandez, Jr. / Ian R. Wilkes | 2 | 1.8 | **28.2%** |
-| 2 | 3 | Tiernanogue | Tyler Gaffalione / Brendan P. Walsh | 3 | 3.5 | **19.1%** |
-| 3 | 8 | Direct Strike | Irad Ortiz, Jr. / Brad H. Cox | 8 | 4.5 | **13.6%** |
-| 4 | 1 | King of Heat | James Graham / J. Keith Desormeaux | 1 | 6.0 | **11.3%** |
-| 5 | 9 | Silver Shot | Jose L. Ortiz / Steven M. Asmussen | 9 | 6.0 | **10.5%** |
-| 6 | 6 | Sartorial | Edgar Morales / George R. Arnold II | 6 | 8.0 | **8.1%** |
-
-**Primary play:** Superfecta 5-horse box (chaos play)
-- Ticket: `2-3-8-1-9 BOX` @ $0.1 = **$12.0**
-_Wide-open. Top 5 = 83%. Chaos super box._
-
-**Alternates:**
-- Exacta 3-horse box: `2-3-8 BOX` @ $1.00 = $6.00
-- Trifecta 4-horse box: `2-3-8-1 BOX` @ $0.50 = $12.00
-
----
-
-## R9 — 4:56 PM • 1 1/16M Turf • $127,000 • ALW
-
-| Rank | # | Horse | Jockey / Trainer | Post | ML | Score |
-|---|---|---|---|---|---|---|
-| 1 | 3 | Brilliantly | Joel Rosario / Bob Baffert | 3 | 3.0 | **21.6%** |
-| 2 | 1 | Midway Memories | Irad Ortiz, Jr. / Chad C. Brown | 1 | 4.0 | **18.3%** |
-| 3 | 5 | Snipsnippitysnip | Tyler Gaffalione / Brendan P. Walsh | 5 | 4.5 | **14.0%** |
-| 4 | 9 | Faithful Departed | Jose L. Ortiz / Grant T. Forster | 9 | 5.0 | **10.1%** |
-| 5 | 7 | Plaza Athenee (GB) | Ben Curtis / Brendan P. Walsh | 7 | 8.0 | **8.3%** |
-| 6 | 10 | Totally Justified | Danny Sheehy / Anna M. Meah | 10 | 6.0 | **8.2%** |
-
-**Primary play:** Superfecta 5-horse box (chaos play)
-- Ticket: `3-1-5-9-7 BOX` @ $0.1 = **$12.0**
-_Wide-open. Top 5 = 72%. Chaos super box._
-
-**Alternates:**
-- Exacta 3-horse box: `3-1-5 BOX` @ $1.00 = $6.00
-- Trifecta 4-horse box: `3-1-5-9 BOX` @ $0.50 = $12.00
+- Trifecta 4-horse box: `3-2-1-10 BOX` @ $0.50 = $12.00
 
 ---
