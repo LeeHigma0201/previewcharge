@@ -282,11 +282,66 @@ function RaceCard({ race, recs, finish, isNext, onLogFinish, onClearFinish }: {
       {/* Horse legend — prevents program# mapping errors from deceiving silently */}
       {!done && <HorseLegend recs={recs} />}
 
+      {/* Per-horse W/P/S sim — full picture */}
+      {!done && <HorseSimTable recs={recs} />}
+
       {/* Tickets */}
       <div className={`space-y-1.5 ${done ? "opacity-50" : ""}`}>
         <TicketRow label="SUPER" s={recs.superfecta} />
         <TicketRow label="TRI"   s={recs.trifecta} />
         <TicketRow label="EXACTA" s={recs.exacta} />
+      </div>
+    </div>
+  );
+}
+
+// Per-horse Win / Place / Show with overlay highlighting.
+// "Overlay" = model thinks horse is undervalued vs morning line — these are the BETS.
+function HorseSimTable({ recs }: { recs: RaceExoticRecs }) {
+  const horses = recs.horses;
+  if (!horses?.length) return null;
+  return (
+    <div className="mb-2 rounded border border-gray-800 bg-black/40 overflow-hidden">
+      <div className="grid grid-cols-[28px_1fr_42px_44px_44px_44px_56px] gap-1 px-2 py-1 text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-800">
+        <div>#</div>
+        <div>Horse</div>
+        <div className="text-right">ML</div>
+        <div className="text-right">Win</div>
+        <div className="text-right">Plc</div>
+        <div className="text-right">Show</div>
+        <div className="text-right">Edge</div>
+      </div>
+      {horses.map((h) => {
+        const edgeColor = h.isOverlay
+          ? "text-emerald-400"
+          : h.overlay >= 1.05
+            ? "text-emerald-300/70"
+            : h.overlay >= 0.85
+              ? "text-gray-400"
+              : "text-rose-400/80";
+        const rowBg = h.isOverlay ? "bg-emerald-950/40" : h.rank === 1 ? "bg-amber-950/30" : "";
+        return (
+          <div
+            key={h.program}
+            className={`grid grid-cols-[28px_1fr_42px_44px_44px_44px_56px] gap-1 px-2 py-1 text-xs font-mono items-center border-b border-gray-900 last:border-0 ${rowBg}`}
+          >
+            <div className="font-black text-white">#{h.program}</div>
+            <div className="truncate">
+              <span className="text-gray-200">{h.name}</span>
+              <span className="text-gray-600 ml-1 text-[10px]">{h.style}</span>
+              {h.isOverlay && <span className="ml-1 text-[9px] font-bold text-emerald-400">★</span>}
+              {h.rank === 1 && !h.isOverlay && <span className="ml-1 text-[9px] font-bold text-amber-400">TOP</span>}
+            </div>
+            <div className="text-right text-gray-400">{h.mlOdds.toFixed(1)}</div>
+            <div className="text-right text-white font-bold">{h.modelWinPct.toFixed(0)}%</div>
+            <div className="text-right text-gray-300">{h.modelPlacePct.toFixed(0)}%</div>
+            <div className="text-right text-gray-400">{h.modelShowPct.toFixed(0)}%</div>
+            <div className={`text-right font-bold ${edgeColor}`}>{(h.overlay).toFixed(2)}×</div>
+          </div>
+        );
+      })}
+      <div className="px-2 py-1 text-[10px] text-gray-500 border-t border-gray-800">
+        ★ = model overlay (undervalued vs ML — bet candidate). TOP = highest model win.
       </div>
     </div>
   );

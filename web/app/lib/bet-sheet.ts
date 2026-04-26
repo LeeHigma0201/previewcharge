@@ -72,6 +72,27 @@ interface RaceProbs {
   programs: string[];            // ordered by horse index
   names: string[];
   winProbs: number[];
+  placeProbs: number[];          // P(finishes 1st OR 2nd) — Harville
+  showProbs: number[];           // P(finishes 1st, 2nd, OR 3rd) — Harville
+  mlOdds: number[];              // morning line decimal odds per horse
+  marketProbs: number[];         // ML-implied probability, normalized
+  styles: string[];
+}
+
+/** Per-horse public-facing probability bundle for the bets page */
+export interface HorseSim {
+  program: string;
+  name: string;
+  style: string;
+  mlOdds: number;
+  marketWinPct: number;          // ML-implied win % (normalized)
+  modelWinPct: number;           // 70/30 model+market blend (sums to 100% in race)
+  modelPlacePct: number;         // P(top 2)
+  modelShowPct: number;          // P(top 3)
+  overlay: number;               // modelWin / marketWin — >1.0 = model thinks horse is undervalued
+  isOverlay: boolean;            // overlay >= 1.25 AND modelWin >= 0.05
+  isFavorite: boolean;           // shortest ML
+  rank: number;                  // 1 = highest model win prob
 }
 
 function computeRaceProbs(race: StaticRace): RaceProbs {
@@ -179,7 +200,73 @@ function computeRaceProbs(race: StaticRace): RaceProbs {
   const winProbs = modelProbs.map((mp, i) =>
     Math.max(0.70 * mp + 0.30 * marketProbs[i], 1e-6),
   );
-  return { programs, names, winProbs };
+
+  // Harville place/show probabilities. P(i in top 2) = winProb_i + sum_{j!=i} P(j wins) * P(i wins | j out)
+  const placeProbs = winProbs.map((wi, i) => {
+    let p = wi;
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      const denom = 1 - winProbs[j];
+      if (denom > 1e-9) p += winProbs[j] * (wi / denom);
+    }
+    return Math.min(1, p);
+  });
+  const showProbs = winProbs.map((wi, i) => {
+    let p = placeProbs[i];
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      for (let k = 0; k < n; k++) {
+        if (k === i || k === j) continue;
+        const d1 = 1 - winProbs[j];
+        const d2 = 1 - winProbs[j] - winProbs[k];
+        if (d1 > 1e-9 && d2 > 1e-9) {
+          p += winProbs[j] * (winProbs[k] / d1) * (wi / d2);
+        }
+      }
+    }
+    return Math.min(1, p);
+  });
+
+  return {
+    programs,
+    names,
+    winProbs,
+    placeProbs,
+    showProbs,
+    mlOdds: horses.map((h) => h.mlOdds),
+    marketProbs,
+    styles: horses.map((h) => h.style ?? "P"),
+  };
+}
+
+/** Build the public-facing per-horse W/P/S table from a RaceProbs. */
+function buildHorseSim(rp: RaceProbs): HorseSim[] {
+  const minMl = Math.min(...rp.mlOdds);
+  const order = rp.winProbs
+    .map((p, i) => ({ p, i }))
+    .sort((a, b) => b.p - a.p);
+  const rank: Record<number, number> = {};
+  order.forEach((o, idx) => { rank[o.i] = idx + 1; });
+
+  return rp.programs.map((prog, i) => {
+    const modelWin = rp.winProbs[i];
+    const marketWin = rp.marketProbs[i];
+    const overlay = marketWin > 1e-9 ? modelWin / marketWin : 0;
+    return {
+      program: prog,
+      name: rp.names[i],
+      style: rp.styles[i],
+      mlOdds: rp.mlOdds[i],
+      marketWinPct: marketWin * 100,
+      modelWinPct: modelWin * 100,
+      modelPlacePct: rp.placeProbs[i] * 100,
+      modelShowPct: rp.showProbs[i] * 100,
+      overlay,
+      isOverlay: overlay >= 1.25 && modelWin >= 0.05,
+      isFavorite: rp.mlOdds[i] === minMl,
+      rank: rank[i],
+    };
+  });
 }
 
 // Build an ExoticCombo from an ordered index list
@@ -282,6 +369,7 @@ export interface RaceExoticRecs {
   exacta: BetStrategy;
   trifecta: BetStrategy;
   superfecta: BetStrategy;
+  horses: HorseSim[];        // per-horse W/P/S sim + overlay flags (sorted by model win)
 }
 
 export function computeExoticsAnalytic(race: StaticRace): RaceExoticRecs {
@@ -396,11 +484,14 @@ export function computeExoticsAnalytic(race: StaticRace): RaceExoticRecs {
     }
   }
 
+  const horses = buildHorseSim(rp).sort((a, b) => a.rank - b.rank);
+
   return {
     raceNumber: race.raceNumber,
     exacta: pickBest(exactaCands),
     trifecta: pickBest(triCands),
     superfecta: pickBest(superCands.length > 0 ? superCands : exactaCands),
+    horses,
   };
 }
 
