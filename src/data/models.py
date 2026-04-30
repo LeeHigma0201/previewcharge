@@ -4,9 +4,9 @@ Schema designed around BRIS data format. Entry is the central table —
 one row per horse per race, the unit of prediction.
 """
 
-from datetime import date
+from datetime import date, datetime
 
-from sqlalchemy import Date, Float, ForeignKey, Index, Integer, String, UniqueConstraint
+from sqlalchemy import Date, DateTime, Float, ForeignKey, Index, Integer, JSON, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -189,3 +189,53 @@ class Workout(Base):
     surface: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     horse: Mapped["Horse"] = relationship(back_populates="workouts")
+
+
+class TrackBias(Base):
+    """Track bias statistics computed from historical results.
+
+    Stores post-position and running-style win rates for a given
+    track/surface/condition combination over a rolling date window.
+    """
+
+    __tablename__ = "track_bias"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    track_code: Mapped[str] = mapped_column(String(5), index=True)
+    surface: Mapped[str] = mapped_column(String(10))
+    condition: Mapped[str | None] = mapped_column(String(5), nullable=True)
+    date_range_start: Mapped[date] = mapped_column(Date)
+    date_range_end: Mapped[date] = mapped_column(Date)
+    post_position_win_rates: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    early_speed_win_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    closer_win_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    inside_win_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    outside_win_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    sample_size: Mapped[int] = mapped_column(Integer)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "track_code", "surface", "condition", "date_range_start", "date_range_end",
+            name="uq_track_bias",
+        ),
+    )
+
+
+class OddsSnapshot(Base):
+    """A snapshot of live odds for one horse at a point in time.
+
+    Polled periodically before post time to track odds movement.
+    The most recent snapshot feeds the PDS calculation at post time.
+    """
+
+    __tablename__ = "odds_snapshots"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    race_id: Mapped[int] = mapped_column(ForeignKey("races.id"), index=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime)
+    program_number: Mapped[str] = mapped_column(String(5))
+    win_odds: Mapped[float | None] = mapped_column(Float, nullable=True)
+    exacta_probable: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    trifecta_probable: Mapped[str | None] = mapped_column(JSON, nullable=True)
+
+    race: Mapped["Race"] = relationship()

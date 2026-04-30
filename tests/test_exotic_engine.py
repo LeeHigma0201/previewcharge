@@ -84,27 +84,20 @@ class TestKelly:
 
 
 class TestSuperfecta:
-    def test_superfecta_probs_shape(self):
+    def test_superfecta_probs_is_dict(self):
         probs = np.array([0.30, 0.25, 0.20, 0.15, 0.10])
         sim = henery_simulate(probs, n_simulations=50_000, seed=42, compute_superfecta=True)
         assert sim.superfecta_probs is not None
-        assert sim.superfecta_probs.shape == (5, 5, 5, 5)
+        assert isinstance(sim.superfecta_probs, dict)
+        assert len(sim.superfecta_probs) > 0
 
     def test_superfecta_probs_sum(self):
         probs = np.array([0.30, 0.25, 0.20, 0.15, 0.10])
         sim = henery_simulate(probs, n_simulations=50_000, seed=42, compute_superfecta=True)
-        # Total probability of all valid superfecta combos should be ~1.0
-        total = 0.0
-        n = len(probs)
-        for i in range(n):
-            for j in range(n):
-                if j == i: continue
-                for k in range(n):
-                    if k == i or k == j: continue
-                    for l in range(n):
-                        if l == i or l == j or l == k: continue
-                        total += sim.superfecta_probs[i, j, k, l]
-        assert total == pytest.approx(1.0, abs=0.02)
+        # Total probability of all stored superfecta combos should be close to 1.0
+        # (some very low-prob combos are filtered out, so allow more tolerance)
+        total = sum(sim.superfecta_probs.values())
+        assert total == pytest.approx(1.0, abs=0.05)
 
     def test_superfecta_backward_compatible(self):
         probs = np.array([0.30, 0.25, 0.20, 0.15, 0.10])

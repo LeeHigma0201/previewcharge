@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { KEENELAND_APR18_2026, KEE_APR18_DATE } from "../lib/keeneland-apr18";
-import { computeExoticsAnalytic, type RaceExoticRecs } from "../lib/bet-sheet";
+import { CD_2026_04_30 as TODAYS_CARD, CD_2026_04_30_DATE as TODAYS_DATE } from "../lib/cd-2026-04-30";
+import ClarkBot from "../components/ClarkBot";
+import { computeExoticsAnalytic, conditionalNextProbs, getRaceProbs, type RaceExoticRecs, type RaceProbs } from "../lib/bet-sheet";
+import type { StaticRace } from "../lib/keeneland-apr18";
 import {
   allRacePicks,
   computeMultiRaceRec,
@@ -19,18 +21,185 @@ import {
 } from "../lib/results-store";
 import type { BetStrategy } from "../lib/types";
 
+// Parse a static post-time string like "12:45 PM" combined with TODAYS_DATE
+// into an epoch-ms for scheduling. Returns null if unparseable.
+function parsePostTimeMs(postTime: string, isoDate: string): number | null {
+  const m = postTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+  if (!m) return null;
+  let h = parseInt(m[1], 10);
+  const min = parseInt(m[2], 10);
+  const meridiem = (m[3] ?? "PM").toUpperCase();
+  if (meridiem === "PM" && h < 12) h += 12;
+  if (meridiem === "AM" && h === 12) h = 0;
+  const [yyyy, mm, dd] = isoDate.split("-").map(Number);
+  // Construct a Date in local time (CD is in ET; user device tz is what matters for the UI scheduler)
+  return new Date(yyyy, (mm || 1) - 1, dd || 1, h, min).getTime();
+}
+
+// Parse manual scratch input like "R1:4, R3:3,4, R6:8" into { "1": ["4"], "3": ["3","4"], "6": ["8"] }
+function parseManualScratches(input: string): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  if (!input) return out;
+  for (const part of input.split(/[;,\n]+/).map((s) => s.trim()).filter(Boolean)) {
+    const m = part.match(/^R?(\d+)\s*[:\-=]\s*(.+)$/i);
+    if (!m) continue;
+    const race = m[1];
+    const progs = m[2].split(/[\s,]+/).map((p) => p.replace(/^#/, "").trim()).filter(Boolean);
+    if (progs.length === 0) continue;
+    out[race] = [...(out[race] ?? []), ...progs];
+  }
+  return out;
+}
+
+const MANUAL_SCRATCH_KEY = "horsegpt_manual_scratches_2026-04-30";
+const TRACK_CONDITION_KEY = "horsegpt_track_condition_2026-04-30";
+
+const TRACK_CONDITIONS = ["Fast", "Wet Fast", "Good", "Muddy", "Sloppy", "Yielding", "Soft", "Firm"] as const;
+type TrackCondition = (typeof TRACK_CONDITIONS)[number];
+
 export default function BetSheet() {
   const [results, setResults] = useState<ResultsMap>({});
   const [fetchStatus, setFetchStatus] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
+  // Race insights (live odds, pace narrative, sharp moves) for the next race
+  type RaceInsights = {
+    raceNumber: number;
+    liveOdds: Record<string, number>;
+    paceScenario: string;
+    sharpMoves: Array<{ program: string; from: number; to: number; reason: string }>;
+    trackCondition: string | null;
+    keyAngles: string[];
+    source: string;
+    checked_at: string;
+    live_grounded?: boolean;
+    grounded_urls?: string[];
+  };
+  const [insights, setInsights] = useState<RaceInsights | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  // Auto-fetched (Gemini) scratches
+  const [autoScratches, setAutoScratches] = useState<Record<string, string[]>>({});
+  // User-entered scratches — persisted to localStorage so they survive refresh
+  const [manualScratchInput, setManualScratchInput] = useState<string>("");
+  const [scratchStatus, setScratchStatus] = useState<string | null>(null);
+  // Track condition override — defaults to Fast for Apr 30 (no precip in forecast); user can flip mid-card.
+  const [trackCondition, setTrackCondition] = useState<TrackCondition>("Fast");
 
   useEffect(() => {
     setResults(loadResults());
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(MANUAL_SCRATCH_KEY);
+      if (stored) setManualScratchInput(stored);
+      const cond = localStorage.getItem(TRACK_CONDITION_KEY);
+      if (cond && (TRACK_CONDITIONS as readonly string[]).includes(cond)) {
+        setTrackCondition(cond as TrackCondition);
+      }
+    }
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(TRACK_CONDITION_KEY, trackCondition);
+  }, [trackCondition]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(MANUAL_SCRATCH_KEY, manualScratchInput);
+  }, [manualScratchInput]);
+
+  // Merge auto + manual scratches by race; manual wins on conflict / dedupe
+  const scratches = useMemo<Record<string, string[]>>(() => {
+    const manual = parseManualScratches(manualScratchInput);
+    const merged: Record<string, string[]> = {};
+    const races = new Set([...Object.keys(autoScratches), ...Object.keys(manual)]);
+    for (const r of races) {
+      const set = new Set<string>([...(autoScratches[r] ?? []), ...(manual[r] ?? [])]);
+      merged[r] = Array.from(set);
+    }
+    return merged;
+  }, [autoScratches, manualScratchInput]);
+
+  // Fetch scratches once on mount; refresh every 5 minutes while page is open.
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchScratches() {
+      try {
+        const res = await fetch(`/api/scratches?track=CD&date=${TODAYS_DATE}`, { cache: "no-store" });
+        const data = await res.json();
+        if (cancelled) return;
+        if (data.gemini_disabled) {
+          setScratchStatus(`⚠ ${data.message}`);
+          return;
+        }
+        if (data.error) {
+          setScratchStatus(`✗ scratch fetch: ${data.error}`);
+          return;
+        }
+        const byRace = (data.byRace ?? {}) as Record<string, string[]>;
+        setAutoScratches(byRace);
+        const total = Object.values(byRace).reduce((acc, arr) => acc + arr.length, 0);
+        setScratchStatus(total > 0 ? `✓ Gemini found ${total} scratch(es) — verify and add manual ones below` : `Gemini found no scratches — add manual ones below if you see any`);
+      } catch (err: unknown) {
+        if (!cancelled) setScratchStatus(`✗ ${err instanceof Error ? err.message : "scratch fetch failed"}`);
+      }
+    }
+    fetchScratches();
+    const id = setInterval(fetchScratches, 5 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+
+  // Fetch race insights for the next race (live odds + pace + sharp moves).
+  // Re-fetches whenever the next race changes.
+  async function fetchInsightsFor(raceNumber: number) {
+    setInsightsLoading(true);
+    try {
+      const res = await fetch(`/api/race-insights?race=${raceNumber}`, { cache: "no-store" });
+      const data = await res.json();
+      if (data.gemini_disabled || data.error) {
+        setInsights(null);
+      } else {
+        setInsights(data);
+        // If Gemini reports a different track condition with confidence, surface it
+        // (don't auto-apply — user should approve via the toggle).
+      }
+    } catch {
+      setInsights(null);
+    } finally {
+      setInsightsLoading(false);
+    }
+  }
+
+  // Auto-update finishes: 4 minutes after each scheduled post time, fetch live results.
+  // Effect runs once; for each future race, schedule a one-shot timer.
+  useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const now = Date.now();
+    for (const race of TODAYS_CARD) {
+      const postMs = parsePostTimeMs(race.postTime, TODAYS_DATE);
+      if (postMs == null) continue;
+      const fireAt = postMs + 4 * 60 * 1000;
+      const delay = fireAt - now;
+      if (delay > 0 && delay < 12 * 60 * 60 * 1000) {
+        timers.push(setTimeout(() => { fetchLiveResults(); }, delay));
+      }
+    }
+    return () => timers.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Build a card with scratches AND track condition applied. The condition
+  // override flows into bet-sheet.ts scoring so wet tracks boost closers/stalkers.
+  const cardWithScratches = useMemo(() => {
+    return TODAYS_CARD.map((race) => {
+      const sc = scratches[String(race.raceNumber)] ?? [];
+      const out = { ...race, condition: trackCondition };
+      if (sc.length > 0) out.scratches = sc;
+      return out;
+    });
+  }, [scratches, trackCondition]);
+
   const allRecs = useMemo<RaceExoticRecs[]>(
-    () => KEENELAND_APR18_2026.map(computeExoticsAnalytic),
-    [],
+    () => cardWithScratches.map(computeExoticsAnalytic),
+    [cardWithScratches],
   );
 
   const multiRecs = useMemo<MultiRaceRec[]>(() => {
@@ -76,8 +245,16 @@ export default function BetSheet() {
 
   const filledCount = Object.keys(results).length;
   const nextRace = useMemo(() => {
-    return KEENELAND_APR18_2026.find((r) => !results[r.raceNumber]);
-  }, [results]);
+    return cardWithScratches.find((r) => !results[r.raceNumber]);
+  }, [results, cardWithScratches]);
+
+  // Re-fetch race insights whenever the next race changes
+  useEffect(() => {
+    if (!nextRace) return;
+    if (insights?.raceNumber === nextRace.raceNumber) return;
+    fetchInsightsFor(nextRace.raceNumber);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextRace?.raceNumber]);
 
   return (
     <main className="min-h-screen bg-black text-white pb-24">
@@ -87,9 +264,48 @@ export default function BetSheet() {
           <div className="min-w-0">
             <h1 className="text-lg font-black truncate">HorseGPT &middot; Bet Sheet</h1>
             <p className="text-xs text-gray-400">
-              Keeneland {KEE_APR18_DATE} &middot; {filledCount}/11 done
+              Churchill Downs {TODAYS_DATE} &middot; {filledCount}/{TODAYS_CARD.length} done
               {nextRace && <span> &middot; next R{nextRace.raceNumber} {nextRace.postTime}</span>}
             </p>
+            {scratchStatus && (
+              <p className={`text-[10px] leading-tight mt-0.5 ${
+                scratchStatus.startsWith("✓") ? "text-emerald-500"
+                : scratchStatus.startsWith("⚠") ? "text-amber-400"
+                : "text-red-400"
+              }`}>{scratchStatus}</p>
+            )}
+            <div className="mt-1 flex items-center gap-2">
+              <label className="text-[10px] text-gray-400 shrink-0">Track:</label>
+              <select
+                value={trackCondition}
+                onChange={(e) => setTrackCondition(e.target.value as TrackCondition)}
+                className={`text-[11px] px-2 py-1 rounded border bg-gray-900 border-gray-700 focus:outline-none focus:border-emerald-500 ${
+                  ["Muddy","Sloppy","Wet Fast","Good","Yielding","Soft"].includes(trackCondition)
+                    ? "text-amber-300" : "text-gray-200"
+                }`}
+              >
+                {TRACK_CONDITIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="mt-1">
+              <input
+                type="text"
+                value={manualScratchInput}
+                onChange={(e) => setManualScratchInput(e.target.value)}
+                placeholder='SCR override: "R1:4, R3:3,4, R6:8"'
+                className="w-full text-[11px] px-2 py-1 rounded bg-gray-900 border border-gray-700 text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500"
+              />
+              {(() => {
+                const total = Object.values(scratches).reduce((a, arr) => a + arr.length, 0);
+                if (total === 0) return null;
+                const lines = Object.entries(scratches)
+                  .filter(([, progs]) => progs.length > 0)
+                  .sort((a, b) => Number(a[0]) - Number(b[0]))
+                  .map(([r, progs]) => `R${r}: ${progs.map((p) => `#${p}`).join(", ")}`)
+                  .join(" · ");
+                return <p className="text-[10px] text-amber-400 mt-0.5 leading-tight">{`Active scratches: ${lines}`}</p>;
+              })()}
+            </div>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             <button
@@ -111,6 +327,30 @@ export default function BetSheet() {
       </header>
 
       <div className="max-w-3xl mx-auto px-4 pt-4">
+        {/* R1 lessons learned */}
+        {results[1] && (
+          <div className="mb-3 p-3 rounded-lg border border-amber-700 bg-amber-950/40">
+            <div className="text-xs font-bold text-amber-300 mb-1">R1 LEARNED ({results[1].join("-")})</div>
+            <div className="text-[11px] text-amber-100/90 leading-snug space-y-1">
+              <p><span className="font-semibold">#4 Star&apos;s Image won at 9/2.</span> The EVEN-money chalk #1 Banned for Life finished 3rd.</p>
+              <p><span className="font-semibold">Pattern:</span> Star&apos;s Image had a single Beyer of 62 off a 108-day layoff. Algo punished him to ability ×0.70 on that lone figure; market priced him 4.5/1 because the layoff figure was stale.</p>
+              <p><span className="font-semibold">Fix shipped:</span> When a horse has ≤1 prior Beyer, defer to Prime Power. Plus 12 CD spring-meet trainers added (Sharp, Saffie Joseph Jr., DeVaux, Casse, Romans, Wilkes...).</p>
+            </div>
+          </div>
+        )}
+        {/* Through-R4 lessons + algo v2 ship notice */}
+        {results[4] && (
+          <div className="mb-4 p-3 rounded-lg border-2 border-emerald-700 bg-emerald-950/40">
+            <div className="text-xs font-bold text-emerald-300 mb-1">ALGO v2 SHIPPED — TWO TWEAKS BACKED BY 4 RACES OF DATA</div>
+            <div className="text-[11px] text-emerald-100/90 leading-snug space-y-1">
+              <p><span className="font-semibold">Pool-disparity flag is now 4-for-4 today.</span> R1 BFL → 3rd. R2 SV → 3rd. R3 Spotted → out of top 5. R4 Theoretical → 5th. Every public chalk we flagged has lost.</p>
+              <p><span className="font-semibold">Tweak A — Dual-mode pool disparity.</span> Old: W{'>'}P always meant chalk-doubt. New: top-3 odds + W{'>'}P = chalk doubt (penalty); 5/1–12/1 + W{'>'}P = sharp WIN money (bonus). R4 #11 Plot fit the second case (W11/P7/S5, 7/1) and finished 2nd; algo had penalized him.</p>
+              <p><span className="font-semibold">Tweak B — Intra-card style-bias override.</span> 4/4 winners today were P/EP/closer types beating the chalk speed. Track is closer-friendly. eIV: 1.45→1.10. epIV: 1.60→1.20. pIV: 0.65→1.00. sIV: 0.35→0.90. Inside-post bonus also dampened. Auto-activates at race 5+ when results.json shows the pattern.</p>
+              <p><span className="font-semibold">R5 picks reflect both:</span> #3 Jinxzi tops, #12 Tregetour 2nd (smart board lean +6), #1 Chasing Gray 3rd (Expert E #1). Pre-tweak algo had #4 Cliffs of Dover #1 (he&apos;s now 6th — money drifted off, 4.5 ML to 10 live).</p>
+              <p className="text-emerald-300/70"><span className="font-semibold">Honest caveat:</span> Tweak A backed by N=1 (R4 #11). Tweak B backed by 4-race intra-card pattern. Real validation still needs 30+ races. Both reverse cleanly if R5 result contradicts.</p>
+            </div>
+          </div>
+        )}
         {/* HUGE next-race block — write these on your ticket */}
         {nextRace && (() => {
           const recs = allRecs.find((r) => r.raceNumber === nextRace.raceNumber);
@@ -150,6 +390,64 @@ export default function BetSheet() {
                 <BigBetRow label="TRIFECTA"   s={recs.trifecta} />
                 <BigBetRow label="EXACTA"     s={recs.exacta} />
               </div>
+              {/* Gemini race insights — live odds, pace, sharp moves */}
+              {insightsLoading && (
+                <div className="mt-3 text-[11px] text-emerald-200/70 italic">Fetching live odds + pace…</div>
+              )}
+              {insights && insights.raceNumber === nextRace.raceNumber && (
+                <div className="mt-3 p-3 rounded-lg bg-black/40 border border-emerald-700/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[10px] uppercase tracking-wide text-emerald-400 font-bold">Race intelligence (Gemini)</div>
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                      insights.live_grounded ? "bg-emerald-700 text-white" : "bg-red-800 text-red-100"
+                    }`}>
+                      {insights.live_grounded ? "LIVE" : "STALE"}
+                    </span>
+                  </div>
+                  {!insights.live_grounded && (
+                    <div className="text-[10px] text-red-300">
+                      Gemini did not perform a live web search — track condition / odds suppressed. Refresh in a minute.
+                    </div>
+                  )}
+                  {insights.trackCondition && (
+                    <div className="text-[11px] text-amber-300">
+                      <span className="text-gray-400">Track:</span> {insights.trackCondition}
+                      {insights.trackCondition !== trackCondition && (
+                        <button
+                          onClick={() => setTrackCondition(insights.trackCondition as TrackCondition)}
+                          className="ml-2 px-2 py-0.5 rounded bg-amber-700 hover:bg-amber-600 text-white text-[10px]"
+                        >apply</button>
+                      )}
+                    </div>
+                  )}
+                  {insights.paceScenario && (
+                    <div className="text-[11px] text-emerald-100/90">{insights.paceScenario}</div>
+                  )}
+                  {insights.sharpMoves.length > 0 && (
+                    <div className="text-[11px]">
+                      <span className="text-gray-400">Sharp moves: </span>
+                      {insights.sharpMoves.map((m, i) => (
+                        <span key={i} className="text-yellow-400 mr-2">
+                          #{m.program} {m.from.toFixed(1)}→{m.to.toFixed(1)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {insights.keyAngles.length > 0 && (
+                    <ul className="text-[11px] text-emerald-200/80 space-y-0.5 list-disc list-inside">
+                      {insights.keyAngles.map((a, i) => <li key={i}>{a}</li>)}
+                    </ul>
+                  )}
+                  {Object.keys(insights.liveOdds).length > 0 && (
+                    <div className="text-[10px] text-gray-400">
+                      Live odds: {Object.entries(insights.liveOdds)
+                        .sort((a, b) => Number(a[0]) - Number(b[0]))
+                        .map(([p, o]) => `#${p}:${o.toFixed(1)}`)
+                        .join(" · ")}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })()}
@@ -168,7 +466,7 @@ export default function BetSheet() {
 
         {/* Race cards */}
         <div className="space-y-3">
-          {KEENELAND_APR18_2026.map((race) => {
+          {cardWithScratches.map((race) => {
             const recs = allRecs.find((r) => r.raceNumber === race.raceNumber);
             if (!recs) return null;
             const finish = results[race.raceNumber];
@@ -200,14 +498,95 @@ export default function BetSheet() {
           </div>
         </div>
       </div>
+      <ClarkBot />
     </main>
   );
 }
 
 // ───────────────────────────── components ─────────────────────────────
 
+/**
+ * Probability matrix explorer — click a horse to "lock" them in 1st, then see
+ * the conditional 2nd-place probs for every remaining horse. Click again to lock
+ * 2nd, see 3rd. Etc. Lets you build a tri/super ticket by walking the tree.
+ */
+function ProbMatrix({ race }: { race: StaticRace }) {
+  const [locked, setLocked] = useState<number[]>([]); // indices into rp.programs
+  const rp = useMemo<RaceProbs>(() => getRaceProbs(race), [race]);
+  if (rp.programs.length === 0) return null;
+
+  // Build columns: col 0 = win probs; col 1 = conditional given lock[0]; etc.
+  const columns: Array<{ probs: number[]; lockedSoFar: number[] }> = [];
+  for (let depth = 0; depth <= Math.min(3, rp.programs.length - 1); depth++) {
+    const lockedAtDepth = locked.slice(0, depth);
+    const probs = depth === 0
+      ? rp.winProbs
+      : conditionalNextProbs(rp, lockedAtDepth);
+    columns.push({ probs, lockedSoFar: lockedAtDepth });
+    if (depth >= locked.length) break; // don't show columns past current depth + 1
+  }
+
+  function clickAt(depth: number, idx: number) {
+    if (locked.includes(idx) && locked.indexOf(idx) !== depth) return; // already locked elsewhere
+    const next = [...locked.slice(0, depth), idx];
+    setLocked(next);
+  }
+
+  function reset() { setLocked([]); }
+
+  const labels = ["1st", "2nd", "3rd", "4th"];
+
+  return (
+    <div className="mt-2 p-2 rounded bg-black/40 border border-gray-700">
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-[10px] uppercase tracking-wide text-indigo-400 font-bold">Probability Matrix</div>
+        {locked.length > 0 && (
+          <button onClick={reset} className="text-[10px] text-gray-400 hover:text-white px-2 py-0.5 rounded border border-gray-700">reset</button>
+        )}
+      </div>
+      <div className="text-[10px] text-gray-500 mb-2">Click a horse in any column to lock them in that position. The next column re-weights for remaining horses.</div>
+      <div className={`grid grid-cols-${columns.length} gap-2`} style={{ gridTemplateColumns: `repeat(${columns.length}, 1fr)` }}>
+        {columns.map((col, depth) => {
+          const sortedIdxs = col.probs
+            .map((p, i) => ({ i, p }))
+            .filter((x) => x.p > 0)
+            .sort((a, b) => b.p - a.p);
+          return (
+            <div key={depth} className="space-y-1">
+              <div className="text-[10px] font-bold text-indigo-300 mb-1">{labels[depth]}</div>
+              {sortedIdxs.slice(0, 8).map(({ i, p }) => {
+                const isLockedHere = locked[depth] === i;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => clickAt(depth, i)}
+                    className={`w-full text-left text-[11px] px-1.5 py-1 rounded border transition-colors ${
+                      isLockedHere
+                        ? "bg-indigo-700 border-indigo-500 text-white font-bold"
+                        : "border-gray-700 bg-gray-900 hover:bg-gray-800 text-gray-200"
+                    }`}
+                  >
+                    <span className="font-bold mr-1">#{rp.programs[i]}</span>
+                    <span className="text-gray-400">{(p * 100).toFixed(1)}%</span>
+                    <div className="text-[9px] text-gray-500 truncate">{rp.names[i]}</div>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+      {locked.length > 0 && (
+        <div className="mt-2 text-[11px] text-emerald-300">
+          Building: {locked.map((i) => `#${rp.programs[i]}`).join(" → ")}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RaceCard({ race, recs, finish, isNext, onLogFinish, onClearFinish }: {
-  race: (typeof KEENELAND_APR18_2026)[number];
+  race: (typeof TODAYS_CARD)[number];
   recs: RaceExoticRecs;
   finish?: string[];
   isNext: boolean;
@@ -288,6 +667,9 @@ function RaceCard({ race, recs, finish, isNext, onLogFinish, onClearFinish }: {
         <TicketRow label="TRI"   s={recs.trifecta} />
         <TicketRow label="EXACTA" s={recs.exacta} />
       </div>
+
+      {/* Conditional probability matrix — click horses to walk the tree */}
+      {!done && <ProbMatrix race={race} />}
     </div>
   );
 }

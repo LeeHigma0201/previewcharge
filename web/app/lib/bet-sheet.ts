@@ -68,10 +68,30 @@ function buildStrategy(
 }
 
 // Get analytic win probabilities for a race + program lookup
-interface RaceProbs {
+export interface RaceProbs {
   programs: string[];            // ordered by horse index
   names: string[];
   winProbs: number[];
+}
+
+/**
+ * Harville conditional probability: given that the horses at `lockedIndices`
+ * have already finished (in order) at the leading positions, compute the
+ * probability of every remaining horse finishing NEXT.
+ *
+ * Math: P(j finishes next | locked) = winProb[j] / (1 - sum(winProb[locked]))
+ */
+export function conditionalNextProbs(rp: RaceProbs, lockedIndices: number[]): number[] {
+  const lockedSet = new Set(lockedIndices);
+  const lockedSum = lockedIndices.reduce((s, i) => s + rp.winProbs[i], 0);
+  const remaining = 1 - lockedSum;
+  if (remaining <= 1e-9) return rp.winProbs.map(() => 0);
+  return rp.winProbs.map((p, i) => (lockedSet.has(i) ? 0 : p / remaining));
+}
+
+// Re-export computeRaceProbs so the bet sheet UI can build the matrix from a race
+export function getRaceProbs(race: StaticRace): RaceProbs {
+  return computeRaceProbs(race);
 }
 
 function computeRaceProbs(race: StaticRace): RaceProbs {
@@ -162,8 +182,72 @@ function computeRaceProbs(race: StaticRace): RaceProbs {
     : 1;
   const primePowerZ = ppVals.map((v) => (v > 0 ? (v - ppMean) / ppSd : 0));
 
+  // Learning (R1 Apr 29 CD): Tres Soles (PP rank 6) outran Quokka (PP rank 3)
+  // because Tres Soles' last3Beyer was trending UP (72→77→85) while Quokka's
+  // was DOWN (83→86→76). Mean-of-L3 misses the trend; slope captures it.
+  // Learning (R2 Apr 29 CD): Barksdale won despite negative trend [71,92,84]
+  // because the 71 was a LAYOFF PREP (59 days off). When daysSinceLast > 45,
+  // the most-recent figure is unreliable — drop it from trend calc, use the
+  // older two figures' delta instead.
+  const trendVals = horses.map((h) => {
+    const b = h.last3Beyer ?? [];
+    const days = h.daysSinceLast ?? 0;
+    const isPostLayoffPrep = days > 45;
+    // Use index 1+ if returning from layoff (skip the prep race)
+    const start = isPostLayoffPrep && b.length >= 3 ? 1 : 0;
+    if (b.length - start < 2) return 0;
+    const recent = b[start] ?? 0;
+    const oldest = b[b.length - 1] ?? recent;
+    return recent - oldest; // positive = improving, negative = declining
+  });
+  const trendKnown = trendVals.filter((v) => v !== 0);
+  const tMean = trendKnown.length ? trendKnown.reduce((a, b) => a + b, 0) / trendKnown.length : 0;
+  const tSd = trendKnown.length
+    ? Math.sqrt(trendKnown.reduce((a, v) => a + (v - tMean) ** 2, 0) / trendKnown.length) || 1
+    : 1;
+  const trendZ = trendVals.map((v) => (v - tMean) / tSd);
+
+  // Learning (R1 Apr 29 CD): track was muddy/wet — closer/stalker types ran past
+  // pace-figure leaders, EXCEPT Empire Builder (E, post 1, PP-topper) won wire-to-wire.
+  // Refined: full E/EP penalty in mud only when NOT on rail. Rail-running speed in routes
+  // can hold even on wet — they get away cleanly and aren't engulfed by closers.
+  const surfStr = (race.surface ?? "").toLowerCase();
+  const condStr = (race.condition ?? "").toLowerCase();
+  const isDirtSurface = surfStr.includes("dirt");
+  const isWet = ["muddy", "sloppy", "good", "yielding", "soft", "wet"].some((c) => condStr.includes(c));
+  const distFurlongs = (() => {
+    const d = (race.distance ?? "").toLowerCase();
+    const fM = d.match(/([\d.]+)\s*f/);
+    if (fM) return parseFloat(fM[1]);
+    const frM = d.match(/(\d+)\s+(\d+)\/(\d+)\s*m/);
+    if (frM) return (parseInt(frM[1]) + parseInt(frM[2]) / parseInt(frM[3])) * 8;
+    const mM = d.match(/([\d.]+)\s*m/);
+    return mM ? parseFloat(mM[1]) * 8 : 8;
+  })();
+  const isRoute = distFurlongs >= 8; // 1m and beyond
+  const wetAdj = horses.map((h) => {
+    if (!(isDirtSurface && isWet)) return 0;
+    const s = (h.style || "").toUpperCase();
+    const post = Number(h.program) || 0;
+    const isInside = post >= 1 && post <= 3;
+    const isRail = post === 1;
+    if (["S", "C"].includes(s)) return 0.55;
+    if (["E", "EP"].includes(s)) {
+      // Learning (R1, R2 Apr 29 CD): rail-running E (post 1) wires on slop in
+      // BOTH routes (Empire Builder R1 1m) and SPRINTS (Barksdale R2 6.5f).
+      // Two for two — rail E + clean break = wet-track winner.
+      if (isRail) return 0.10; // small POSITIVE for rail E in slop
+      if (isInside) return -0.10; // post 2-3: nearly neutral
+      // Outer posts: full wet penalty
+      return -0.45;
+    }
+    return 0;
+  });
+
+  // Final ability: speed mean (0.22) + pace shape (0.18) + class drop (0.14) +
+  // style/post IV (0.12) + layoff (0.08) + PP composite (0.10) + speed trend (0.10) + wet adj (0.12)
   const abilities = horses.map((_, i) =>
-    0.22 * speedZ[i] + 0.18 * paceAdj[i] + 0.14 * classAdj[i] + 0.12 * biasAdj[i] + 0.08 * layoffAdj[i] + 0.10 * primePowerZ[i],
+    0.22 * speedZ[i] + 0.18 * paceAdj[i] + 0.14 * classAdj[i] + 0.12 * biasAdj[i] + 0.08 * layoffAdj[i] + 0.10 * primePowerZ[i] + 0.10 * trendZ[i] + 0.12 * wetAdj[i],
   );
   const maxA = Math.max(...abilities);
   const exps = abilities.map((a) => Math.exp(a - maxA));

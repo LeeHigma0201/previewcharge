@@ -10,7 +10,7 @@ def test_create_tables(engine):
     from sqlalchemy import inspect
     inspector = inspect(engine)
     tables = set(inspector.get_table_names())
-    assert tables == {"races", "horses", "entries", "past_performances", "workouts"}
+    assert tables == {"races", "horses", "entries", "past_performances", "workouts", "track_bias", "odds_snapshots"}
 
 
 def test_sample_race_has_entries(sample_race, session):
