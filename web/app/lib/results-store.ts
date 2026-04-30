@@ -27,12 +27,23 @@ export const RESULTS_STORAGE_KEY = `horsegpt_results_${RESULTS_DATE}`;
 // CHALK-DOUBT FLAG NOW 4-FOR-4 — #8 Theoretical (-6% gap, public chalk) was 4th in photo, not in top 3.
 // New lesson: in chaos races, the BALANCED contender (no flags either way, top trainer+jockey) is often the winner.
 // Our algo over-weights signal extremes and under-rates "boring." #12 had Cherie DeVaux + Jose Ortiz.
+// R5 OFFICIAL (3-12-6-5): Jinxzi won, Tregetour 2nd — first clean exacta hit of the day.
+// Algo's top-2 called the order EXACTLY (3 → 12). Win pool: $12.78 → +$10.78. Exacta box
+// alternate (3-12-1 BOX, $6) returned $93.48 → +$87.48. Validates the "exacta-strong"
+// pattern — when top-2 model_prob clusters ≥35% with a flat tail, the exacta box should
+// promote from alternate to primary.
+// R6 OFFICIAL (4-6-5-8): UAE President Cup Arabian S. — algo skipped (Arabian flag working).
+// Diamond Gem AA was 5/2 chalk and won by daylight; nothing to learn here.
+// R7 OFFICIAL (1-7-5-4): Honfleur won at 4/5 (chalk). Algo top-1, model_prob 30.6%. Top-1 hit.
+// Through R7 (excl Arabian R6): top-1 2/6 (33%), top-3 4/6 (67%). Win-pool ROI +$4.90 on $12 cost (+41%).
 export const CONFIRMED_RESULTS: ResultsMap = {
   1: ["4", "5", "1", "2", "6"],
   2: ["2", "3", "5"],
   3: ["2", "4", "3", "1", "9"],
   4: ["12", "11", "3", "10", "8"],
   5: ["3", "12", "6", "5", "13"],
+  6: ["4", "6", "5", "8"],
+  7: ["1", "7", "5", "4"],
 };
 
 export function loadResults(): ResultsMap {
