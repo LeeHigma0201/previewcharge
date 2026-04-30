@@ -12,6 +12,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+# Canonical bet unit costs — import this instead of redefining.
+UNIT_COSTS = {
+    "exacta": 2.0,
+    "trifecta": 1.0,
+    "superfecta": 0.10,
+    "dd": 1.0,
+    "pick3": 0.50,
+    "pick4": 0.50,
+    "pick5": 0.20,
+    "pick6": 0.20,
+}
+
 
 @dataclass
 class SizedTicket:

@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 
 from src.betting.kelly import (
+    UNIT_COSTS,
     SizedTicket,
     allocate_bankroll,
     estimate_exotic_payoff,
@@ -122,17 +123,6 @@ class MultiRaceBetPlan:
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-
-UNIT_COSTS = {
-    "exacta": 2.0,
-    "trifecta": 1.0,
-    "superfecta": 0.10,
-    "dd": 1.0,
-    "pick3": 0.50,
-    "pick4": 0.50,
-    "pick5": 0.20,
-    "pick6": 0.20,
-}
 
 SPREAD_SIZES = {
     "dd": 2,

@@ -27,10 +27,18 @@ class SimulationResult:
     win_probs: np.ndarray  # P(horse i wins)
     place_probs: np.ndarray  # P(horse i finishes top 2)
     show_probs: np.ndarray  # P(horse i finishes top 3)
+    top4_probs: np.ndarray  # P(horse i finishes top 4)
     exacta_probs: np.ndarray  # P(horse i wins, horse j places) — shape (n, n)
     trifecta_probs: np.ndarray  # P(i, j, k) — shape (n, n, n)
     finish_matrix: np.ndarray  # P(horse i finishes in position j) — shape (n, n)
-    superfecta_probs: np.ndarray | None = None  # P(i, j, k, l) — shape (n, n, n, n)
+    superfecta_probs: dict[tuple[int, ...], float] | None = None  # top combos only (prob > 1/n^4)
+
+    @property
+    def entropy(self) -> float:
+        """Shannon entropy of win probability distribution (bits)."""
+        from src.models.entropy import race_entropy
+
+        return race_entropy(self.win_probs)
 
 
 def henery_simulate(
@@ -78,10 +86,14 @@ def henery_simulate(
         for horse in range(n_horses):
             finish_matrix[horse, pos] = np.mean(rankings[:, pos] == horse)
 
-    # Win/place/show probabilities
+    # Win/place/show/top4 probabilities
     win_probs_sim = finish_matrix[:, 0]
     place_probs = finish_matrix[:, 0] + finish_matrix[:, 1]
     show_probs = finish_matrix[:, 0] + finish_matrix[:, 1] + finish_matrix[:, 2]
+    if n_horses >= 4:
+        top4_probs = finish_matrix[:, 0] + finish_matrix[:, 1] + finish_matrix[:, 2] + finish_matrix[:, 3]
+    else:
+        top4_probs = np.zeros(n_horses)
 
     # Exacta: P(horse i wins AND horse j places)
     exacta_probs = np.zeros((n_horses, n_horses))
@@ -107,10 +119,13 @@ def henery_simulate(
                 trifecta_probs[i, j, k] = np.mean(mask_ij & (thirds == k))
 
     # Superfecta: P(i first, j second, k third, l fourth)
+    # Stored as dict of tuple→float to avoid O(n^4) memory for large fields.
+    # Only combos with prob > 1/n^4 are kept to prevent dict bloat.
     superfecta_probs = None
     if compute_superfecta and n_horses >= 4:
         fourths = rankings[:, 3]
-        superfecta_probs = np.zeros((n_horses, n_horses, n_horses, n_horses))
+        prob_threshold = 1.0 / (n_horses ** 4)
+        superfecta_probs = {}
         for i in range(n_horses):
             mask_i = winners == i
             for j in range(n_horses):
@@ -124,14 +139,15 @@ def henery_simulate(
                     for l in range(n_horses):
                         if l == i or l == j or l == k:
                             continue
-                        superfecta_probs[i, j, k, l] = np.mean(
-                            mask_ijk & (fourths == l)
-                        )
+                        prob = float(np.mean(mask_ijk & (fourths == l)))
+                        if prob > prob_threshold:
+                            superfecta_probs[(i, j, k, l)] = prob
 
     return SimulationResult(
         win_probs=win_probs_sim,
         place_probs=place_probs,
         show_probs=show_probs,
+        top4_probs=top4_probs,
         exacta_probs=exacta_probs,
         trifecta_probs=trifecta_probs,
         finish_matrix=finish_matrix,
@@ -277,6 +293,8 @@ def find_value_exotics(
         elif len(combo) == 3:
             i, j, k = combo
             prob = sim.trifecta_probs[i, j, k]
+        elif len(combo) == 4 and sim.superfecta_probs is not None:
+            prob = sim.superfecta_probs.get(combo, 0.0)
         else:
             continue
 

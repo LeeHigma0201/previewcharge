@@ -4,19 +4,35 @@
 export type RaceFinish = string[]; // program numbers in finishing order: ["3","4","5","2"]
 export type ResultsMap = Record<number, RaceFinish>;
 
-export const RESULTS_STORAGE_KEY = "horsegpt_results_2026-04-18";
+// Storage key is date-scoped so flipping cards (e.g., CD Wed → CD Thu) doesn't
+// inherit yesterday's finishes. Update RESULTS_DATE when the active card changes.
+export const RESULTS_DATE = "2026-04-30";
+export const RESULTS_STORAGE_KEY = `horsegpt_results_${RESULTS_DATE}`;
 
-// Confirmed results from the track (append new ones here for cross-device sync)
+// Confirmed results from the track for TODAY'S card only.
+// Populate with official finishes as races go off (or let auto-fetch fill via /api/live-results).
+// IMPORTANT: never put a different date's results here — that's what RESULTS_STORAGE_KEY guards.
+// Churchill Downs Thursday April 30, 2026 — populated as races go off.
+// R1 OFFICIAL (4-5-1-2-6): Star's Image won at 9/2; algo had #4 at 9.7%.
+//   Patched: lone-Beyer protection + 12 CD trainers added.
+// R2 OFFICIAL (2-3-5): She'z the Law won; she went ML 15/1 -> live 1.6 (9.4x bet-down).
+//   Algo had her 21.5%; market priced her 38%. We updated mlOdds but kept fighting
+//   with stale bias/ability multipliers. Patched: sharp-money detector — when ML/live
+//   ratio is high, pull bias and ability factors toward 1.0 (trust the market).
+// R3 OFFICIAL (2-4-3-1-9): Fresh Out won photo over Silvertown. Algo top pick #5 Spotted
+// finished out of top 5 — exactly what the pool-disparity flag predicted (W%-P% gap of -8%).
+// Pool-disparity signal is now 3-for-3 today on chalk-trap detection (R1, R2, R3).
+// Algo's residual stack is structurally underperforming chalk; rebuild discussed.
+// R4 OFFICIAL (12-11-3, photo 4th): Breaking Hearts won at 5/1. Algo had her 4th at 12.2%.
+// CHALK-DOUBT FLAG NOW 4-FOR-4 — #8 Theoretical (-6% gap, public chalk) was 4th in photo, not in top 3.
+// New lesson: in chaos races, the BALANCED contender (no flags either way, top trainer+jockey) is often the winner.
+// Our algo over-weights signal extremes and under-rates "boring." #12 had Cherie DeVaux + Jose Ortiz.
 export const CONFIRMED_RESULTS: ResultsMap = {
-  1: ["3", "4", "5", "2", "6", "1"], // R1: Reality Star, Raghba, Babysitter, Song of Sarah, Sonhador, Miss Milky Way
-  2: ["5", "3", "9", "4"],            // R2: Consolidated, Stonemont Reunion, Tiz Freedom, Bonafide
-  3: ["7", "3", "12", "8"],           // R3: Capturing, Perfect Figure, #12, #8
-  4: ["3", "6", "2", "8"],            // R4: Morunning, Armed N Dangerous, Askari, Ice Shot (#4 + #9 scratched)
-  5: ["10", "7", "4", "12"],          // R5: Syntagma, Discotheque, Street Party, Pelican Bay
-  6: ["9", "3", "4", "7"],            // R6: Kentucky Belle, Bless Her, Dagmara, Surprise Ending (official Brisnet chart)
-  7: ["1", "7", "3", "2"],            // R7: Floodlites, Whatchatalkinabout, Kalahari Dreams, Can Do Andrew — #4 Keep It Easy DNF (rider dislodged); #5/#6 scratched; $0.50 tri box 1-7-3 paid $5.91 — WON
-  8: ["6", "1", "7", "3"], // R8 OFFICIAL: Works for Me, Troubleshooting, Silent Heart, Dhabab. $1 EX 6/1 $20.06; $0.50 TRI 6/1/7 $47.90; $0.50 SUPER 6/1/7/3 $160.11. #4 Run Carson + #10 Runnin' Rocket scratched. Model top pick #11 Arrest Me Red did NOT hit top 4.
-  9: ["1", "6", "5", "2"], // R9 OFFICIAL (Ben Ali G3): Stars and Stripes, Batten Down, San Siro, Awesome Aaron. TOP PICK HIT — sharp money (bet from 4 ML to 9/5) called correctly. $1 EX 1-6 cashed (~$20-40). #9 Honor Marie scratched. Pick 3 LIVE.
+  1: ["4", "5", "1", "2", "6"],
+  2: ["2", "3", "5"],
+  3: ["2", "4", "3", "1", "9"],
+  4: ["12", "11", "3", "10", "8"],
+  5: ["3", "12", "6", "5", "13"],
 };
 
 export function loadResults(): ResultsMap {

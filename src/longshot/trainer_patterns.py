@@ -32,13 +32,17 @@ def check_trainer_patterns(
     if not trainer:
         return signals
 
-    # Get trainer's historical entries
-    trainer_entries = (
+    # Get trainer's historical entries BEFORE this race date only.
+    # Without the date filter, future results leak into signals — lookahead bias.
+    race_date = race.race_date if race else None
+    query = (
         session.query(Entry)
         .filter(Entry.trainer == trainer)
         .filter(Entry.finish_position.isnot(None))
-        .all()
     )
+    if race_date is not None:
+        query = query.join(Race).filter(Race.race_date < race_date)
+    trainer_entries = query.all()
 
     if len(trainer_entries) < 20:
         return signals

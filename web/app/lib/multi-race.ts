@@ -4,7 +4,7 @@
 
 import type { HorseEntry, RaceInfo } from "./types";
 import type { StaticRace, StaticHorse } from "./keeneland-apr18";
-import { KEENELAND_APR18_2026 } from "./keeneland-apr18";
+import { CD_2026_04_30 as TODAYS_CARD } from "./cd-2026-04-30";
 
 function staticToEntries(race: StaticRace): { horses: HorseEntry[]; raceInfo: RaceInfo } {
   const scratched = new Set(race.scratches ?? []);
@@ -30,9 +30,9 @@ function staticToEntries(race: StaticRace): { horses: HorseEntry[]; raceInfo: Ra
     ...(sh.primePower !== undefined ? { primePower: sh.primePower } : {}),
   } as HorseEntry & { primePower?: number }));
   const raceInfo: RaceInfo = {
-    track: "KEE",
-    trackName: "Keeneland",
-    date: "2026-04-18",
+    track: "CD",
+    trackName: "Churchill Downs",
+    date: "2026-04-30",
     raceNumber: race.raceNumber,
     distance: race.distance,
     surface: race.surface,
@@ -192,7 +192,7 @@ export function pickForRace(race: StaticRace): RacePick {
 }
 
 export function allRacePicks(): RacePick[] {
-  return KEENELAND_APR18_2026.map(pickForRace);
+  return TODAYS_CARD.map(pickForRace);
 }
 
 // Multi-race bet structures offered at Keeneland Apr 18
@@ -203,15 +203,17 @@ export interface MultiRaceBet {
   minUnit: number; // $ minimum
 }
 
+// CD Apr 30 — 12-race card with R6 = UAE President Cup Arabian Stakes (excluded;
+// our model is Thoroughbred-only, and the track typically pools Arabians separately).
 export const MULTI_RACE_BETS: MultiRaceBet[] = [
-  { id: "early-p5", label: "Early Pick 5",      legs: [1, 2, 3, 4, 5],  minUnit: 0.5 },
-  { id: "p6",       label: "Pick 6 Jackpot",    legs: [6, 7, 8, 9, 10, 11], minUnit: 0.5 },
-  { id: "late-p5",  label: "Late Pick 5",       legs: [7, 8, 9, 10, 11], minUnit: 0.5 },
-  { id: "p4",       label: "Pick 4 (8-11)",     legs: [8, 9, 10, 11],    minUnit: 0.5 },
-  { id: "turf-p3",  label: "Turf Pick 3",       legs: [6, 8, 10],        minUnit: 1.0 },
-  { id: "late-p3",  label: "Late Pick 3",       legs: [9, 10, 11],       minUnit: 1.0 },
-  { id: "roll-p3-2",label: "Rolling Pick 3",    legs: [2, 3, 4],         minUnit: 1.0 },
-  { id: "roll-p3-5",label: "Rolling Pick 3",    legs: [5, 6, 7],         minUnit: 1.0 },
+  { id: "early-p5", label: "Early Pick 5",      legs: [1, 2, 3, 4, 5],     minUnit: 0.5 },
+  { id: "p6",       label: "Pick 6 Jackpot",    legs: [7, 8, 9, 10, 11, 12], minUnit: 0.5 },
+  { id: "late-p5",  label: "Late Pick 5",       legs: [8, 9, 10, 11, 12],  minUnit: 0.5 },
+  { id: "p4",       label: "Pick 4 (9-12)",     legs: [9, 10, 11, 12],     minUnit: 0.5 },
+  { id: "turf-p3",  label: "Turf Pick 3",       legs: [7, 9, 11],          minUnit: 1.0 },
+  { id: "late-p3",  label: "Late Pick 3",       legs: [10, 11, 12],        minUnit: 1.0 },
+  { id: "roll-p3-2",label: "Rolling Pick 3",    legs: [2, 3, 4],           minUnit: 1.0 },
+  { id: "roll-p3-7",label: "Rolling Pick 3",    legs: [7, 8, 9],           minUnit: 1.0 },
 ];
 
 export interface MultiRaceRec {

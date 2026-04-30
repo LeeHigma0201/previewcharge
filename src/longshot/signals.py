@@ -44,6 +44,55 @@ class LongshotCandidate:
     ev: float = 0.0
     kelly_fraction: float = 0.0
     recommended_stake_pct: float = 0.0
+    capable: bool = True
+
+
+def capable_longshot_filter(
+    candidate: LongshotCandidate,
+    best_beyer: float | None,
+    beyer_trend: float | None,
+    days_since_last: float | None,
+    trainer_layoff_win_pct: float | None,
+    sim_win_pct: float,
+    pace_scenario_favorable: bool,
+    race_class_par: float = 80.0,
+) -> tuple[bool, list[str]]:
+    """5-point filter for capable longshots. All 5 must pass.
+
+    Returns:
+        Tuple of (is_capable, list of failure reasons).
+    """
+    failures: list[str] = []
+
+    # 1. Has run a competitive figure
+    if best_beyer is None or best_beyer < race_class_par - 5:
+        failures.append(
+            f"best_beyer {best_beyer} < par-5 ({race_class_par - 5})"
+        )
+
+    # 2. Not declining
+    if beyer_trend is None or beyer_trend < 0:
+        failures.append(f"beyer_trend {beyer_trend} < 0 (declining)")
+
+    # 3. Recent activity or trainer overcomes layoff
+    if days_since_last is not None and days_since_last > 90:
+        if trainer_layoff_win_pct is None or trainer_layoff_win_pct < 0.15:
+            failures.append(
+                f"layoff {days_since_last:.0f}d with trainer_layoff_win_pct "
+                f"{trainer_layoff_win_pct} < 0.15"
+            )
+    elif days_since_last is None:
+        failures.append("days_since_last unknown")
+
+    # 4. Monte Carlo gives real chance
+    if sim_win_pct < 0.08:
+        failures.append(f"sim_win_pct {sim_win_pct:.3f} < 0.08")
+
+    # 5. Pace scenario matches running style
+    if not pace_scenario_favorable:
+        failures.append("pace_scenario not favorable")
+
+    return len(failures) == 0, failures
 
 
 def identify_longshot_candidates(
@@ -54,6 +103,11 @@ def identify_longshot_candidates(
     min_odds: float = 5.0,
     min_overlay_ev: float = 1.10,
     takeout: float = 0.17,
+    entry_features: dict[int, dict] | None = None,
+    sim_win_probs: np.ndarray | None = None,
+    pace_favorable: dict[int, bool] | None = None,
+    race_class_par: float = 80.0,
+    trainer_layoff_win_pcts: dict[int, float] | None = None,
 ) -> list[LongshotCandidate]:
     """Layer 2: Flag horses where model sees more value than the market.
 
@@ -90,7 +144,7 @@ def identify_longshot_candidates(
         kelly = (net_b * p - q) / net_b if net_b > 0 else 0
         kelly = max(0, kelly)
 
-        candidates.append(LongshotCandidate(
+        candidate = LongshotCandidate(
             entry_id=entry_ids[i],
             horse_name=horse_names[i],
             model_prob=model_probs[i],
@@ -99,7 +153,35 @@ def identify_longshot_candidates(
             ev=ev,
             kelly_fraction=kelly,
             recommended_stake_pct=kelly * 0.25,  # Fractional Kelly (25%)
-        ))
+        )
+
+        # Run capable longshot filter if feature data is available
+        if entry_features is not None:
+            feats = entry_features.get(entry_ids[i], {})
+            swp = float(sim_win_probs[i]) if sim_win_probs is not None else 0.0
+            pf = (pace_favorable or {}).get(entry_ids[i], False)
+            tlwp = (trainer_layoff_win_pcts or {}).get(entry_ids[i])
+
+            is_capable, reasons = capable_longshot_filter(
+                candidate,
+                best_beyer=feats.get("best_beyer"),
+                beyer_trend=feats.get("beyer_trend"),
+                days_since_last=feats.get("days_since_last"),
+                trainer_layoff_win_pct=tlwp,
+                sim_win_pct=swp,
+                pace_scenario_favorable=pf,
+                race_class_par=race_class_par,
+            )
+            candidate.capable = is_capable
+            if not is_capable:
+                candidate.signals.append(LongshotSignal(
+                    name="capable_filter",
+                    weight=0.0,
+                    active=False,
+                    detail=f"Failed: {'; '.join(reasons)}",
+                ))
+
+        candidates.append(candidate)
 
     return sorted(candidates, key=lambda c: c.overlay_pct, reverse=True)
 

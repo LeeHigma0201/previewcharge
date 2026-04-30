@@ -11,7 +11,8 @@ import type {
   BetStrategy,
 } from "./lib/types";
 import { runSimulation } from "./lib/data";
-import { KEENELAND_APR18_2026, KEE_APR18_DATE } from "./lib/keeneland-apr18";
+import { CD_2026_04_30 as TODAYS_CARD, CD_2026_04_30_DATE as TODAYS_DATE } from "./lib/cd-2026-04-30";
+import ClarkBot from "./components/ClarkBot";
 import {
   loadResults,
   setRaceFinish,
@@ -27,7 +28,7 @@ import {
 } from "./lib/multi-race";
 import { isFalseFavorite, type HorseProbs } from "./lib/ev-math";
 
-// ── Keeneland April 18, 2026 — Brisnet track-bias build ──
+// ── Churchill Downs Thursday, April 30, 2026 — Brisnet Ultimate PPs build ──
 // Splash is off. Landing page shows the full feature matrix for today's
 // card at /today; the exotic simulator still lives below, wired to
 // static Brisnet data (no Gemini/Equibase latency on race day).
@@ -41,7 +42,7 @@ export default function Home() {
           HorseGPT
         </h1>
         <p className="text-2xl text-gray-300 mb-8 text-center">
-          Rebuilding for Keeneland
+          Rebuilding for Churchill Downs
         </p>
       </main>
     );
@@ -51,7 +52,7 @@ export default function Home() {
     <main className="min-h-screen bg-black text-white flex flex-col">
       <nav className="border-b border-gray-900 px-4 md:px-8 py-3 flex items-center justify-between">
         <Link href="/today" className="text-lg font-black tracking-tight">
-          HorseGPT <span className="text-gray-500 text-sm font-normal">· Keeneland Spring 2026</span>
+          HorseGPT <span className="text-gray-500 text-sm font-normal">· Churchill Downs Spring 2026</span>
         </Link>
         <div className="flex items-center gap-4 text-sm">
           <Link href="/today" className="text-emerald-400 hover:underline">Today&rsquo;s card</Link>
@@ -59,20 +60,20 @@ export default function Home() {
         </div>
       </nav>
       <div id="simulator" className="flex-1">
-        <KeenelandApp />
+        <RaceDayApp />
       </div>
     </main>
   );
 }
 
-function KeenelandApp() {
+function RaceDayApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [race, setRace] = useState<RaceInfo | null>(null);
   const [result, setResult] = useState<SimulationResult | null>(null);
 
-  // Hardcoded to Keeneland
-  const selectedTrack = { code: "KEE", name: "Keeneland" };
+  // Hardcoded to Churchill Downs (today's card)
+  const selectedTrack = { code: "CD", name: "Churchill Downs" };
 
   // Race number selection
   const [selectedRaceNum, setSelectedRaceNum] = useState<number | null>(null);
@@ -250,8 +251,8 @@ function KeenelandApp() {
     setShowResults(false);
     setActualFinish(["", "", "", ""]);
     try {
-      // Use static Brisnet data for KEE Apr 18 2026 — no Gemini latency, no bot blocking
-      const staticRace = KEENELAND_APR18_2026.find((r) => r.raceNumber === selectedRaceNum);
+      // Use static Brisnet data for today's card — no Gemini latency, no bot blocking
+      const staticRace = TODAYS_CARD.find((r) => r.raceNumber === selectedRaceNum);
       if (!staticRace) throw new Error(`Race ${selectedRaceNum} not found in static card`);
 
       // Shape the static horses like the Gemini response so downstream merge logic works
@@ -282,7 +283,7 @@ function KeenelandApp() {
       const raceInfo: RaceInfo = {
         track: selectedTrack.code,
         trackName: selectedTrack.name,
-        date: KEE_APR18_DATE,
+        date: TODAYS_DATE,
         raceNumber: selectedRaceNum,
         distance: staticRace.distance,
         surface: staticRace.surface,
@@ -319,7 +320,7 @@ function KeenelandApp() {
     setLiveRefreshing(true);
     setLiveStatus(null);
     try {
-      const query = `Keeneland Race ${selectedRaceNum} April 18 2026`;
+      const query = `Churchill Downs Race ${selectedRaceNum} April 30 2026`;
       const res = await fetch("/api/race", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -455,10 +456,10 @@ function KeenelandApp() {
   return (
     <main className="max-w-4xl mx-auto px-6 py-10">
       <h1 className="text-5xl font-black tracking-tight mb-1">
-        HorseGPT <span className="text-blue-600">Keeneland</span>
+        HorseGPT <span className="text-blue-600">Churchill Downs</span>
       </h1>
       <p className="text-gray-500 text-lg mb-4">
-        April 18, 2026 &middot; Brisnet track bias loaded &middot; Monte Carlo exotic pricing
+        Thursday, April 30, 2026 &middot; Brisnet Ultimate PPs loaded &middot; Monte Carlo exotic pricing
       </p>
 
       {/* Bet Sheet CTA — the new primary UX */}
@@ -468,7 +469,7 @@ function KeenelandApp() {
       >
         <div>
           <div className="text-xl font-black text-emerald-900">Bet Sheet &rarr;</div>
-          <div className="text-sm text-emerald-800">All 11 races' small-wager exotic tickets, one scroll.</div>
+          <div className="text-sm text-emerald-800">All {TODAYS_CARD.length} races' small-wager exotic tickets, one scroll.</div>
         </div>
         <div className="text-emerald-700 text-2xl">&rarr;</div>
       </Link>
@@ -481,10 +482,10 @@ function KeenelandApp() {
 
       {/* Select Race Number */}
       <div className="mb-2 text-sm font-bold text-gray-500 uppercase tracking-wide">
-        Select Race at Keeneland
+        Select Race at Churchill Downs
       </div>
       <div className="mb-6 flex flex-wrap gap-2">
-        {Array.from({ length: 11 }, (_, i) => i + 1).map((num) => (
+        {Array.from({ length: TODAYS_CARD.length }, (_, i) => i + 1).map((num) => (
           <button
             key={num}
             onClick={() => setSelectedRaceNum(num)}
@@ -864,6 +865,7 @@ function KeenelandApp() {
           )}
         </>
       )}
+      <ClarkBot />
     </main>
   );
 }

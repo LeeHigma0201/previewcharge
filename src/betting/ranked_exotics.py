@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from src.betting.kelly import estimate_exotic_payoff, kelly_exotic
+from src.betting.kelly import UNIT_COSTS, estimate_exotic_payoff
 
 
 @dataclass
@@ -38,13 +38,6 @@ class RankedExoticList:
     cutoff_rank: int  # rank where combos drop below cutoff
     total_above_cutoff: int
     total_cost_above_cutoff: float
-
-
-UNIT_COSTS = {
-    "exacta": 2.0,
-    "trifecta": 1.0,
-    "superfecta": 0.10,
-}
 
 
 def rank_exactas(
@@ -168,7 +161,7 @@ def rank_trifectas(
 
 
 def rank_superfectas(
-    superfecta_probs: np.ndarray,
+    superfecta_probs: dict[tuple[int, ...], float],
     horse_names: list[str],
     program_numbers: list[str],
     takeout: float = 0.22,
@@ -178,40 +171,31 @@ def rank_superfectas(
     """Rank all superfecta combinations by probability.
 
     Args:
+        superfecta_probs: Dict mapping (i, j, k, l) tuples to probabilities.
         min_prob: Minimum probability cutoff. Default 0.1% for superfectas.
         max_combos: Max combos to return (keeps memory bounded for large fields).
     """
-    n = superfecta_probs.shape[0]
     combos = []
     unit = UNIT_COSTS["superfecta"]
 
-    for i in range(n):
-        for j in range(n):
-            if j == i:
-                continue
-            for k in range(n):
-                if k == i or k == j:
-                    continue
-                for l in range(n):
-                    if l == i or l == j or l == k:
-                        continue
-                    prob = float(superfecta_probs[i, j, k, l])
-                    if prob <= 0:
-                        continue
-                    payoff = estimate_exotic_payoff(prob, takeout)
+    for combo_key, prob in superfecta_probs.items():
+        if prob <= 0:
+            continue
+        payoff = estimate_exotic_payoff(prob, takeout)
+        c1, c2, c3, c4 = combo_key
 
-                    combos.append(RankedCombo(
-                        positions=(i, j, k, l),
-                        horse_names=(horse_names[i], horse_names[j],
-                                     horse_names[k], horse_names[l]),
-                        program_numbers=(program_numbers[i], program_numbers[j],
-                                         program_numbers[k], program_numbers[l]),
-                        probability=prob,
-                        estimated_payoff=round(payoff, 2),
-                        unit_cost=unit,
-                        rank=0,
-                        above_cutoff=prob >= min_prob,
-                    ))
+        combos.append(RankedCombo(
+            positions=combo_key,
+            horse_names=(horse_names[c1], horse_names[c2],
+                         horse_names[c3], horse_names[c4]),
+            program_numbers=(program_numbers[c1], program_numbers[c2],
+                             program_numbers[c3], program_numbers[c4]),
+            probability=prob,
+            estimated_payoff=round(payoff, 2),
+            unit_cost=unit,
+            rank=0,
+            above_cutoff=prob >= min_prob,
+        ))
 
     combos.sort(key=lambda c: c.probability, reverse=True)
     combos = combos[:max_combos]

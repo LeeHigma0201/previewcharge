@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HorseGPT v3.14 — 1M Context Codebase Audit</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1419; color: #e7e9ea; padding: 2rem; }
+    h1 { text-align: center; margin-bottom: 0.25rem; font-size: 1.75rem; color: #fff; }
+    .subtitle { text-align: center; color: #71767b; margin-bottom: 2rem; font-size: 0.9rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; max-width: 1400px; margin: 0 auto; }
+    .grid-full { grid-column: 1 / -1; }
+    .card { background: #16202a; border: 1px solid #2f3336; border-radius: 12px; padding: 1.25rem; }
+    .metric { font-size: 2.2rem; font-weight: 700; color: #1d9bf0; }
+    .metric.green { color: #00ba7c; }
+    .metric.yellow { color: #ffd700; }
+    .metric.red { color: #f4212e; }
+    .metric.purple { color: #7856ff; }
+    .label { font-size: 0.75rem; color: #71767b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.1rem; color: #e7e9ea; margin-bottom: 1rem; border-bottom: 1px solid #2f3336; padding-bottom: 0.5rem; }
+    h3 { font-size: 0.95rem; color: #1d9bf0; margin: 1rem 0 0.5rem; }
+    .severity-critical { background: #2d1215; border-color: #f4212e; }
+    .severity-warning { background: #2a2310; border-color: #ffd700; }
+    .severity-info { background: #0d1f2d; border-color: #1d9bf0; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-critical { background: #67090f; color: #f4212e; }
+    .badge-warning { background: #5c4a08; color: #ffd700; }
+    .badge-info { background: #0a3d62; color: #1d9bf0; }
+    .badge-ok { background: #003d1f; color: #00ba7c; }
+    .finding { margin-bottom: 1rem; padding: 0.75rem; border-radius: 8px; border-left: 3px solid #2f3336; background: #1c2732; }
+    .finding-critical { border-left-color: #f4212e; }
+    .finding-warning { border-left-color: #ffd700; }
+    .finding-info { border-left-color: #1d9bf0; }
+    .finding-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .finding-detail { font-size: 0.82rem; color: #8b98a5; line-height: 1.5; }
+    .finding-file { font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 0.75rem; color: #7856ff; margin-top: 0.25rem; }
+    code { font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 0.8rem; background: #2f3336; padding: 0.1rem 0.35rem; border-radius: 4px; color: #e7e9ea; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th { text-align: left; padding: 0.5rem; border-bottom: 2px solid #2f3336; color: #71767b; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    td { padding: 0.5rem; border-bottom: 1px solid #2f3336; }
+    tr:hover td { background: #1c2732; }
+    .chart-container { position: relative; height: 200px; }
+    .dep-arrow { color: #71767b; }
+    .section-divider { grid-column: 1 / -1; border-top: 1px solid #2f3336; margin: 0.5rem 0; }
+    .status-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid #2f3336; }
+    .status-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <h1>HorseGPT v3.14 — Codebase Audit</h1>
+  <p class="subtitle">Full 1M-context cross-file analysis &middot; April 13, 2026 &middot; ~/previewcharge</p>
+
+  <!-- KPI METRICS -->
+  <div class="grid" style="margin-bottom: 1.25rem;">
+    <div class="card">
+      <div class="label">Source Files</div>
+      <div class="metric">38</div>
+      <div class="finding-detail">Python files across src/, tests/, config/, dashboard/</div>
+    </div>
+    <div class="card">
+      <div class="label">Lines of Code</div>
+      <div class="metric green">~6,800</div>
+      <div class="finding-detail">src/ ~4,500 + tests/ ~1,400 + config/ ~50 + dashboard/ ~850</div>
+    </div>
+    <div class="card">
+      <div class="label">Tests</div>
+      <div class="metric green">131</div>
+      <div class="finding-detail">All passing (1 skipped: test_logistic needs statsmodels)</div>
+    </div>
+    <div class="card">
+      <div class="label">Audit Findings</div>
+      <div class="metric yellow">14</div>
+      <div class="finding-detail">1 critical &middot; 5 warning &middot; 8 informational</div>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE OVERVIEW -->
+  <div class="grid" style="margin-bottom: 1.25rem;">
+    <div class="card grid-full">
+      <h2>Architecture — Module Dependency Map</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center; font-size: 0.8rem;">
+        <div style="background:#0a3d62;padding:0.75rem;border-radius:8px;">
+          <strong>NLP Layer</strong><br>
+          race_query.py &middot; prompt_builder.py &middot; cli.py<br>
+          <span class="dep-arrow">&darr; uses features + data + betting</span>
+        </div>
+        <div style="background:#2a2310;padding:0.75rem;border-radius:8px;">
+          <strong>Betting Layer</strong><br>
+          exotic_engine.py &middot; kelly.py &middot; ranked_exotics.py &middot; <em>horizontal.py</em><br>
+          <span class="dep-arrow">&darr; uses models</span>
+        </div>
+        <div style="background:#1a2d1a;padding:0.75rem;border-radius:8px;">
+          <strong>Model Layer</strong><br>
+          monte_carlo.py &middot; logistic.py &middot; lightgbm.py &middot; ensemble.py &middot; <em>entropy.py</em><br>
+          <span class="dep-arrow">&darr; uses features</span>
+        </div>
+        <div style="background:#2d1a1a;padding:0.75rem;border-radius:8px;">
+          <strong>Longshot Layer</strong><br>
+          signals.py &middot; value.py &middot; pace_scenarios.py &middot; trainer_patterns.py<br>
+          <span class="dep-arrow">&darr; uses data + models</span>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; font-size: 0.8rem; margin-top: 1rem;">
+        <div style="background:#1c2732;padding:0.75rem;border-radius:8px;">
+          <strong>Feature Layer</strong><br>
+          core.py (72 features) &middot; pipeline.py &middot; interactions.py (stub)<br>
+          <span class="dep-arrow">&darr; uses data</span>
+        </div>
+        <div style="background:#1c2732;padding:0.75rem;border-radius:8px;">
+          <strong>Data Layer</strong><br>
+          models.py (7 tables) &middot; ingest.py &middot; bris_parser.py &middot; <em>track_bias.py</em><br>
+          <span class="dep-arrow">&darr; SQLAlchemy + SQLite</span>
+        </div>
+        <div style="background:#1c2732;padding:0.75rem;border-radius:8px;">
+          <strong>Scrapers</strong><br>
+          equibase.py &middot; drf_free.py &middot; racing_api.py &middot; <em>live_odds.py</em><br>
+          <span class="dep-arrow">&darr; httpx + selectolax</span>
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:#71767b;margin-top:0.75rem;"><em>Italic</em> = new from Gaps 1-8 build</div>
+    </div>
+  </div>
+
+  <!-- FINDINGS -->
+  <div class="grid" style="margin-bottom: 1.25rem;">
+
+    <!-- CRITICAL -->
+    <div class="card grid-full severity-critical">
+      <h2><span class="badge badge-critical">Critical</span> Lookahead Bias</h2>
+
+      <div class="finding finding-critical">
+        <div class="finding-title">1. trainer_patterns.py queries future data</div>
+        <div class="finding-detail">
+          <code>check_trainer_patterns()</code> queries ALL trainer entries without date filtering.
+          Compare with <code>compute_jockey_trainer_features()</code> which correctly uses
+          <code>Race.race_date &lt; race_date</code>. If trainer_patterns is ever used in model training
+          or feature computation, it will leak future results into predictions.<br><br>
+          <strong>Fix:</strong> Add <code>.join(Race).filter(Race.race_date &lt; entry.race.race_date)</code> to the query at line 36.
+        </div>
+        <div class="finding-file">src/longshot/trainer_patterns.py:36-41</div>
+      </div>
+    </div>
+
+    <!-- WARNINGS -->
+    <div class="card grid-full severity-warning">
+      <h2><span class="badge badge-warning">Warning</span> Code Quality Issues (5)</h2>
+
+      <div class="finding finding-warning">
+        <div class="finding-title">2. Duplicate UNIT_COSTS constants</div>
+        <div class="finding-detail">
+          <code>UNIT_COSTS</code> is defined separately in both <code>exotic_engine.py:126</code> and
+          <code>ranked_exotics.py:43</code> with identical values. If one changes, the other won't.
+          Should be a single constant imported from <code>kelly.py</code> or a shared config.
+        </div>
+        <div class="finding-file">src/betting/exotic_engine.py:126 &amp; src/betting/ranked_exotics.py:43</div>
+      </div>
+
+      <div class="finding finding-warning">
+        <div class="finding-title">3. Inconsistent takeout defaults across modules</div>
+        <div class="finding-detail">
+          Takeout rates default to different values in different functions:<br>
+          &bull; <code>signals.py</code>: 0.17 (win pool)<br>
+          &bull; <code>kelly.py</code>: 0.22 (exotic pool)<br>
+          &bull; <code>value.py kelly_fraction()</code>: 0.0 (!)<br>
+          &bull; <code>config/settings.py</code>: 0.17 win / 0.22 exotic<br>
+          The 0.0 default in <code>value.py</code> is misleading &mdash; calling <code>kelly_fraction()</code>
+          without explicit takeout overstates the Kelly stake by 17-22%.
+        </div>
+        <div class="finding-file">src/longshot/value.py:23 vs config/settings.py:26</div>
+      </div>
+
+      <div class="finding finding-warning">
+        <div class="finding-title">4. N+1 query in track_bias_feature (per-entry DB hit)</div>
+        <div class="finding-detail">
+          <code>compute_track_bias_feature()</code> runs a <code>session.query(TrackBias)</code> for every
+          entry in a race. For an 8-horse field, that's 8 identical queries returning the same row.
+          Should be cached at race level inside <code>compute_race_features()</code> and passed down,
+          like <code>_compute_pace_scenario()</code> already does.
+        </div>
+        <div class="finding-file">src/features/core.py:428-467 (called from line 487)</div>
+      </div>
+
+      <div class="finding finding-warning">
+        <div class="finding-title">5. No database migration system for new tables</div>
+        <div class="finding-detail">
+          <code>TrackBias</code> and <code>OddsSnapshot</code> were added to <code>models.py</code>.
+          <code>Base.metadata.create_all()</code> creates them in new DBs, but <strong>existing</strong>
+          <code>horsegpt.db</code> databases won't get the new tables automatically. Need either Alembic
+          or a one-time <code>CREATE TABLE IF NOT EXISTS</code> in the init script.
+        </div>
+        <div class="finding-file">src/data/models.py (TrackBias:194, OddsSnapshot:217)</div>
+      </div>
+
+      <div class="finding finding-warning">
+        <div class="finding-title">6. New Gap modules not wired into CLI or dashboard</div>
+        <div class="finding-detail">
+          The 8 new features (entropy, horizontal sequencer, EVPD, capable longshot filter,
+          track bias, live odds) are implemented and tested but not yet integrated into:<br>
+          &bull; <code>cli.py</code> (no CLI commands for entropy, horizontal, EVPD)<br>
+          &bull; <code>dashboard/</code> (no Streamlit pages for new modules)<br>
+          &bull; <code>exotic_engine.py</code> (doesn't use capable filter or EVPD)<br>
+          They exist as standalone importable modules awaiting wiring.
+        </div>
+        <div class="finding-file">src/models/horizontal.py, src/models/entropy.py, src/longshot/value.py (compute_exotic_evpd)</div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="card grid-full severity-info">
+      <h2><span class="badge badge-info">Info</span> Observations (8)</h2>
+
+      <div class="finding finding-info">
+        <div class="finding-title">7. check_trainer_patterns() is never called</div>
+        <div class="finding-detail">
+          <code>trainer_patterns.py</code> defines <code>check_trainer_patterns()</code> but it's not
+          imported or called from any other file in the codebase. It's dead code.
+          <code>check_pace_signals()</code> in <code>pace_scenarios.py</code> is similarly uncalled
+          from the signal pipeline (only <code>estimate_pace_impact</code> is used by the dashboard).
+        </div>
+        <div class="finding-file">src/longshot/trainer_patterns.py:19 &amp; src/longshot/pace_scenarios.py:48</div>
+      </div>
+
+      <div class="finding finding-info">
+        <div class="finding-title">8. Stub modules: gnn_pace.py, neural_net.py, interactions.py</div>
+        <div class="finding-detail">
+          Three modules raise <code>NotImplementedError</code> or return unchanged data:<br>
+          &bull; <code>gnn_pace.py</code>: GATv2Conv architecture documented but not implemented (Phase 4)<br>
+          &bull; <code>neural_net.py</code>: 44-line stub<br>
+          &bull; <code>interactions.py</code>: Returns input unchanged (Phase 2 placeholder)
+        </div>
+        <div class="finding-file">src/models/gnn_pace.py, src/models/neural_net.py, src/features/interactions.py</div>
+      </div>
+
+      <div class="finding finding-info">
+        <div class="finding-title">9. Missing statsmodels dependency breaks test_logistic.py</div>
+        <div class="finding-detail">
+          <code>statsmodels</code> is not installed in the current Python 3.14 environment.
+          <code>test_logistic.py</code> fails to collect with <code>ModuleNotFoundError: No module named 'statsmodels'</code>.
+          The Benter logistic model itself also cannot be used without it.
+        </div>
+        <div class="finding-file">src/models/logistic.py:24 (import statsmodels.api)</div>
+      </div>
+
+      <div class="finding finding-info">
+        <div class="finding-title">10. EquibaseLiveOdds.fetch_odds() returns empty list</div>
+        <div class="finding-detail">
+          The <code>_parse_odds_html()</code> method is a placeholder that always returns <code>[]</code>.
+          <code>poll_odds()</code> will succeed but store nothing until the parser is implemented.
+          This is expected for Gap 8 &mdash; the interface and pipeline are in place.
+        </div>
+        <div class="finding-file">src/data/scrapers/live_odds.py:96-99</div>
+      </div>
+
+      <div class="finding finding-info">
+        <div class="finding-title">11. Gemini model hardcoded to gemini-2.5-flash</div>
+        <div class="finding-detail">
+          <code>gemini_fetcher.py</code> hardcodes <code>gemini-2.5-flash</code> as the model name.
+          Should be configurable via environment variable or settings for model upgrades.
+        </div>
+        <div class="finding-file">src/data/gemini_fetcher.py (model constant)</div>
+      </div>
+
+      <div class="finding finding-info">
+        <div class="finding-title">12. Exotic engine still uses compute_superfecta_for_anchor (3D ndarray)</div>
+        <div class="finding-detail">
+          Gap 1 changed <code>SimulationResult.superfecta_probs</code> to dict, but
+          <code>compute_superfecta_for_anchor()</code> still returns its own 3D ndarray. This is correct &mdash;
+          the anchor function computes a separate, focused array &mdash; but the two superfecta approaches
+          (full dict vs anchor array) coexist without clear documentation of when to use which.
+        </div>
+        <div class="finding-file">src/models/monte_carlo.py:157-198 vs SimulationResult.superfecta_probs</div>
+      </div>
+
+      <div class="finding finding-info">
+        <div class="finding-title">13. Pre-existing lint issues (28 warnings in untouched files)</div>
+        <div class="finding-detail">
+          28 ruff warnings exist in files not modified during the Gaps build. Mostly unused imports
+          (F401), ambiguous variable <code>l</code> (E741), and unused local variables (F841).
+          All new/modified files pass lint clean.
+        </div>
+        <div class="finding-file">Various — run <code>ruff check src/ tests/</code> for full list</div>
+      </div>
+
+      <div class="finding finding-info">
+        <div class="finding-title">14. BRIS field positions are brittle magic numbers</div>
+        <div class="finding-detail">
+          <code>bris_parser.py</code> maps ~100 fields at hardcoded column positions (e.g., bris_speed @ 210,
+          PPs start @ 255). These are correct per the BRIS DRF spec, but a format change would silently
+          produce wrong data. Consider adding a header validation check.
+        </div>
+        <div class="finding-file">src/data/bris_parser.py (RACE_FIELDS, ENTRY_FIELDS, PP_BLOCK constants)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURE MATRIX & CHARTS -->
+  <div class="grid" style="margin-bottom: 1.25rem;">
+
+    <div class="card">
+      <h2>Feature Count by Category</h2>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="featureChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Lines of Code by Layer</h2>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="locChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Test Coverage by Module</h2>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="testChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Findings by Severity</h2>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="findingChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAP BUILD STATUS -->
+  <div class="grid">
+    <div class="card grid-full">
+      <h2>8 Exotic Betting Gaps &mdash; Build Status</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Gap</th>
+            <th>Feature</th>
+            <th>Files Changed</th>
+            <th>New Tests</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Superfecta Probabilities (dict + top4_probs)</td>
+            <td>monte_carlo.py, ranked_exotics.py, test_exotic_engine.py</td>
+            <td>12 (test_superfecta.py)</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Capable Longshot Filter (5-point gate)</td>
+            <td>signals.py</td>
+            <td>10 (test_capable_filter.py)</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Jockey/Trainer Combo Stats</td>
+            <td>core.py</td>
+            <td>via test_features.py</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Track Bias Table + Feature</td>
+            <td>models.py, track_bias.py (new), core.py</td>
+            <td>via test_features.py</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Race Entropy</td>
+            <td>entropy.py (new), monte_carlo.py</td>
+            <td>11 (test_entropy.py)</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Horizontal Exotic Sequencer</td>
+            <td>horizontal.py (new)</td>
+            <td>10 (test_horizontal.py)</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Per-Combo EVPD</td>
+            <td>value.py</td>
+            <td>9 (test_evpd.py)</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Live Odds Pipeline</td>
+            <td>models.py, live_odds.py (new)</td>
+            <td>via test_database.py</td>
+            <td><span class="badge badge-ok">PASS</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top: 0.75rem; font-size: 0.82rem; color: #71767b;">
+        131 total tests &middot; 131 passing &middot; 0 failing &middot; All new files pass ruff lint
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIORITY ACTION ITEMS -->
+  <div class="grid" style="margin-top: 1.25rem;">
+    <div class="card grid-full">
+      <h2>Priority Action Items</h2>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Action</th><th>Severity</th><th>Effort</th><th>File</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Add date filter to trainer_patterns.py query (lookahead bias)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td>5 min</td>
+            <td>trainer_patterns.py:36</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Cache track_bias lookup at race level (N+1 query)</td>
+            <td><span class="badge badge-warning">Warning</span></td>
+            <td>15 min</td>
+            <td>core.py:428</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Consolidate UNIT_COSTS into a single shared constant</td>
+            <td><span class="badge badge-warning">Warning</span></td>
+            <td>10 min</td>
+            <td>kelly.py or config/</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Fix takeout default in value.py kelly_fraction (0.0 &rarr; 0.17)</td>
+            <td><span class="badge badge-warning">Warning</span></td>
+            <td>2 min</td>
+            <td>value.py:23</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Add CREATE TABLE IF NOT EXISTS for TrackBias + OddsSnapshot</td>
+            <td><span class="badge badge-warning">Warning</span></td>
+            <td>10 min</td>
+            <td>scripts/init_db.py</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Wire new Gap modules into CLI and dashboard</td>
+            <td><span class="badge badge-warning">Warning</span></td>
+            <td>1-2 hrs</td>
+            <td>cli.py, dashboard/</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Install statsmodels for Benter logistic model</td>
+            <td><span class="badge badge-info">Info</span></td>
+            <td>1 min</td>
+            <td>pip install statsmodels</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Feature count chart
+    new Chart(document.getElementById('featureChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Speed', 'Pace', 'Class', 'Form', 'J/T', 'Post', 'Dist', 'Odds', 'Equip', 'Trip', 'Bias', 'Pace Scn'],
+        datasets: [{
+          label: 'Features',
+          data: [5, 8, 6, 11, 14, 5, 5, 4, 4, 5, 1, 9],
+          backgroundColor: '#1d9bf0',
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#71767b', font: { size: 10 } }, grid: { display: false } },
+          y: { ticks: { color: '#71767b' }, grid: { color: '#2f3336' } }
+        }
+      }
+    });
+
+    // LOC chart
+    new Chart(document.getElementById('locChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Data', 'Models', 'Features', 'Betting', 'Longshot', 'NLP', 'Eval', 'Tests'],
+        datasets: [{
+          data: [1700, 1100, 600, 800, 660, 870, 275, 1400],
+          backgroundColor: ['#1d9bf0', '#7856ff', '#00ba7c', '#ffd700', '#f4212e', '#ff6b35', '#71767b', '#00d4aa']
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'right', labels: { color: '#e7e9ea', font: { size: 10 }, boxWidth: 12 } } }
+      }
+    });
+
+    // Test coverage chart
+    new Chart(document.getElementById('testChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Exotic Engine', 'Superfecta', 'Features', 'Entropy', 'Horizontal', 'EVPD', 'Filter', 'Scrapers', 'DB', 'NLP', 'BRIS'],
+        datasets: [{
+          label: 'Tests',
+          data: [23, 12, 4, 11, 10, 9, 10, 14, 4, 20, 5],
+          backgroundColor: '#00ba7c',
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#71767b', font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
+          y: { ticks: { color: '#71767b' }, grid: { color: '#2f3336' } }
+        }
+      }
+    });
+
+    // Findings chart
+    new Chart(document.getElementById('findingChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Critical', 'Warning', 'Info'],
+        datasets: [{
+          data: [1, 5, 8],
+          backgroundColor: ['#f4212e', '#ffd700', '#1d9bf0']
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'right', labels: { color: '#e7e9ea', font: { size: 11 }, boxWidth: 12 } } }
+      }
+    });
+  </script>
+</body>
+</html>

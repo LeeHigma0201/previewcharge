@@ -1,10 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
+import { CD_CONTEXT } from "../../lib/cd-context";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const EQUIBASE_BASE = "https://www.equibase.com";
 
-// Keeneland Spring Meet 2026 — Track Intelligence
+// Legacy Keeneland Spring Meet context (kept as fallback reference; today's card uses CD_CONTEXT)
 const KEE_CONTEXT = `
 KEENELAND SPRING MEET 2026 TRACK PROFILE:
 
@@ -275,15 +276,15 @@ export async function POST(request: NextRequest) {
     const parsed = parseQuery(query);
     if (!parsed) {
       return NextResponse.json(
-        { error: "Could not parse race number. Try: 'Keeneland Race 5 April 11 2026'" },
+        { error: "Could not parse race number. Try: 'Churchill Downs Race 5 April 29 2026'" },
         { status: 400 },
       );
     }
 
-    // Force Keeneland April 18, 2026 (today's card)
-    const trackCode = "KEE";
+    // Force Churchill Downs Thursday April 30, 2026 (today's card)
+    const trackCode = "CD";
     const raceNumber = parsed.raceNumber;
-    const isoDate = "2026-04-18";
+    const isoDate = "2026-04-30";
 
     // Check cache first
     const cacheKey = `${trackCode}-${raceNumber}-${isoDate}`;
@@ -435,23 +436,51 @@ RULES:
     // =================================================================
     // STEP 2: Verify scratches with a dedicated search
     // Scratches happen after entries are drawn. This catches late scratches.
+    // Returns program numbers AND names to support robust matching.
     // =================================================================
+    function normalizeName(s: string): string {
+      return String(s)
+        .toLowerCase()
+        .replace(/\([^)]*\)/g, "") // strip parenthetical "(KY)" etc.
+        .replace(/[^\w\s]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
     try {
-      const horseNames = horses.map((h) => String(h.name)).join(", ");
-      const scratchPrompt = `TODAY IS ${isoDate}. Check for scratches in ${trackCode} Race ${raceNumber} on ${isoDate}.
+      const horseList = horses.map((h, i) => `${i + 1}. #${h.program_number ?? "?"} ${h.name}`).join("\n");
+      const scratchPrompt = `TASK: Identify which horses in ${trackCode} Race ${raceNumber} on ${isoDate} have been SCRATCHED.
 
-Search for "${trackCode} scratches ${isoDate}" or "equibase scratches today"
+Today: ${isoDate}. Track: ${trackCode}. Race: ${raceNumber}.
 
-These horses are currently entered: ${horseNames}
+ENTERED HORSES (this is the authoritative list — only these horses are running this race today):
+${horseList}
 
-Return ONLY a JSON object:
+Search these sources in order:
+1. site:equibase.com ${trackCode} scratches ${isoDate}
+2. twinspires.com ${trackCode} race ${raceNumber} ${isoDate}
+3. horseracingnation.com ${trackCode} ${isoDate} entries
+4. ${trackCode} ${isoDate} scratched horses race ${raceNumber}
+
+A horse is scratched if marked "SCR", "Scratched", "Late Scratch", strikethrough,
+or excluded from the race-day program on Equibase / TwinSpires / official track site.
+
+CRITICAL RULES:
+- ONLY return horses from the ENTERED HORSES list above. Do NOT invent names.
+- The "name" you return MUST match a name from that list verbatim.
+- The "program" you return MUST match the program number from that list.
+- If a search result mentions a horse not in the list, IGNORE it — that's a different race or stale data.
+- Better to return zero scratches than wrong ones.
+
+Return ONLY this JSON:
 {
-  "scratches": ["Horse Name 1", "Horse Name 2"],
-  "source": "where you found this info"
+  "scratches": [{"program": "5", "name": "Exact Horse Name From List"}],
+  "source": "url or site",
+  "checked_at": "ISO timestamp"
 }
 
-If NO scratches found, return: {"scratches": [], "source": "no scratches found"}
-Return ONLY valid JSON.`;
+If no scratches found: {"scratches": [], "source": "no scratches", "checked_at": "..."}
+Return ONLY valid JSON, no markdown.`;
 
       const scratchResponse = await ai.models.generateContent({
         model: GEMINI_MODEL,
@@ -461,19 +490,33 @@ Return ONLY valid JSON.`;
 
       const scratchRaw = cleanJson(scratchResponse.text ?? "");
       const scratchData = JSON.parse(scratchRaw);
-      const scratchNames: string[] = (scratchData.scratches ?? []).map((s: string) => s.toLowerCase().trim());
+      const scratchEntries: Array<{ program?: string; name?: string }> = Array.isArray(scratchData.scratches)
+        ? scratchData.scratches
+        : [];
 
-      if (scratchNames.length > 0) {
+      const scratchProgs = new Set(scratchEntries.map((s) => String(s.program ?? "").trim()).filter(Boolean));
+      const scratchNamesNorm = new Set(scratchEntries.map((s) => normalizeName(s.name ?? "")).filter(Boolean));
+
+      if (scratchProgs.size > 0 || scratchNamesNorm.size > 0) {
         const before = horses.length;
+        const removed: string[] = [];
         horses = horses.filter((h) => {
-          const name = String(h.name ?? "").toLowerCase().trim();
-          return !scratchNames.includes(name);
+          const prog = String(h.program_number ?? "").trim();
+          const name = normalizeName(String(h.name ?? ""));
+          const isScratched = scratchProgs.has(prog) || scratchNamesNorm.has(name);
+          if (isScratched) removed.push(`#${prog} ${h.name}`);
+          return !isScratched;
         });
         raceData.horses = horses;
-        raceData._scratches = `${before - horses.length} horse(s) scratched: ${scratchData.scratches.join(", ")}`;
+        if (removed.length > 0) {
+          raceData._scratches = `${before - horses.length} scratched: ${removed.join(", ")} (source: ${scratchData.source ?? "Gemini"})`;
+          raceData._scratch_programs = Array.from(scratchProgs);
+        }
       }
-    } catch {
-      // Scratch check failed — proceed with original entries
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "scratch check failed";
+      raceData._scratch_check_error = msg;
+      // Proceed with original entries — don't block the whole race fetch
     }
 
     // =================================================================
@@ -492,7 +535,7 @@ Return ONLY valid JSON.`;
         .replaceAll("{race_type}", String(raceData.race_type ?? "ALW"))
         .replaceAll("{purse}", String(raceData.purse ?? 0))
         .replaceAll("{horse_list}", horseList)
-        + `\n\nTRACK CONTEXT FOR KEENELAND:\n${KEE_CONTEXT}\n\nUse this context when evaluating jockey/trainer records. Search for their CURRENT Keeneland spring 2026 meet statistics, not just career stats.`;
+        + `\n\nTRACK CONTEXT FOR CHURCHILL DOWNS:\n${CD_CONTEXT}\n\nUse this context when evaluating jockey/trainer records. Search for their CURRENT Churchill Downs spring 2026 meet statistics, not just career stats.`;
 
       const enrichResponse = await ai.models.generateContent({
         model: GEMINI_MODEL,

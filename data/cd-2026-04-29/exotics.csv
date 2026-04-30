@@ -1,0 +1,11 @@
+race,race_type,structure,tickets,unit_cost,total_cost,hit_prob_est_pct,rationale
+1,Clm  16000,Trifecta 3-horse box,1-4-8 BOX,0.5,3.0,34.8,Top 3 cover 63% — tri box at $0.50.
+2,Clm  25000,Superfecta 4-horse box,5-6-1-4 BOX,0.1,2.4,47.7,Top 4 cover 87% — cheap super box catches any order.
+3,Mdn 120k,Superfecta 5-horse box (chaos play),12-7-8-10-6 BOX,0.1,12.0,30.6,Wide-open. Top 5 = 68%. Chaos super box.
+4,MC 50000,Superfecta 5-horse box (chaos play),6-4-8-7-5 BOX,0.1,12.0,27.9,Wide-open. Top 5 = 62%. Chaos super box.
+5,MC 50000,Superfecta 5-horse box (chaos play),10-9-4-3-8 BOX,0.1,12.0,33.2,Wide-open. Top 5 = 74%. Chaos super box.
+6,KyJuvnileB250K,Trifecta key 1st OVER top 3,"2 / 4,7,5 / 4,7,5",0.5,3.0,26.1,"#2 Skara Brae dominates at 35%. Single on top, spread under."
+7,OC  80000n2x,Superfecta 5-horse box (chaos play),2-9-10-5-7 BOX,0.1,12.0,32.1,Wide-open. Top 5 = 71%. Chaos super box.
+8,Alw  50000s,Superfecta 5-horse box (chaos play),3-4-1-7-5 BOX,0.1,12.0,33.2,Wide-open. Top 5 = 74%. Chaos super box.
+9,IMphyMthnL200K,Superfecta 5-horse box (chaos play),2-1-8-5-4 BOX,0.1,12.0,35.7,Wide-open. Top 5 = 79%. Chaos super box.
+10,Clm 30000n2L,Superfecta 5-horse box (chaos play),9-6-13-12-2 BOX,0.1,12.0,27.3,Wide-open. Top 5 = 61%. Chaos super box.
