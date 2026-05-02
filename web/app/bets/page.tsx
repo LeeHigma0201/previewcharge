@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CD_2026_04_30 as TODAYS_CARD, CD_2026_04_30_DATE as TODAYS_DATE } from "../lib/cd-2026-04-30";
-import ClarkBot from "../components/ClarkBot";
+import { CD_2026_05_02 as TODAYS_CARD, CD_2026_05_02_DATE as TODAYS_DATE } from "../lib/cd-2026-05-02";
+import HorseGPT from "../components/HorseGPT";
 import { computeExoticsAnalytic, conditionalNextProbs, getRaceProbs, type RaceExoticRecs, type RaceProbs } from "../lib/bet-sheet";
 import type { StaticRace } from "../lib/keeneland-apr18";
 import {
@@ -51,8 +51,8 @@ function parseManualScratches(input: string): Record<string, string[]> {
   return out;
 }
 
-const MANUAL_SCRATCH_KEY = "horsegpt_manual_scratches_2026-04-30";
-const TRACK_CONDITION_KEY = "horsegpt_track_condition_2026-04-30";
+const MANUAL_SCRATCH_KEY = "horsegpt_manual_scratches_2026-05-02";
+const TRACK_CONDITION_KEY = "horsegpt_track_condition_2026-05-02";
 
 const TRACK_CONDITIONS = ["Fast", "Wet Fast", "Good", "Muddy", "Sloppy", "Yielding", "Soft", "Firm"] as const;
 type TrackCondition = (typeof TRACK_CONDITIONS)[number];
@@ -569,7 +569,7 @@ export default function BetSheet() {
           </div>
         </div>
       </div>
-      <ClarkBot />
+      <HorseGPT />
     </main>
   );
 }
