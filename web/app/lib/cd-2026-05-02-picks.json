@@ -4801,24 +4801,16 @@
         8,
         9
       ],
-      "single_leg": 7,
+      "singleLeg": 7,
       "tickets": "2 / 1,6,2 / 4,12,8",
       "combos": 9,
       "unit": 0.5,
-      "cost": 4.5
-    },
-    {
-      "type": "pick3",
-      "races": [
-        10,
-        11,
-        12
-      ],
-      "single_leg": 10,
-      "tickets": "6 / 6,4,9 / 1,6,18",
-      "combos": 9,
-      "unit": 0.5,
-      "cost": 4.5
+      "cost": 4.5,
+      "estimatedPool": 200000,
+      "estPayoutBand": [
+        34667.0,
+        346667.0
+      ]
     },
     {
       "type": "pick4",
@@ -4828,11 +4820,36 @@
         11,
         12
       ],
-      "single_leg": 10,
-      "tickets": "4,12,8 / 6 / 6,4,9 / 1,6,18",
-      "combos": 27,
+      "singleLeg": 11,
+      "tickets": "4,12,8 / 6,2,1 / 6 / 1,6,18,12,9",
+      "combos": 45,
       "unit": 0.5,
-      "cost": 13.5
+      "cost": 22.5,
+      "estimatedPool": 2000000,
+      "estPayoutBand": [
+        69333.0,
+        693333.0
+      ]
+    },
+    {
+      "type": "pick5",
+      "races": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "singleLeg": 11,
+      "tickets": "1,6,2 / 4,12,8 / 6,2,1 / 6 / 1,6,18,12,9",
+      "combos": 135,
+      "unit": 0.5,
+      "cost": 67.5,
+      "estimatedPool": 1500000,
+      "estPayoutBand": [
+        17333.0,
+        173333.0
+      ]
     },
     {
       "type": "pick4",
@@ -4842,11 +4859,16 @@
         13,
         14
       ],
-      "single_leg": 11,
-      "tickets": "6 / 1,6,18 / 10,8,11 / 8,3,7",
-      "combos": 27,
+      "singleLeg": 11,
+      "tickets": "6 / 1,6,18,12,9 / 10,8,11 / 3,8,7",
+      "combos": 45,
       "unit": 0.5,
-      "cost": 13.5
+      "cost": 22.5,
+      "estimatedPool": 800000,
+      "estPayoutBand": [
+        27733.0,
+        277333.0
+      ]
     }
   ],
   "publicBias": {
@@ -8258,5 +8280,59 @@
     "1": [
       "9"
     ]
-  }
+  },
+  "raceResults": {
+    "1": {
+      "status": "pending",
+      "finish": null,
+      "note": "Jason bet TRI 11/3/6-5 \u2014 pending result.",
+      "algoTop3": [
+        "11",
+        "3",
+        "9 (scratched, replaced #8 in saver)"
+      ]
+    },
+    "2": {
+      "status": "final",
+      "finish": [
+        "1",
+        "2",
+        "9",
+        "8"
+      ],
+      "finishNames": [
+        "Out of the Woods",
+        "Sovereign Law",
+        "Our Moneyman",
+        "Taptastic"
+      ],
+      "algoTop3": [
+        "8 Taptastic",
+        "4 Memory",
+        "1 Out of the Woods"
+      ],
+      "lessonsLearned": [
+        "MISS \u2014 algo had #1 Out of the Woods at #3 (12.2% P1). Actual: wire-to-wire winner.",
+        "Pattern: Hall-of-Fame jockey (Velazquez) + post 1 + early style + Beyer 94 = textbook CD spring rail-master signature.",
+        "Generic post1to3IV (1.10) + jockey-tier +0.04 was insufficient bonus.",
+        "PATCH: Built src/models/cd_historian.py \u2014 RAIL_MASTER pattern boosts Velazquez/Irad/Saez/Smith/Castellano on post 1-2 with E/EP style by 1.15-1.18x.",
+        "Retroactive R2: #1 would have ranked 2nd (17.8%) with triple-flag stack visible to user."
+      ],
+      "improvement": "All races re-scored with CD historian. Going forward, look for triple-flag stacks (RAIL_MASTER + JOCKEY_MEET + DIST_PATTERN) \u2014 they signal under-weighted stars."
+    }
+  },
+  "recalibrationLog": [
+    {
+      "timestamp": "2026-05-02 R2-post-race",
+      "change": "Added cd_historian.py with RAIL_MASTER, JOCKEY_MEET, TRAINER_MEET, DIST_PATTERN multipliers",
+      "reason": "R2 #1 wire-to-wire winner (Velazquez post 1 E style) was underweighted",
+      "impact": "All position probs re-Henery-computed across 14 races; sleepers now flagged"
+    },
+    {
+      "timestamp": "2026-05-02 pre-R3",
+      "change": "Acknowledged exotic-ROI data: Super Hi-5 +22.8%, Pick 5 +18.2%, Superfecta +92%, Win ~breakeven (TwinSpires 2023 report)",
+      "reason": "Jason confirmed exotic structures with positive ROI track record",
+      "impact": "Bumping Hi-5 + Pick-N tickets to default plays; deprecating saver tri boxes when alternative is available"
+    }
+  ]
 }

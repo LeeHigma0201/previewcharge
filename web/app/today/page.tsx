@@ -38,11 +38,29 @@ interface V3Race {
 interface PickChain {
   type: string;
   races: number[];
-  single_leg: number;
+  single_leg?: number;
+  singleLeg?: number;
   tickets: string;
   combos: number;
   unit: number;
   cost: number;
+  estimatedPool?: number;
+  estPayoutBand?: [number, number];
+}
+interface RaceResult {
+  status: string;
+  finish: string[] | null;
+  finishNames?: string[];
+  algoTop3: string[];
+  note?: string;
+  lessonsLearned?: string[];
+  improvement?: string;
+}
+interface RecalibrationLog {
+  timestamp: string;
+  change: string;
+  reason: string;
+  impact: string;
 }
 interface BiasRow {
   program: string;
@@ -101,6 +119,8 @@ export default function TodayPage() {
   const bettable = v3.filter((r) => r.totalCost > 0).length;
   const bias = (picks.publicBias ?? {}) as Record<string, BiasRow[]>;
   const smartDerby = picks.smartDerby as { super: SmartDerbySuper; place: SmartDerbyPlace; totalCost: number } | undefined;
+  const raceResults = (picks.raceResults ?? {}) as Record<string, RaceResult>;
+  const recalibrationLog = (picks.recalibrationLog ?? []) as RecalibrationLog[];
 
   return (
     <main className="min-h-screen bg-black text-white p-4 md:p-8 space-y-6">
@@ -125,6 +145,63 @@ export default function TodayPage() {
           Every race gets at least a saver ticket. Angles are PP-grounded only — each cites the source PP field, no hallucinated stats.
         </p>
       </header>
+
+      {Object.keys(raceResults).length > 0 && (
+        <section className="border border-zinc-700 rounded-lg bg-zinc-950/50 p-5">
+          <header className="mb-3">
+            <h2 className="text-2xl font-black text-zinc-100">Race Results &amp; Lessons</h2>
+            <p className="text-xs text-zinc-500">Live result tracker + algo post-mortem after each race.</p>
+          </header>
+          <div className="space-y-3">
+            {Object.entries(raceResults).map(([rn, r]) => {
+              const ranAndFinal = r.status === "final" && r.finish;
+              return (
+                <div key={rn} className={`border rounded p-3 ${ranAndFinal ? "border-zinc-700" : "border-zinc-800 bg-zinc-900/40"}`}>
+                  <div className="flex items-baseline justify-between flex-wrap gap-2">
+                    <div className="text-sm font-bold">R{rn} — {ranAndFinal ? "FINAL" : "PENDING"}</div>
+                    {ranAndFinal && r.finish && (
+                      <div className="text-sm font-mono">
+                        Finish: {r.finish.map((p, i) => (
+                          <span key={i} className="text-zinc-300">
+                            <span className="text-emerald-400 font-bold">#{p}</span>{r.finishNames?.[i] ? ` ${r.finishNames[i]}` : ""}{i < (r.finish?.length ?? 0) - 1 ? " · " : ""}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-zinc-500 mt-1">Algo top 3: {r.algoTop3.join(", ")}</div>
+                  {r.note && <div className="text-[11px] text-zinc-400 mt-1 italic">{r.note}</div>}
+                  {r.lessonsLearned && r.lessonsLearned.length > 0 && (
+                    <details className="mt-2 text-[11px]">
+                      <summary className="cursor-pointer text-amber-400 hover:text-amber-300">Lessons learned (algo post-mortem)</summary>
+                      <ul className="mt-2 space-y-1 ml-4 list-disc text-zinc-400">
+                        {r.lessonsLearned.map((l, i) => (<li key={i}>{l}</li>))}
+                      </ul>
+                      {r.improvement && (
+                        <div className="mt-2 text-emerald-300 ml-4">→ Improvement: {r.improvement}</div>
+                      )}
+                    </details>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {recalibrationLog.length > 0 && (
+            <details className="mt-3">
+              <summary className="cursor-pointer text-xs text-emerald-400 hover:text-emerald-300">Recalibration log ({recalibrationLog.length} entries)</summary>
+              <ul className="mt-2 space-y-1 text-[11px] text-zinc-400 ml-4">
+                {recalibrationLog.map((e, i) => (
+                  <li key={i}>
+                    <span className="font-mono text-zinc-500">[{e.timestamp}]</span> <span className="text-zinc-300">{e.change}</span>
+                    <div className="text-zinc-500 ml-3">why: {e.reason}</div>
+                    <div className="text-emerald-400 ml-3">→ {e.impact}</div>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </section>
+      )}
 
       {smartDerby && (
         <section className="border-2 border-emerald-400 rounded-lg bg-gradient-to-br from-emerald-950/40 to-black p-5">
@@ -286,8 +363,13 @@ export default function TodayPage() {
                   <div className="text-sm font-bold">{c.type.toUpperCase()} R{c.races[0]}–R{c.races[c.races.length - 1]}</div>
                   <div className="text-emerald-300 font-mono font-bold">${c.cost.toFixed(2)}</div>
                 </div>
-                <div className="text-[11px] text-zinc-500 mb-1">Single leg: R{c.single_leg} · {c.combos} combos × ${c.unit.toFixed(2)}</div>
+                <div className="text-[11px] text-zinc-500 mb-1">Single leg: R{c.singleLeg ?? c.single_leg} · {c.combos} combos × ${c.unit.toFixed(2)}</div>
                 <div className="font-mono text-xs text-emerald-300 break-all">{c.tickets}</div>
+                {c.estimatedPool && c.estPayoutBand && (
+                  <div className="mt-2 text-[10px] text-zinc-500">
+                    Est pool: <span className="text-emerald-400">${(c.estimatedPool/1000).toFixed(0)}K</span> · payout band ${c.estPayoutBand[0].toLocaleString()}-${c.estPayoutBand[1].toLocaleString()}
+                  </div>
+                )}
               </div>
             ))}
           </div>
