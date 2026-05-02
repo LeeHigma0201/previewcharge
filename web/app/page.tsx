@@ -8,6 +8,9 @@ export default function Home() {
     return acc;
   }, {} as Record<string, number>);
   const totalCost = races.reduce((s, r) => s + (r.cost || 0), 0);
+  const v3Total = picks.exoticV3Total ?? 0;
+  const v3 = (picks.exoticV3 ?? []) as { totalCost: number }[];
+  const v3Bettable = v3.filter((r) => r.totalCost > 0).length;
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center p-6">
@@ -21,9 +24,9 @@ export default function Home() {
           <div className="text-xs uppercase tracking-wider text-zinc-500 mb-2">Today · Kentucky Derby 152</div>
           <div className="text-2xl font-black mb-4">{picks.date} · {races.length} races</div>
           <div className="grid grid-cols-3 gap-3 mb-5">
-            <Tile label="Bettable" value={String((tierCounts.FULL_EDGE ?? 0) + (tierCounts.PARTIAL_EDGE ?? 0))} accent="emerald" />
-            <Tile label="Pass (chalk)" value={String(tierCounts.CHALK_MATCH ?? 0)} accent="zinc" />
-            <Tile label="Outlay" value={`$${totalCost.toFixed(2)}`} accent="amber" />
+            <Tile label="v3 bettable" value={`${v3Bettable}/14`} accent="emerald" />
+            <Tile label="v3 outlay" value={`$${v3Total.toFixed(2)}`} accent="amber" />
+            <Tile label="v1 strict" value={`${(tierCounts.FULL_EDGE ?? 0) + (tierCounts.PARTIAL_EDGE ?? 0)}/14`} accent="zinc" />
           </div>
           <div className="flex gap-3">
             <Link href="/today" className="flex-1 text-center px-4 py-3 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold">Today's Card →</Link>
@@ -39,9 +42,11 @@ export default function Home() {
             market's recorded ROI in chalk-match races.
           </p>
           <p>
-            <span className="font-bold text-zinc-400">Exotic v2 (new):</span> Henery-corrected ordering probabilities
-            (γ=0.81, δ=0.65) instead of biased Harville. Edge is multiplicative across positions; one controversial
-            horse + a wide super-wheel beats boxing the public favorites all day.
+            <span className="font-bold text-zinc-400">Exotic v3 (active):</span> Henery position probabilities
+            (γ=0.81, δ=0.65, ε=0.55) for every horse — P(1st), P(2nd), P(3rd), P(4th). Aggressive recommendation
+            policy: every race gets at least a saver ticket. PP-grounded angle detector flags lone speed, speed duels,
+            overlay closers, layoff risks, Prime-Power overlays — each angle cites the source PP field (no hallucinated
+            stats).
           </p>
           <p className="text-zinc-600 italic">
             Sources: Benter (1994), Henery (1981), Lo &amp; Bacon-Shone (2008), Crist (Exotic Betting), Ziemba (Beat the Racetrack).

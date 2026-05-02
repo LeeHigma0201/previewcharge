@@ -3259,5 +3259,1635 @@
       ]
     }
   ],
-  "exoticV2Total": 14.2
+  "exoticV2Total": 14.2,
+  "exoticV3": [
+    {
+      "raceNumber": 1,
+      "fieldSize": 11,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "LOW",
+      "totalCost": 0.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 11,3,9 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        }
+      ],
+      "angles": [],
+      "positionProbs": [
+        {
+          "program": "11",
+          "name": "Powershift",
+          "p1": 0.215,
+          "p2": 0.1676,
+          "p3": 0.2226,
+          "p4": 0.2452,
+          "itm": 0.6053,
+          "mlOdds": 0.196587379260457
+        },
+        {
+          "program": "3",
+          "name": "Silent Way",
+          "p1": 0.177,
+          "p2": 0.152,
+          "p3": 0.1998,
+          "p4": 0.2252,
+          "itm": 0.5288,
+          "mlOdds": 0.1572699034083656
+        },
+        {
+          "program": "9",
+          "name": "Winston Ave",
+          "p1": 0.148,
+          "p2": 0.1369,
+          "p3": 0.18,
+          "p4": 0.2076,
+          "itm": 0.465,
+          "mlOdds": 0.14297263946215055
+        },
+        {
+          "program": "8",
+          "name": "Bourbon Dream",
+          "p1": 0.125,
+          "p2": 0.123,
+          "p3": 0.1625,
+          "p4": 0.1917,
+          "itm": 0.4106,
+          "mlOdds": 0.13105825284030467
+        },
+        {
+          "program": "6",
+          "name": "Cromwell",
+          "p1": 0.107,
+          "p2": 0.1109,
+          "p3": 0.1475,
+          "p4": 0.1776,
+          "itm": 0.3654,
+          "mlOdds": 0.11233564529168971
+        },
+        {
+          "program": "10",
+          "name": "Midnight Playboy",
+          "p1": 0.043,
+          "p2": 0.0568,
+          "p3": 0.0818,
+          "p4": 0.1051,
+          "itm": 0.1816,
+          "mlOdds": 0.04914684481511425
+        },
+        {
+          "program": "1",
+          "name": "Bhatia",
+          "p1": 0.042,
+          "p2": 0.0558,
+          "p3": 0.0795,
+          "p4": 0.1038,
+          "itm": 0.1773,
+          "mlOdds": 0.04914684481511425
+        },
+        {
+          "program": "5",
+          "name": "Get Them Roses",
+          "p1": 0.042,
+          "p2": 0.0558,
+          "p3": 0.0795,
+          "p4": 0.1038,
+          "itm": 0.1773,
+          "mlOdds": 0.04914684481511425
+        }
+      ]
+    },
+    {
+      "raceNumber": 2,
+      "fieldSize": 12,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 8,4,1 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 8 / 4,1,9,6 / 4,1,9,6 / 4,1,9,6 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "OVERLAY_CLOSER",
+          "horseProgram": "6",
+          "description": "#6 has best LP last race (100) but rates outside algo top-3 \u2014 closer overlay if pace flattens.",
+          "sourceField": "latePaceLast"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "8",
+          "name": "Taptastic",
+          "p1": 0.2052,
+          "p2": 0.1567,
+          "p3": 0.1993,
+          "p4": 0.2114,
+          "itm": 0.5612,
+          "mlOdds": 0.19497403205096098
+        },
+        {
+          "program": "4",
+          "name": "Memory",
+          "p1": 0.1341,
+          "p2": 0.1232,
+          "p3": 0.1558,
+          "p4": 0.174,
+          "itm": 0.4132,
+          "mlOdds": 0.14179929603706254
+        },
+        {
+          "program": "1",
+          "name": "Out of the Woods",
+          "p1": 0.1221,
+          "p2": 0.116,
+          "p3": 0.1472,
+          "p4": 0.1663,
+          "itm": 0.3853,
+          "mlOdds": 0.11141373260054913
+        },
+        {
+          "program": "9",
+          "name": "Our Moneyman",
+          "p1": 0.1081,
+          "p2": 0.1069,
+          "p3": 0.1365,
+          "p4": 0.1567,
+          "itm": 0.3515,
+          "mlOdds": 0.11141373260054913
+        },
+        {
+          "program": "6",
+          "name": "Make My Day",
+          "p1": 0.1021,
+          "p2": 0.1028,
+          "p3": 0.1317,
+          "p4": 0.1523,
+          "itm": 0.3366,
+          "mlOdds": 0.08665512535598265
+        },
+        {
+          "program": "2",
+          "name": "Sovereign Law",
+          "p1": 0.0851,
+          "p2": 0.0905,
+          "p3": 0.1173,
+          "p4": 0.1358,
+          "itm": 0.2929,
+          "mlOdds": 0.08665512535598265
+        },
+        {
+          "program": "11",
+          "name": "Lincoln's Law",
+          "p1": 0.0791,
+          "p2": 0.0859,
+          "p3": 0.1108,
+          "p4": 0.1305,
+          "itm": 0.2757,
+          "mlOdds": 0.07089964801853127
+        },
+        {
+          "program": "7",
+          "name": "Very Connected",
+          "p1": 0.0501,
+          "p2": 0.0612,
+          "p3": 0.0823,
+          "p4": 0.1014,
+          "itm": 0.1935,
+          "mlOdds": 0.059992009861834145
+        }
+      ]
+    },
+    {
+      "raceNumber": 3,
+      "fieldSize": 14,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 12,6,5 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 12 / 6,5,10,9,1 / 6,5,10,9,1 / 6,5,10,9,1 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "SPEED_DUEL",
+          "horseProgram": null,
+          "description": "3+ E-style horses (#12, #5, #9) \u2014 pace meltdown likely; favor closers (S-style) underneath.",
+          "sourceField": "style"
+        },
+        {
+          "code": "OVERLAY_CLOSER",
+          "horseProgram": "1",
+          "description": "#1 has best LP last race (100) but rates outside algo top-3 \u2014 closer overlay if pace flattens.",
+          "sourceField": "latePaceLast"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "12",
+          "name": "Praetor",
+          "p1": 0.214,
+          "p2": 0.1562,
+          "p3": 0.1945,
+          "p4": 0.2002,
+          "itm": 0.5647,
+          "mlOdds": 0.19454057752525153
+        },
+        {
+          "program": "6",
+          "name": "Who Dey",
+          "p1": 0.143,
+          "p2": 0.1254,
+          "p3": 0.1545,
+          "p4": 0.1663,
+          "itm": 0.4228,
+          "mlOdds": 0.14148405638200112
+        },
+        {
+          "program": "5",
+          "name": "John Hancock",
+          "p1": 0.131,
+          "p2": 0.1186,
+          "p3": 0.1465,
+          "p4": 0.1595,
+          "itm": 0.3962,
+          "mlOdds": 0.11116604430014372
+        },
+        {
+          "program": "10",
+          "name": "Vibe",
+          "p1": 0.109,
+          "p2": 0.1051,
+          "p3": 0.1309,
+          "p4": 0.1458,
+          "itm": 0.345,
+          "mlOdds": 0.11116604430014372
+        },
+        {
+          "program": "9",
+          "name": "Keewaydin",
+          "p1": 0.081,
+          "p2": 0.0854,
+          "p3": 0.1085,
+          "p4": 0.1253,
+          "itm": 0.2749,
+          "mlOdds": 0.08646247890011179
+        },
+        {
+          "program": "14",
+          "name": "Bullard",
+          "p1": 0.052,
+          "p2": 0.0615,
+          "p3": 0.0815,
+          "p4": 0.0961,
+          "itm": 0.195,
+          "mlOdds": 0.05985863923853893
+        },
+        {
+          "program": "2",
+          "name": "Vamos Carlitos",
+          "p1": 0.05,
+          "p2": 0.0597,
+          "p3": 0.0784,
+          "p4": 0.0941,
+          "itm": 0.1882,
+          "mlOdds": 0.04863514438131288
+        },
+        {
+          "program": "4",
+          "name": "Comport",
+          "p1": 0.05,
+          "p2": 0.0597,
+          "p3": 0.0784,
+          "p4": 0.0941,
+          "itm": 0.1882,
+          "mlOdds": 0.04863514438131288
+        }
+      ]
+    },
+    {
+      "raceNumber": 4,
+      "fieldSize": 6,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 4,5,2 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 4 / 5,2,1,6 / 5,2,1,6 / 5,2,1,6 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: LONE_SPEED; TOP_LAYOFF. Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "LONE_SPEED",
+          "horseProgram": "6",
+          "description": "#6 is the only E-style horse \u2014 uncontested early lead likely.",
+          "sourceField": "style"
+        },
+        {
+          "code": "TOP_LAYOFF",
+          "horseProgram": "4",
+          "description": "Algo top-1 #4 (Ways and Means) is off 327 days \u2014 layoff risk; consider saver underneath.",
+          "sourceField": "daysSinceLast"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "4",
+          "name": "Ways and Means",
+          "p1": 0.3227,
+          "p2": 0.2418,
+          "p3": 0.4058,
+          "p4": 0.5225,
+          "itm": 0.9702,
+          "mlOdds": 0.29809528725545864
+        },
+        {
+          "program": "5",
+          "name": "Splendora",
+          "p1": 0.2527,
+          "p2": 0.2281,
+          "p3": 0.3648,
+          "p4": 0.4875,
+          "itm": 0.8456,
+          "mlOdds": 0.2583492489547308
+        },
+        {
+          "program": "2",
+          "name": "Haulin Ice",
+          "p1": 0.1618,
+          "p2": 0.1821,
+          "p3": 0.2896,
+          "p4": 0.4203,
+          "itm": 0.6336,
+          "mlOdds": 0.1550095493728385
+        },
+        {
+          "program": "1",
+          "name": "Usha",
+          "p1": 0.1299,
+          "p2": 0.1585,
+          "p3": 0.2537,
+          "p4": 0.3851,
+          "itm": 0.542,
+          "mlOdds": 0.14091777215712592
+        },
+        {
+          "program": "6",
+          "name": "R Disaster",
+          "p1": 0.1009,
+          "p2": 0.1334,
+          "p3": 0.2162,
+          "p4": 0.3422,
+          "itm": 0.4505,
+          "mlOdds": 0.11072110669488464
+        },
+        {
+          "program": "3",
+          "name": "Autumn Evening",
+          "p1": 0.032,
+          "p2": 0.0562,
+          "p3": 0.1014,
+          "p4": 0.1704,
+          "itm": 0.1895,
+          "mlOdds": 0.03690703556496155
+        }
+      ]
+    },
+    {
+      "raceNumber": 5,
+      "fieldSize": 10,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "LOW",
+      "totalCost": 0.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 3,9,7 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        }
+      ],
+      "angles": [
+        {
+          "code": "LONE_SPEED",
+          "horseProgram": "2",
+          "description": "#2 is the only E-style horse \u2014 uncontested early lead likely.",
+          "sourceField": "style"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "3",
+          "name": "My Boy Prince",
+          "p1": 0.3193,
+          "p2": 0.2069,
+          "p3": 0.3024,
+          "p4": 0.3223,
+          "itm": 0.8286,
+          "mlOdds": 0.22821979819762875
+        },
+        {
+          "program": "9",
+          "name": "Litigation",
+          "p1": 0.1892,
+          "p2": 0.172,
+          "p3": 0.2323,
+          "p4": 0.262,
+          "itm": 0.5935,
+          "mlOdds": 0.19969232342292514
+        },
+        {
+          "program": "7",
+          "name": "Yellow Card",
+          "p1": 0.1221,
+          "p2": 0.1318,
+          "p3": 0.1803,
+          "p4": 0.2163,
+          "itm": 0.4342,
+          "mlOdds": 0.1452307806712183
+        },
+        {
+          "program": "10",
+          "name": "Joe Shiesty",
+          "p1": 0.0951,
+          "p2": 0.111,
+          "p3": 0.1541,
+          "p4": 0.1921,
+          "itm": 0.3603,
+          "mlOdds": 0.11410989909881437
+        },
+        {
+          "program": "5",
+          "name": "Possiblemente",
+          "p1": 0.0721,
+          "p2": 0.0909,
+          "p3": 0.129,
+          "p4": 0.1667,
+          "itm": 0.2919,
+          "mlOdds": 0.07261539033560915
+        },
+        {
+          "program": "8",
+          "name": "Mondogetsbuckets",
+          "p1": 0.0661,
+          "p2": 0.0853,
+          "p3": 0.1219,
+          "p4": 0.1531,
+          "itm": 0.2732,
+          "mlOdds": 0.08875214374352229
+        },
+        {
+          "program": "1",
+          "name": "Wendelssohn",
+          "p1": 0.0511,
+          "p2": 0.0702,
+          "p3": 0.1012,
+          "p4": 0.1328,
+          "itm": 0.2224,
+          "mlOdds": 0.049923080855731286
+        },
+        {
+          "program": "6",
+          "name": "Its Bourbon Thirty",
+          "p1": 0.044,
+          "p2": 0.0627,
+          "p3": 0.0919,
+          "p4": 0.1225,
+          "itm": 0.1987,
+          "mlOdds": 0.049923080855731286
+        }
+      ]
+    },
+    {
+      "raceNumber": 6,
+      "fieldSize": 11,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 2,4,6 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 2 / 4,6,10,11 / 4,6,10,11 / 4,6,10,11 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "SPEED_DUEL",
+          "horseProgram": null,
+          "description": "3+ E-style horses (#2, #5, #8) \u2014 pace meltdown likely; favor closers (S-style) underneath.",
+          "sourceField": "style"
+        },
+        {
+          "code": "OVERLAY_CLOSER",
+          "horseProgram": "10",
+          "description": "#10 has best LP last race (112) but rates outside algo top-3 \u2014 closer overlay if pace flattens.",
+          "sourceField": "latePaceLast"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "2",
+          "name": "Dragoon Guard",
+          "p1": 0.242,
+          "p2": 0.1819,
+          "p3": 0.2476,
+          "p4": 0.2697,
+          "itm": 0.6714,
+          "mlOdds": 0.19480033713524808
+        },
+        {
+          "program": "4",
+          "name": "Be You",
+          "p1": 0.186,
+          "p2": 0.161,
+          "p3": 0.2147,
+          "p4": 0.2414,
+          "itm": 0.5618,
+          "mlOdds": 0.17315585523133162
+        },
+        {
+          "program": "6",
+          "name": "Tour Player",
+          "p1": 0.17,
+          "p2": 0.1532,
+          "p3": 0.2041,
+          "p4": 0.2322,
+          "itm": 0.5273,
+          "mlOdds": 0.15584026970819848
+        },
+        {
+          "program": "10",
+          "name": "Capital Idea",
+          "p1": 0.111,
+          "p2": 0.1171,
+          "p3": 0.1577,
+          "p4": 0.1907,
+          "itm": 0.3858,
+          "mlOdds": 0.12986689142349872
+        },
+        {
+          "program": "11",
+          "name": "Moonlight",
+          "p1": 0.077,
+          "p2": 0.0905,
+          "p3": 0.1248,
+          "p4": 0.1582,
+          "itm": 0.2924,
+          "mlOdds": 0.08657792761566581
+        },
+        {
+          "program": "7",
+          "name": "Will Take It",
+          "p1": 0.069,
+          "p2": 0.0835,
+          "p3": 0.1163,
+          "p4": 0.1436,
+          "itm": 0.2688,
+          "mlOdds": 0.08657792761566581
+        },
+        {
+          "program": "1",
+          "name": "Brotha Keny",
+          "p1": 0.047,
+          "p2": 0.0626,
+          "p3": 0.0891,
+          "p4": 0.1163,
+          "itm": 0.1987,
+          "mlOdds": 0.04870008428381202
+        },
+        {
+          "program": "3",
+          "name": "Banjo Chris",
+          "p1": 0.031,
+          "p2": 0.0454,
+          "p3": 0.068,
+          "p4": 0.0925,
+          "itm": 0.1444,
+          "mlOdds": 0.037104826120999634
+        }
+      ]
+    },
+    {
+      "raceNumber": 7,
+      "fieldSize": 9,
+      "edgeTier": "PARTIAL_EDGE",
+      "isDerby": false,
+      "confidence": "HIGH",
+      "totalCost": 1.1,
+      "plays": [
+        {
+          "structure": "Exacta forward",
+          "ticket": "EX 2/3 $0.50",
+          "cost": 0.5,
+          "rationale": "Forward the divergence \u2014 don't pay box premium for the public-supported leg.",
+          "confidence": "MEDIUM"
+        },
+        {
+          "structure": "Superfecta wheel",
+          "ticket": "SUPER 2-3-8,5,4/8,5,4 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Small super wheel under the forward exacta.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [],
+      "positionProbs": [
+        {
+          "program": "2",
+          "name": "Sweet Rebecca",
+          "p1": 0.278,
+          "p2": 0.1965,
+          "p3": 0.2797,
+          "p4": 0.309,
+          "itm": 0.7542,
+          "mlOdds": 0.2217474456830752
+        },
+        {
+          "program": "3",
+          "name": "Portfolio Duration",
+          "p1": 0.182,
+          "p2": 0.1645,
+          "p3": 0.2242,
+          "p4": 0.2604,
+          "itm": 0.5707,
+          "mlOdds": 0.15522321197815264
+        },
+        {
+          "program": "8",
+          "name": "Pin Up Betty",
+          "p1": 0.133,
+          "p2": 0.1364,
+          "p3": 0.187,
+          "p4": 0.227,
+          "itm": 0.4564,
+          "mlOdds": 0.17247023553128069
+        },
+        {
+          "program": "5",
+          "name": "Classic Q",
+          "p1": 0.095,
+          "p2": 0.1086,
+          "p3": 0.1517,
+          "p4": 0.1934,
+          "itm": 0.3553,
+          "mlOdds": 0.1108737228415376
+        },
+        {
+          "program": "4",
+          "name": "Temptable",
+          "p1": 0.091,
+          "p2": 0.1054,
+          "p3": 0.1476,
+          "p4": 0.1893,
+          "itm": 0.344,
+          "mlOdds": 0.08623511776564034
+        },
+        {
+          "program": "7",
+          "name": "Movin' On Up",
+          "p1": 0.066,
+          "p2": 0.0835,
+          "p3": 0.12,
+          "p4": 0.1538,
+          "itm": 0.2694,
+          "mlOdds": 0.05970123537621255
+        },
+        {
+          "program": "9",
+          "name": "Maggie Go",
+          "p1": 0.065,
+          "p2": 0.0825,
+          "p3": 0.1167,
+          "p4": 0.1525,
+          "itm": 0.2643,
+          "mlOdds": 0.08623511776564034
+        },
+        {
+          "program": "1",
+          "name": "Italian Soiree",
+          "p1": 0.063,
+          "p2": 0.0806,
+          "p3": 0.1144,
+          "p4": 0.1499,
+          "itm": 0.258,
+          "mlOdds": 0.07055600544461484
+        }
+      ]
+    },
+    {
+      "raceNumber": 8,
+      "fieldSize": 12,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 1,6,2 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 1 / 6,2,7,8 / 6,2,7,8 / 6,2,7,8 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: PP_OVERLAY. Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "PP_OVERLAY",
+          "horseProgram": "8",
+          "description": "#8 ranks 1 on Prime Power but 5th by ML odds \u2014 model overlay.",
+          "sourceField": "primePowerRank"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "1",
+          "name": "Englishman",
+          "p1": 0.225,
+          "p2": 0.1745,
+          "p3": 0.2321,
+          "p4": 0.2509,
+          "itm": 0.6316,
+          "mlOdds": 0.19564186423946914
+        },
+        {
+          "program": "6",
+          "name": "Crude Velocity",
+          "p1": 0.224,
+          "p2": 0.1741,
+          "p3": 0.2316,
+          "p4": 0.2504,
+          "itm": 0.6297,
+          "mlOdds": 0.2235907019879647
+        },
+        {
+          "program": "2",
+          "name": "Trouble Calling",
+          "p1": 0.141,
+          "p2": 0.1353,
+          "p3": 0.1781,
+          "p4": 0.2041,
+          "itm": 0.4544,
+          "mlOdds": 0.13042790949297942
+        },
+        {
+          "program": "7",
+          "name": "Crown the Buckeye",
+          "p1": 0.109,
+          "p2": 0.1143,
+          "p3": 0.152,
+          "p4": 0.1805,
+          "itm": 0.3753,
+          "mlOdds": 0.11179535099398236
+        },
+        {
+          "program": "8",
+          "name": "Creole Chrome",
+          "p1": 0.086,
+          "p2": 0.0969,
+          "p3": 0.1307,
+          "p4": 0.1601,
+          "itm": 0.3136,
+          "mlOdds": 0.08695193966198628
+        },
+        {
+          "program": "10",
+          "name": "Great White",
+          "p1": 0.052,
+          "p2": 0.0668,
+          "p3": 0.0942,
+          "p4": 0.1176,
+          "itm": 0.213,
+          "mlOdds": 0.06019749668906743
+        },
+        {
+          "program": "5",
+          "name": "Stop the Car",
+          "p1": 0.037,
+          "p2": 0.0515,
+          "p3": 0.0744,
+          "p4": 0.0976,
+          "itm": 0.1629,
+          "mlOdds": 0.03726511699799412
+        },
+        {
+          "program": "11",
+          "name": "One More Freud",
+          "p1": 0.037,
+          "p2": 0.0515,
+          "p3": 0.0744,
+          "p4": 0.0976,
+          "itm": 0.1629,
+          "mlOdds": 0.048910466059867284
+        }
+      ]
+    },
+    {
+      "raceNumber": 9,
+      "fieldSize": 14,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "LOW",
+      "totalCost": 0.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 4,12,8 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        }
+      ],
+      "angles": [],
+      "positionProbs": [
+        {
+          "program": "4",
+          "name": "Stark Contrast",
+          "p1": 0.187,
+          "p2": 0.1427,
+          "p3": 0.1734,
+          "p4": 0.1786,
+          "itm": 0.5031,
+          "mlOdds": 0.1568588024912545
+        },
+        {
+          "program": "12",
+          "name": "Remember Mamba",
+          "p1": 0.148,
+          "p2": 0.125,
+          "p3": 0.1515,
+          "p4": 0.1601,
+          "itm": 0.4245,
+          "mlOdds": 0.1425989113556859
+        },
+        {
+          "program": "8",
+          "name": "Greenwich Village",
+          "p1": 0.107,
+          "p2": 0.1014,
+          "p3": 0.1245,
+          "p4": 0.1369,
+          "itm": 0.3329,
+          "mlOdds": 0.11204200177946748
+        },
+        {
+          "program": "7",
+          "name": "Alpyland",
+          "p1": 0.102,
+          "p2": 0.0982,
+          "p3": 0.1208,
+          "p4": 0.1336,
+          "itm": 0.321,
+          "mlOdds": 0.08714377916180804
+        },
+        {
+          "program": "5",
+          "name": "Blackout Time",
+          "p1": 0.074,
+          "p2": 0.0782,
+          "p3": 0.0986,
+          "p4": 0.1134,
+          "itm": 0.2508,
+          "mlOdds": 0.07129945567784295
+        },
+        {
+          "program": "14",
+          "name": "Final Score",
+          "p1": 0.07,
+          "p2": 0.0751,
+          "p3": 0.0951,
+          "p4": 0.1078,
+          "itm": 0.2402,
+          "mlOdds": 0.08714377916180804
+        },
+        {
+          "program": "10",
+          "name": "Vasy",
+          "p1": 0.065,
+          "p2": 0.0711,
+          "p3": 0.0897,
+          "p4": 0.1035,
+          "itm": 0.2258,
+          "mlOdds": 0.07129945567784295
+        },
+        {
+          "program": "9",
+          "name": "Honey Dutch",
+          "p1": 0.055,
+          "p2": 0.0628,
+          "p3": 0.0805,
+          "p4": 0.0944,
+          "itm": 0.1983,
+          "mlOdds": 0.06033030865048249
+        }
+      ]
+    },
+    {
+      "raceNumber": 10,
+      "fieldSize": 11,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 6,2,1 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 6 / 2,1,7,5 / 2,1,7,5 / 2,1,7,5 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: TOP_LAYOFF. Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "TOP_LAYOFF",
+          "horseProgram": "6",
+          "description": "Algo top-1 #6 (Knightsbridge) is off 60 days \u2014 layoff risk; consider saver underneath.",
+          "sourceField": "daysSinceLast"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "6",
+          "name": "Knightsbridge",
+          "p1": 0.2977,
+          "p2": 0.1998,
+          "p3": 0.2835,
+          "p4": 0.3021,
+          "itm": 0.7811,
+          "mlOdds": 0.2768015568656631
+        },
+        {
+          "program": "2",
+          "name": "Cornucopian",
+          "p1": 0.1958,
+          "p2": 0.1709,
+          "p3": 0.2288,
+          "p4": 0.2549,
+          "itm": 0.5954,
+          "mlOdds": 0.1722320798275237
+        },
+        {
+          "program": "1",
+          "name": "Disco Time",
+          "p1": 0.1319,
+          "p2": 0.1354,
+          "p3": 0.1822,
+          "p4": 0.214,
+          "itm": 0.4495,
+          "mlOdds": 0.11072062274626523
+        },
+        {
+          "program": "7",
+          "name": "Imagination",
+          "p1": 0.0969,
+          "p2": 0.1099,
+          "p3": 0.1504,
+          "p4": 0.1845,
+          "itm": 0.3572,
+          "mlOdds": 0.11072062274626523
+        },
+        {
+          "program": "5",
+          "name": "Disruptor",
+          "p1": 0.0919,
+          "p2": 0.1059,
+          "p3": 0.1454,
+          "p4": 0.1797,
+          "itm": 0.3432,
+          "mlOdds": 0.08611603991376185
+        },
+        {
+          "program": "11",
+          "name": "Point Dume",
+          "p1": 0.043,
+          "p2": 0.0601,
+          "p3": 0.0885,
+          "p4": 0.1147,
+          "itm": 0.1917,
+          "mlOdds": 0.04844027245149104
+        },
+        {
+          "program": "10",
+          "name": "Banishing",
+          "p1": 0.037,
+          "p2": 0.0536,
+          "p3": 0.079,
+          "p4": 0.1056,
+          "itm": 0.1696,
+          "mlOdds": 0.05961879686337359
+        },
+        {
+          "program": "4",
+          "name": "Hall of Fame",
+          "p1": 0.032,
+          "p2": 0.0478,
+          "p3": 0.0719,
+          "p4": 0.0975,
+          "itm": 0.1517,
+          "mlOdds": 0.03690687424875508
+        }
+      ]
+    },
+    {
+      "raceNumber": 11,
+      "fieldSize": 10,
+      "edgeTier": "PARTIAL_EDGE",
+      "isDerby": false,
+      "confidence": "HIGH",
+      "totalCost": 1.1,
+      "plays": [
+        {
+          "structure": "Exacta forward",
+          "ticket": "EX 6/4 $0.50",
+          "cost": 0.5,
+          "rationale": "Forward the divergence \u2014 don't pay box premium for the public-supported leg.",
+          "confidence": "MEDIUM"
+        },
+        {
+          "structure": "Superfecta wheel",
+          "ticket": "SUPER 6-4-9,10,3/9,10,3 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Small super wheel under the forward exacta.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "OVERLAY_CLOSER",
+          "horseProgram": "7",
+          "description": "#7 has best LP last race (102) but rates outside algo top-3 \u2014 closer overlay if pace flattens.",
+          "sourceField": "latePaceLast"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "6",
+          "name": "Rhetorical",
+          "p1": 0.2507,
+          "p2": 0.1838,
+          "p3": 0.2513,
+          "p4": 0.2733,
+          "itm": 0.6858,
+          "mlOdds": 0.2245980126858865
+        },
+        {
+          "program": "4",
+          "name": "Program Trading",
+          "p1": 0.1838,
+          "p2": 0.1597,
+          "p3": 0.2129,
+          "p4": 0.24,
+          "itm": 0.5565,
+          "mlOdds": 0.15721860888012057
+        },
+        {
+          "program": "9",
+          "name": "Test Score",
+          "p1": 0.1419,
+          "p2": 0.1373,
+          "p3": 0.1834,
+          "p4": 0.214,
+          "itm": 0.4626,
+          "mlOdds": 0.17468734320013393
+        },
+        {
+          "program": "10",
+          "name": "Make Me King",
+          "p1": 0.0919,
+          "p2": 0.1027,
+          "p3": 0.1402,
+          "p4": 0.174,
+          "itm": 0.3348,
+          "mlOdds": 0.11229900634294325
+        },
+        {
+          "program": "3",
+          "name": "Asbury Park",
+          "p1": 0.0799,
+          "p2": 0.0929,
+          "p3": 0.1282,
+          "p4": 0.162,
+          "itm": 0.301,
+          "mlOdds": 0.08734367160006697
+        },
+        {
+          "program": "7",
+          "name": "Gold Phoenix",
+          "p1": 0.0659,
+          "p2": 0.0807,
+          "p3": 0.1132,
+          "p4": 0.1411,
+          "itm": 0.2598,
+          "mlOdds": 0.07146300403641843
+        },
+        {
+          "program": "1",
+          "name": "Corruption",
+          "p1": 0.0659,
+          "p2": 0.0807,
+          "p3": 0.1114,
+          "p4": 0.1411,
+          "itm": 0.258,
+          "mlOdds": 0.049130815275037674
+        },
+        {
+          "program": "5",
+          "name": "Mercante",
+          "p1": 0.0579,
+          "p2": 0.0733,
+          "p3": 0.1024,
+          "p4": 0.1314,
+          "itm": 0.2336,
+          "mlOdds": 0.06046869572312329
+        }
+      ]
+    },
+    {
+      "raceNumber": 12,
+      "fieldSize": 24,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": true,
+      "confidence": "HIGH",
+      "totalCost": 15.6,
+      "plays": [
+        {
+          "structure": "Superfecta 3-key wheel",
+          "ticket": "SUPER 1,6,18 / 1,6,18,12,9,8,15,20 / 1,6,18,12,9,8,15,20 / 1,6,18,12,9,8,15,20 @ $0.10",
+          "cost": 12.6,
+          "rationale": "Derby chaos: 3 keys (top-3 algo: 1,6,18) over top-8 wheel. Once-a-year priced inefficiency.",
+          "confidence": "HIGH"
+        },
+        {
+          "structure": "Trifecta key",
+          "ticket": "TRI KEY 1 / 6,18,12,9,8 / 6,18,12,9,8 @ $0.10",
+          "cost": 2.0,
+          "rationale": "Backup trifecta keying #1 over top-5.",
+          "confidence": "MEDIUM"
+        },
+        {
+          "structure": "Win",
+          "ticket": "WIN #1 $1.00",
+          "cost": 1.0,
+          "rationale": "Algo top-1 with 16.7% win probability.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "PP_OVERLAY",
+          "horseProgram": "20",
+          "description": "#20 ranks 2 on Prime Power but 8th by ML odds \u2014 model overlay.",
+          "sourceField": "primePowerRank"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "1",
+          "name": "Renegade",
+          "p1": 0.167,
+          "p2": 0.1203,
+          "p3": 0.1315,
+          "p4": 0.1249,
+          "itm": 0.4187,
+          "mlOdds": 0.14821677247305398
+        },
+        {
+          "program": "6",
+          "name": "Commandment",
+          "p1": 0.122,
+          "p2": 0.0992,
+          "p3": 0.109,
+          "p4": 0.107,
+          "itm": 0.3302,
+          "mlOdds": 0.10586912319503855
+        },
+        {
+          "program": "18",
+          "name": "Further Ado",
+          "p1": 0.111,
+          "p2": 0.0932,
+          "p3": 0.1028,
+          "p4": 0.102,
+          "itm": 0.3071,
+          "mlOdds": 0.10586912319503855
+        },
+        {
+          "program": "12",
+          "name": "Chief Wallabee",
+          "p1": 0.09,
+          "p2": 0.0807,
+          "p3": 0.0902,
+          "p4": 0.0917,
+          "itm": 0.2609,
+          "mlOdds": 0.08234265137391887
+        },
+        {
+          "program": "9",
+          "name": "The Puma",
+          "p1": 0.059,
+          "p2": 0.0594,
+          "p3": 0.0689,
+          "p4": 0.0734,
+          "itm": 0.1873,
+          "mlOdds": 0.06737126021502453
+        },
+        {
+          "program": "8",
+          "name": "So Happy",
+          "p1": 0.048,
+          "p2": 0.0509,
+          "p3": 0.0603,
+          "p4": 0.0645,
+          "itm": 0.1591,
+          "mlOdds": 0.04631774139782936
+        },
+        {
+          "program": "15",
+          "name": "Emerging Market",
+          "p1": 0.047,
+          "p2": 0.05,
+          "p3": 0.0589,
+          "p4": 0.0638,
+          "itm": 0.156,
+          "mlOdds": 0.04631774139782936
+        },
+        {
+          "program": "20",
+          "name": "Fulleffort",
+          "p1": 0.037,
+          "p2": 0.0417,
+          "p3": 0.0504,
+          "p4": 0.0559,
+          "itm": 0.1291,
+          "mlOdds": 0.03528970773167951
+        }
+      ]
+    },
+    {
+      "raceNumber": 13,
+      "fieldSize": 11,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 10,8,11 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 10 / 8,11,1,5 / 8,11,1,5 / 8,11,1,5 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: . Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "SPEED_DUEL",
+          "horseProgram": null,
+          "description": "3+ E-style horses (#2, #4, #3) \u2014 pace meltdown likely; favor closers (S-style) underneath.",
+          "sourceField": "style"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "10",
+          "name": "Buetane",
+          "p1": 0.212,
+          "p2": 0.1668,
+          "p3": 0.2206,
+          "p4": 0.24,
+          "itm": 0.5994,
+          "mlOdds": 0.22250940394262353
+        },
+        {
+          "program": "8",
+          "name": "Gilded Bandit",
+          "p1": 0.186,
+          "p2": 0.1563,
+          "p3": 0.2052,
+          "p4": 0.2268,
+          "itm": 0.5475,
+          "mlOdds": 0.1946957284497956
+        },
+        {
+          "program": "11",
+          "name": "Noble Affair",
+          "p1": 0.171,
+          "p2": 0.1493,
+          "p3": 0.1956,
+          "p4": 0.2186,
+          "itm": 0.5159,
+          "mlOdds": 0.14159689341803317
+        },
+        {
+          "program": "1",
+          "name": "Small Town",
+          "p1": 0.092,
+          "p2": 0.1,
+          "p3": 0.134,
+          "p4": 0.163,
+          "itm": 0.3259,
+          "mlOdds": 0.08653143486657582
+        },
+        {
+          "program": "5",
+          "name": "Hulkamania",
+          "p1": 0.081,
+          "p2": 0.0913,
+          "p3": 0.1235,
+          "p4": 0.1526,
+          "itm": 0.2958,
+          "mlOdds": 0.08653143486657582
+        },
+        {
+          "program": "2",
+          "name": "Heartily",
+          "p1": 0.073,
+          "p2": 0.0847,
+          "p3": 0.1154,
+          "p4": 0.1398,
+          "itm": 0.2731,
+          "mlOdds": 0.05990637798455249
+        },
+        {
+          "program": "4",
+          "name": "Ring Curl",
+          "p1": 0.048,
+          "p2": 0.0619,
+          "p3": 0.0866,
+          "p4": 0.111,
+          "itm": 0.1965,
+          "mlOdds": 0.0486739321124489
+        },
+        {
+          "program": "6",
+          "name": "Cruisin Chuck",
+          "p1": 0.043,
+          "p2": 0.0569,
+          "p3": 0.0806,
+          "p4": 0.1045,
+          "itm": 0.1805,
+          "mlOdds": 0.0486739321124489
+        }
+      ]
+    },
+    {
+      "raceNumber": 14,
+      "fieldSize": 14,
+      "edgeTier": "CHALK_MATCH",
+      "isDerby": false,
+      "confidence": "MEDIUM",
+      "totalCost": 6.6,
+      "plays": [
+        {
+          "structure": "Trifecta box (saver)",
+          "ticket": "TRI BOX 8,3,7 @ $0.10",
+          "cost": 0.6,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "confidence": "LOW"
+        },
+        {
+          "structure": "Superfecta angle (upset coverage)",
+          "ticket": "SUPER 8 / 3,7,5,9,6 / 3,7,5,9,6 / 3,7,5,9,6 @ $0.10",
+          "cost": 6.0,
+          "rationale": "Angle flag: LONE_SPEED; PP_OVERLAY; PP_OVERLAY. Wheel angle horses underneath top algo pick.",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "angles": [
+        {
+          "code": "LONE_SPEED",
+          "horseProgram": "13",
+          "description": "#13 is the only E-style horse \u2014 uncontested early lead likely.",
+          "sourceField": "style"
+        },
+        {
+          "code": "PP_OVERLAY",
+          "horseProgram": "6",
+          "description": "#6 ranks 1 on Prime Power but 8th by ML odds \u2014 model overlay.",
+          "sourceField": "primePowerRank"
+        },
+        {
+          "code": "PP_OVERLAY",
+          "horseProgram": "11",
+          "description": "#11 ranks 2 on Prime Power but 9th by ML odds \u2014 model overlay.",
+          "sourceField": "primePowerRank"
+        }
+      ],
+      "positionProbs": [
+        {
+          "program": "8",
+          "name": "Find No Fault",
+          "p1": 0.1411,
+          "p2": 0.1189,
+          "p3": 0.1419,
+          "p4": 0.1495,
+          "itm": 0.402,
+          "mlOdds": 0.14340383958569966
+        },
+        {
+          "program": "3",
+          "name": "Interrogator",
+          "p1": 0.1341,
+          "p2": 0.1152,
+          "p3": 0.1376,
+          "p4": 0.1459,
+          "itm": 0.387,
+          "mlOdds": 0.112674445388764
+        },
+        {
+          "program": "7",
+          "name": "Act Of Parliament",
+          "p1": 0.1191,
+          "p2": 0.1067,
+          "p3": 0.1281,
+          "p4": 0.1377,
+          "itm": 0.354,
+          "mlOdds": 0.112674445388764
+        },
+        {
+          "program": "5",
+          "name": "Don's Winner",
+          "p1": 0.0911,
+          "p2": 0.0889,
+          "p3": 0.1085,
+          "p4": 0.1205,
+          "itm": 0.2885,
+          "mlOdds": 0.08763567974681645
+        },
+        {
+          "program": "9",
+          "name": "Big Jake",
+          "p1": 0.0781,
+          "p2": 0.0797,
+          "p3": 0.0984,
+          "p4": 0.1113,
+          "itm": 0.2561,
+          "mlOdds": 0.08763567974681645
+        },
+        {
+          "program": "1",
+          "name": "Boylston",
+          "p1": 0.0771,
+          "p2": 0.0789,
+          "p3": 0.0976,
+          "p4": 0.1089,
+          "itm": 0.2536,
+          "mlOdds": 0.07170191979284983
+        },
+        {
+          "program": "14",
+          "name": "Brave Pilot",
+          "p1": 0.0751,
+          "p2": 0.0774,
+          "p3": 0.0952,
+          "p4": 0.1073,
+          "itm": 0.2477,
+          "mlOdds": 0.08763567974681645
+        },
+        {
+          "program": "6",
+          "name": "Prize Pick",
+          "p1": 0.0731,
+          "p2": 0.0759,
+          "p3": 0.0936,
+          "p4": 0.1058,
+          "itm": 0.2426,
+          "mlOdds": 0.06067085520933447
+        }
+      ]
+    }
+  ],
+  "exoticV3Total": 72.4,
+  "exoticV3Chains": [
+    {
+      "type": "pick3",
+      "races": [
+        7,
+        8,
+        9
+      ],
+      "single_leg": 7,
+      "tickets": "2 / 1,6,2 / 4,12,8",
+      "combos": 9,
+      "unit": 0.5,
+      "cost": 4.5
+    },
+    {
+      "type": "pick3",
+      "races": [
+        10,
+        11,
+        12
+      ],
+      "single_leg": 10,
+      "tickets": "6 / 6,4,9 / 1,6,18",
+      "combos": 9,
+      "unit": 0.5,
+      "cost": 4.5
+    },
+    {
+      "type": "pick4",
+      "races": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "single_leg": 10,
+      "tickets": "4,12,8 / 6 / 6,4,9 / 1,6,18",
+      "combos": 27,
+      "unit": 0.5,
+      "cost": 13.5
+    },
+    {
+      "type": "pick4",
+      "races": [
+        11,
+        12,
+        13,
+        14
+      ],
+      "single_leg": 11,
+      "tickets": "6 / 1,6,18 / 10,8,11 / 8,3,7",
+      "combos": 27,
+      "unit": 0.5,
+      "cost": 13.5
+    }
+  ]
 }
