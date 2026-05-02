@@ -10,15 +10,27 @@ Process a CD race card from raw-entries.json into:
 If results.json exists for the date, also produces:
   - backtest.md    (algo picks vs actual results, hit rate, payout-if-bet)
 
-Limited-data scoring approach (no Beyer/PP/class available from public sources):
-  1. Market-implied probability from ML odds, normalized within race
+Scoring approach:
+  1. Market-implied probability from ML odds, normalized within race (strips takeout)
   2. CD track-bias post-position adjustment via cd-context defaults
   3. Trainer/jockey tier bonuses (top CD performers per cd-context.ts)
-  4. Renormalized to sum to 1.0
+  4. Ability factor from BRIS Prime Power + last-3 Beyer (z-scored within field)
+  5. Renormalized to sum to 1.0
 
-Exotic logic uses Plackett-Luce ordering for joint probabilities.
+EDGE GUARDRAILS (added 2026-05-02 after DeepSeek + Kimi adversarial reviews):
+  The model is a market-shadow: scores are perturbations of normalized market
+  probabilities. When the algo's top-2 = market's top-2 (by ML odds), the
+  exacta-box "edge" is illusory — you're paying 22% takeout to bet two
+  market-supported horses. We now compute a `chalk_overlap` bin (0/1/2) per
+  race and downsize or PASS bet recommendations in the 2-overlap bin.
 
-Usage: python3 scripts/process_card.py 2026-04-26
+  Disabled by default (because reviewers correctly flagged them as overfits):
+    - chalk-doubt pool-disparity penalty (set DISABLE_CHALK_DOUBT=False to re-enable)
+    - intra-card style-bias override / Tweak B (pass --enable-tweak-b to re-enable)
+
+  Use --strict to force PASS on 2-overlap races (no bet placed at all).
+
+Usage: python3 scripts/process_card.py 2026-04-26 [--strict] [--enable-tweak-b] [--enable-chalk-doubt]
 """
 import csv
 import json
@@ -26,6 +38,11 @@ import math
 import sys
 from datetime import datetime
 from pathlib import Path
+
+# Edge-guardrail defaults. CLI flags override.
+DISABLE_CHALK_DOUBT = True   # was active through 2026-04-30; demoted per algo-perf-summary meta-lesson + reviewer feedback
+DISABLE_TWEAK_B = True       # intra-card style-bias override contaminates the algo (Kimi); off by default
+STRICT_EDGE_MODE = False     # if True, PASS on 2-overlap races instead of downsizing
 
 # --- CD track-bias defaults (mirrors web/app/lib/cd-context.ts CD_DEFAULT_BIASES) ---
 CD_BIASES = {
@@ -239,17 +256,17 @@ def _ability_factors(horses: list, race: dict) -> list[float]:
 
 
 def _pool_disparity_factor(h: dict, live_odds_rank: int | None = None) -> tuple[float, float]:
-    """Pool-disparity factor with DUAL-MODE handling (Tweak A, after R4).
+    """Pool-disparity factor — secondary signal only after 2026-05-02 review.
 
-    The W%-P% gap means different things at different price tiers:
-      - Live odds top-3 + W%-P% < -5: PUBLIC CHALK DOUBT → penalty ×0.7
+    The W%-P% gap captures three signals at different price tiers:
+      - Live odds top-3 + W%-P% < -5: PUBLIC CHALK DOUBT (gated by DISABLE_CHALK_DOUBT)
       - Live odds 5/1-12/1 + W%-P% < -3: SHARP WIN-BET → mild bonus ×1.05
       - Any tier + W%-P% > +1.5: SMART BOARD MONEY → mild bonus ×1.05
 
-    Validation:
-      Chalk-doubt (4/4 today): R1 BFL, R2 SV, R3 Spotted, R4 Theoretical — all flagged, all lost.
-      Mid-price W>>P (R4 #11 Plot, 7/1, W11/P7/S5): finished 2nd. Earlier we penalized him; this dual-mode bonuses him.
-      Smart board (R4 #4 Lexico W10/P15/S18): board signal not validated R4 (4th in photo) — keep mild only.
+    Chalk-doubt was 4/4 in claiming/maiden/allowance on 2026-04-30 then 0/3 in
+    stakes (R9 Lagynos, R10 Maximum Bourbon, R11 Cy Fair — all chalks won).
+    DeepSeek + Kimi adversarial reviews flagged this as an N=7 overfit. Now
+    OFF by default; controlled by module-level DISABLE_CHALK_DOUBT.
 
     Returns (gap_in_pct_points, multiplier).
     """
@@ -257,26 +274,22 @@ def _pool_disparity_factor(h: dict, live_odds_rank: int | None = None) -> tuple[
     pp = h.get("placePoolPct")
     if wp is None or pp is None:
         return (0.0, 1.0)
-    gap = float(pp) - float(wp)  # positive = board lean, negative = win-only lean
+    gap = float(pp) - float(wp)
     live = h.get("mlOdds") or 99.0
 
-    # Smart-money board lean (gap positive) → mild bonus regardless of price tier
     if gap > 1.5:
         bonus = 1.0 + min(0.05, 0.012 * gap)
         return (gap, bonus)
 
-    # Win-only lean (gap negative) — different meaning at different prices
     if gap < -3.0:
-        # If horse is a top-3 chalk by live odds → public chalk doubt → penalty
-        # The "top-3 chalk" check uses live_odds_rank if provided, else falls back to
-        # an absolute price threshold (live odds <= 3.0 = chalk territory).
         is_chalk = (live_odds_rank is not None and live_odds_rank <= 3) or (live <= 3.0)
         if is_chalk:
-            penalty = max(0.7, 1.0 + 0.05 * gap)  # -10% → 0.5 → clamp 0.7
+            if DISABLE_CHALK_DOUBT:
+                return (gap, 1.0)
+            penalty = max(0.7, 1.0 + 0.05 * gap)
             return (gap, penalty)
-        # Mid-priced (5/1-12/1) horse with win-only sharp money → mild bonus
         if 4.5 <= live <= 13.0 and gap < -3.0:
-            bonus = 1.0 + min(0.06, -0.010 * gap)  # gap=-5 → +5%
+            bonus = 1.0 + min(0.06, -0.010 * gap)
             return (gap, bonus)
     return (gap, 1.0)
 
@@ -420,12 +433,61 @@ def plackett_luce_pair(scored: list, k: int = 4) -> dict:
     return out
 
 
+def compute_chalk_overlap(scored: list, k: int = 2) -> dict:
+    """Compute overlap between algo top-k and market top-k (by ML odds rank).
+
+    Per DeepSeek + Kimi adversarial review (2026-05-02): the algo's "ordering edge"
+    over the market is unfalsifiable in the 2-overlap bin (where algo top-k =
+    market top-k). In that bin, the exacta box is just paying takeout to bet two
+    market-supported horses. Bet recommendations should be downsized or skipped.
+
+    Returns:
+        overlap_count: 0/1/2 = how many of algo's top-k are also in market's top-k
+        algo_topk: programs of algo top-k (highest score first)
+        market_topk: programs of market top-k (lowest ML odds first)
+        tier: "FULL_EDGE" | "PARTIAL_EDGE" | "CHALK_MATCH"
+    """
+    if len(scored) < k:
+        return {"overlap_count": 0, "algo_topk": [], "market_topk": [], "tier": "FULL_EDGE"}
+    algo_topk = [s["program"] for s in scored[:k]]
+    by_ml = sorted(scored, key=lambda s: float(s.get("mlOdds") or 99.0))
+    market_topk = [s["program"] for s in by_ml[:k]]
+    overlap = len(set(algo_topk) & set(market_topk))
+    if overlap >= k:
+        tier = "CHALK_MATCH"
+    elif overlap == 0:
+        tier = "FULL_EDGE"
+    else:
+        tier = "PARTIAL_EDGE"
+    return {
+        "overlap_count": overlap,
+        "algo_topk": algo_topk,
+        "market_topk": market_topk,
+        "tier": tier,
+    }
+
+
 def best_exotic_strategy(scored: list, race_type: str) -> dict:
     """Recommend an exotic bet structure based on score concentration.
-    Returns the PRIMARY rec; alt structures are returned in `alternates`."""
+    Returns the PRIMARY rec; alt structures are returned in `alternates`.
+
+    EDGE GUARDRAIL: computes chalk_overlap and downsizes (or PASSes in --strict
+    mode) when algo top-2 = market top-2. In that bin the algo has no
+    demonstrable edge over the market — see DeepSeek + Kimi adversarial reviews
+    2026-05-02.
+    """
+    overlap = compute_chalk_overlap(scored, k=2)
     n = len(scored)
     if n < 4:
-        return {"recommendation": "PASS — too small a field for exotic"}
+        return {
+            "recommendation": "PASS — too small a field for exotic",
+            "structure": "PASS",
+            "tickets": [],
+            "unit_cost": 0,
+            "total_cost": 0,
+            "chalk_overlap": overlap,
+            "edge_tier": overlap["tier"],
+        }
 
     top_score = scored[0]["score"]
     top2 = sum(s["score"] for s in scored[:2])
@@ -492,6 +554,44 @@ def best_exotic_strategy(scored: list, race_type: str) -> dict:
                 "hit_prob_est": top4 * 0.5,
             }],
         }
+
+    # Apply edge guardrail based on chalk_overlap
+    primary["chalk_overlap"] = overlap
+    primary["edge_tier"] = overlap["tier"]
+    if overlap["tier"] == "CHALK_MATCH":
+        if STRICT_EDGE_MODE:
+            return {
+                "recommendation": "PASS — algo top-2 = market top-2; no edge to monetize",
+                "structure": "PASS (CHALK MATCH)",
+                "tickets": [],
+                "unit_cost": 0,
+                "total_cost": 0,
+                "chalk_overlap": overlap,
+                "edge_tier": "CHALK_MATCH",
+                "rationale": (
+                    f"Algo top-2 ({'-'.join(overlap['algo_topk'])}) = market top-2. "
+                    "Paying 22% takeout on a market chalk box is negative-EV in expectation."
+                ),
+            }
+        # Non-strict: downsize 50% and add warning
+        if primary.get("unit_cost"):
+            primary["unit_cost"] = round(primary["unit_cost"] / 2.0, 2)
+        if primary.get("total_cost"):
+            primary["total_cost"] = round(primary["total_cost"] / 2.0, 2)
+        primary["rationale"] = (
+            f"⚠️ CHALK MATCH (algo top-2 = market top-2): downsized 50%. "
+            + primary.get("rationale", "")
+        )
+    elif overlap["tier"] == "PARTIAL_EDGE":
+        primary["rationale"] = (
+            f"PARTIAL EDGE (1 of algo top-2 not in market top-2): "
+            + primary.get("rationale", "")
+        )
+    elif overlap["tier"] == "FULL_EDGE":
+        primary["rationale"] = (
+            f"FULL EDGE (neither algo top-2 in market top-2): "
+            + primary.get("rationale", "")
+        )
     return primary
 
 
@@ -559,21 +659,59 @@ def write_races_csv(processed_races: list, out_path: Path):
 
 
 def write_picks_md(processed_races: list, date: str, out_path: Path):
+    # Aggregate edge-tier counts for the bankroll discipline header
+    tier_counts = {"FULL_EDGE": 0, "PARTIAL_EDGE": 0, "CHALK_MATCH": 0, "PASS": 0}
+    total_cost = 0.0
+    for r in processed_races:
+        ex = r.get("exotic") or {}
+        tier = ex.get("edge_tier") or "PASS"
+        tier_counts[tier] = tier_counts.get(tier, 0) + 1
+        total_cost += float(ex.get("total_cost") or 0)
+
     lines = [
         f"# CD {date} — Algo Picks & Exotic Recommendations",
         "",
-        f"_Generated {datetime.now().isoformat(timespec='seconds')} • BRIS-rich scoring._",
+        f"_Generated {datetime.now().isoformat(timespec='seconds')} • BRIS-rich scoring + edge guardrails._",
         "",
-        "Scoring inputs: ML odds (Benter anchor), post position, runstyle, jockey/trainer tier,",
-        "CD track-bias defaults, **Prime Power + best last-3 Beyer (z-scored within field)**, mud % (wet tracks).",
+        "Scoring inputs: ML odds (market anchor, takeout-stripped via field renorm), post position,",
+        "runstyle, jockey/trainer tier, CD track-bias defaults, **Prime Power + best last-3 Beyer",
+        "(z-scored within field)**, mud % (wet tracks).",
+        "",
+        "## Bankroll Discipline (edge-tier breakdown)",
+        "",
+        "| Tier | Meaning | Race count |",
+        "|---|---|---|",
+        f"| FULL EDGE | Algo top-2 has 0 horses in market top-2 | {tier_counts.get('FULL_EDGE', 0)} |",
+        f"| PARTIAL EDGE | Algo top-2 has 1 horse in market top-2 | {tier_counts.get('PARTIAL_EDGE', 0)} |",
+        f"| CHALK MATCH | Algo top-2 = market top-2 (downsized 50% / PASS in --strict) | {tier_counts.get('CHALK_MATCH', 0)} |",
+        f"| PASS | Field too small or no recommendation | {tier_counts.get('PASS', 0)} |",
+        "",
+        f"**Total recommended outlay:** ${total_cost:.2f}",
+        "",
+        "_Edge tiers are computed from the algo's own scores vs. ML-odds rank._",
+        "_2-overlap (CHALK MATCH) is the bin where the algo has no demonstrable edge over the market —_",
+        "_per DeepSeek + Kimi adversarial reviews 2026-05-02. Recommendations are downsized in that bin._",
         "",
         "---",
         "",
     ]
     for r in processed_races:
+        ex = r.get("exotic") or {}
+        tier = ex.get("edge_tier") or "PASS"
+        tier_label = {
+            "FULL_EDGE": "[FULL EDGE]",
+            "PARTIAL_EDGE": "[PARTIAL EDGE]",
+            "CHALK_MATCH": "[CHALK MATCH — downsized]",
+            "PASS": "[PASS]",
+        }.get(tier, "[?]")
+        overlap = ex.get("chalk_overlap") or {}
+        algo_top2 = "-".join(overlap.get("algo_topk", [])) or "?"
+        market_top2 = "-".join(overlap.get("market_topk", [])) or "?"
+
         lines.append(f"## R{r['raceNumber']} — {r['postTime']} • {r['distance']} {r['surface']} • ${r['purse']:,} • {r['raceType']}")
         if r.get("stakesName"):
             lines.append(f"**{r['stakesName']}**")
+        lines.append(f"_{tier_label} • algo top-2: {algo_top2} • market top-2 (ML): {market_top2}_")
         lines.append("")
         lines.append("| Rank | # | Horse | Jockey / Trainer | Post | ML | Style | PP | Beyer | Ability×| Score |")
         lines.append("|---|---|---|---|---|---|---|---|---|---|---|")
@@ -589,7 +727,6 @@ def write_picks_md(processed_races: list, date: str, out_path: Path):
                 f"{h.get('style','?')} | {pp} | {best_beyer} | "
                 f"{ab:.2f} | **{h['score']*100:.1f}%** |"
             )
-        ex = r["exotic"]
         lines.append("")
         lines.append(f"**Primary play:** {ex.get('structure', ex.get('recommendation','PASS'))}")
         if ex.get("tickets"):
@@ -749,52 +886,89 @@ def write_ts_static(processed_races: list, date: str, track: str, out_path: Path
 
 
 def write_backtest_md(processed_races: list, results: dict, date: str, out_path: Path):
-    """Compare algo top picks to actual results."""
+    """Compare algo top picks to actual results, stratified by chalk_overlap.
+
+    The stratification is the falsification test the adversarial reviewers asked
+    for: if positive ROI is concentrated in the 2-overlap (CHALK MATCH) bin, the
+    algo is paying takeout to bet market chalk and has no proven edge. Real
+    edge would show in the 0-overlap and 1-overlap bins.
+    """
     res_by_race = {r["raceNumber"]: r for r in results.get("races", [])}
     lines = [
-        f"# CD {date} — Backtest Report",
+        f"# CD {date} — Backtest Report (stratified by chalk-overlap)",
         "",
-        f"_Algo limited-data picks vs actual results from data/cd-{date}/results.json_",
+        f"_Algo picks vs actual results from data/cd-{date}/results.json._",
+        "_Stratification per DeepSeek + Kimi adversarial reviews 2026-05-02._",
         "",
-        "| R | Algo #1 | Algo #2 | Algo #3 | Winner | Algo Hit | Top-3 Hit | Win $ | Tri $ |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "| R | Tier | Algo #1 | Algo #2 | Winner | Top-1 | Top-3 | Algo top-2 | Mkt top-2 | Win $ | Box hit? |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
+    # Stratified totals
+    bins = {"FULL_EDGE": [], "PARTIAL_EDGE": [], "CHALK_MATCH": []}
     n_races = 0
     n_top1 = 0
     n_top3 = 0
     total_win_payout_if_bet = 0.0
     total_win_cost = 0.0
+
     for r in processed_races:
         rn = r["raceNumber"]
         result = res_by_race.get(rn)
         if not result:
             continue
         n_races += 1
+
+        ex = r.get("exotic") or {}
+        overlap = ex.get("chalk_overlap") or compute_chalk_overlap(r["scored"], k=2)
+        tier = overlap.get("tier", "FULL_EDGE")
+
+        algo_top2_progs = overlap.get("algo_topk", [])
+        market_top2_progs = overlap.get("market_topk", [])
         algo_top = [s["program"] for s in r["scored"][:3]]
         algo_top_names = [s["name"] for s in r["scored"][:3]]
-        winner_prog = result.get("winner", {}).get("program", "?")
+
+        winner_prog = str(result.get("winner", {}).get("program", "?"))
         winner_name = result.get("winner", {}).get("name", "?")
         win_payout = result.get("winPayout") or result.get("winner", {}).get("winPayout") or 0
-        tri_payout = result.get("trifectaPayout", 0) or 0
 
-        algo_hit = "✅" if str(winner_prog) == str(algo_top[0]) else "❌"
-        top3_hit = "✅" if str(winner_prog) in [str(p) for p in algo_top] else "❌"
+        # Determine if algo top-2 box "hit" (top 2 finishers in any order)
+        # We need actual top-2 finish from results — finish order
+        finish_order = result.get("finishOrder") or result.get("officialOrder") or []
+        if not finish_order:
+            # Fall back: if results format gives winner + place + show
+            place_prog = str(result.get("place", {}).get("program", ""))
+            finish_top2 = {winner_prog, place_prog} if place_prog else {winner_prog}
+        else:
+            finish_top2 = {str(p) for p in finish_order[:2]}
+        algo_box_hit = finish_top2 == set(str(p) for p in algo_top2_progs)
 
-        if str(winner_prog) == str(algo_top[0]):
+        algo_hit = "Y" if winner_prog == str(algo_top[0]) else "-"
+        top3_hit = "Y" if winner_prog in [str(p) for p in algo_top] else "-"
+
+        if winner_prog == str(algo_top[0]):
             n_top1 += 1
-            total_win_payout_if_bet += win_payout  # $2 win bet returns winPayout
-        total_win_cost += 2.0  # we'd bet $2 on top horse each race
-
-        if str(winner_prog) in [str(p) for p in algo_top]:
+            total_win_payout_if_bet += win_payout
+        total_win_cost += 2.0
+        if winner_prog in [str(p) for p in algo_top]:
             n_top3 += 1
 
+        bins.setdefault(tier, []).append({
+            "race": rn,
+            "winner": winner_prog,
+            "algo_top1_hit": winner_prog == str(algo_top[0]),
+            "algo_top2_box_hit": algo_box_hit,
+            "win_payout": float(win_payout) if win_payout else 0.0,
+        })
+
+        tier_short = {"FULL_EDGE": "FULL", "PARTIAL_EDGE": "PARTIAL", "CHALK_MATCH": "CHALK"}.get(tier, tier)
         lines.append(
-            f"| {rn} | #{algo_top[0]} {algo_top_names[0]} | "
-            f"#{algo_top[1]} {algo_top_names[1] if len(algo_top_names)>1 else ''} | "
-            f"#{algo_top[2] if len(algo_top)>2 else ''} {algo_top_names[2] if len(algo_top_names)>2 else ''} | "
+            f"| {rn} | {tier_short} | #{algo_top[0]} {algo_top_names[0]} | "
+            f"#{algo_top[1] if len(algo_top)>1 else ''} {algo_top_names[1] if len(algo_top_names)>1 else ''} | "
             f"#{winner_prog} {winner_name} | {algo_hit} | {top3_hit} | "
-            f"${win_payout:.2f} | ${tri_payout:.2f} |"
+            f"{'-'.join(algo_top2_progs)} | {'-'.join(market_top2_progs)} | "
+            f"${win_payout:.2f} | {'Y' if algo_box_hit else '-'} |"
         )
+
     lines.append("")
     if n_races > 0:
         net_pl = total_win_payout_if_bet - total_win_cost
@@ -802,15 +976,65 @@ def write_backtest_md(processed_races: list, results: dict, date: str, out_path:
         lines.append(f"**Top-3 hit rate**: {n_top3}/{n_races} = **{n_top3/n_races*100:.1f}%**")
         lines.append(f"**$2 WIN bet on top pick all card**: cost ${total_win_cost:.2f}, returned ${total_win_payout_if_bet:.2f}, net **${net_pl:+.2f}**")
         lines.append("")
-        lines.append("Caveats: limited-data mode (no Beyer/PP/class); ML-only signal heavily favored chalk.")
+
+    # Stratified attribution
+    lines.append("## Edge attribution (stratified)")
+    lines.append("")
+    lines.append("| Tier | Races | Top-1 hits | Box hits | $2 EX BOX cost | Notes |")
+    lines.append("|---|---|---|---|---|---|")
+    for tier in ("FULL_EDGE", "PARTIAL_EDGE", "CHALK_MATCH"):
+        rows = bins.get(tier, [])
+        if not rows:
+            lines.append(f"| {tier} | 0 | — | — | — | (no races in this bin) |")
+            continue
+        n = len(rows)
+        h1 = sum(1 for r in rows if r["algo_top1_hit"])
+        bh = sum(1 for r in rows if r["algo_top2_box_hit"])
+        cost = n * 2.0
+        note = ""
+        if tier == "CHALK_MATCH" and bh:
+            note = "Box hits in CHALK MATCH bin = riding market chalk, not edge"
+        elif tier == "FULL_EDGE" and bh:
+            note = "Box hits in FULL EDGE bin = real ordering edge"
+        elif tier == "PARTIAL_EDGE" and bh:
+            note = "Partial-edge wins = algo's marginal divergence from market"
+        lines.append(f"| {tier} | {n} | {h1}/{n} | {bh}/{n} | ${cost:.2f} | {note} |")
+
+    lines.append("")
+    lines.append("**How to read this:** the edge-claim hypothesis is that the algo finds")
+    lines.append("real ordering signal beyond the market. That signal would manifest as")
+    lines.append("box hits in the FULL EDGE and PARTIAL EDGE bins. If box hits cluster in")
+    lines.append("the CHALK MATCH bin, the algo is just paying takeout to bet two")
+    lines.append("market-supported horses — no edge.")
+    lines.append("")
     out_path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python3 process_card.py YYYY-MM-DD")
+    global DISABLE_CHALK_DOUBT, DISABLE_TWEAK_B, STRICT_EDGE_MODE
+    args = sys.argv[1:]
+    if not args:
+        print("Usage: python3 process_card.py YYYY-MM-DD [--strict] [--enable-tweak-b] [--enable-chalk-doubt]")
+        print("  --strict             PASS on chalk-match races (default: downsize 50%)")
+        print("  --enable-tweak-b     re-enable mid-card style-bias override (default: off)")
+        print("  --enable-chalk-doubt re-enable pool-disparity chalk-doubt penalty (default: off)")
         sys.exit(1)
-    date = sys.argv[1]
+    date = None
+    for a in args:
+        if a == "--strict":
+            STRICT_EDGE_MODE = True
+        elif a == "--enable-tweak-b":
+            DISABLE_TWEAK_B = False
+        elif a == "--enable-chalk-doubt":
+            DISABLE_CHALK_DOUBT = False
+        elif not a.startswith("--"):
+            date = a
+    if date is None:
+        print("ERROR: must provide YYYY-MM-DD argument")
+        sys.exit(1)
+
+    print(f"[flags] strict={STRICT_EDGE_MODE} chalk_doubt_disabled={DISABLE_CHALK_DOUBT} tweak_b_disabled={DISABLE_TWEAK_B}")
+
     repo = Path(__file__).resolve().parent.parent
     in_dir = repo / "data" / f"cd-{date}"
     in_path = in_dir / "raw-entries.json"
@@ -820,18 +1044,18 @@ def main():
     raw = json.loads(in_path.read_text())
     track = raw.get("track", "CD")
 
-    # Determine if today's intra-card style-bias override should activate.
-    # Trigger: 4+ races on the card have completed AND >= 3 winners were P/EP/S types
-    # (i.e., the chalk speed pattern is broken). Cheap to compute from results.json.
+    # Tweak B (intra-card style-bias override) — gated behind DISABLE_TWEAK_B.
+    # Reviewers correctly identified mid-card hand-tuning as algo contamination
+    # (Kimi 2026-05-02). Off by default; pass --enable-tweak-b to restore.
     res_path = in_dir / "results.json"
     today_override_active = False
-    if res_path.exists():
+    if not DISABLE_TWEAK_B and res_path.exists():
         try:
             res = json.loads(res_path.read_text(encoding="utf-8"))
             done = len(res.get("races", []))
             if done >= 4:
                 today_override_active = True
-                print(f"[bias] Intra-card style-override ACTIVE (4+ races done, applying TODAYS_BIAS_OVERRIDE)")
+                print(f"[bias] Tweak B ACTIVE (4+ races done; --enable-tweak-b override)")
         except Exception:
             pass
 
