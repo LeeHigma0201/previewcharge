@@ -1,0 +1,18 @@
+https://docs.google.com/spreadsheets/d/1sjDEqTjwFtXa4MMTyKSNiIzw3hjYrxefwYJlGJDyzJ0/edit
+
+Title: HorseGPT — CD 2026-05-02 Derby Day
+Created: 2026-05-02
+
+Tabs (gid):
+- Card (0) — 14 race rows: race info, post times, distances, surfaces, purses, stakes flags
+- Entries (1343826769) — 169 horses across full card with saddle/post/jockey/trainer/ML
+- Pools (1487302951) — empty, for live W/P/S pool % capture during race day
+- Horses (1417549449) — Derby R12 deep-dive: 24 horses with sire/dam_sire/Beyer/HRN/preps/style/key signals
+- Jockeys (2066285679) — 15 jockeys: hot/cold tier, YTD stats, Derby record, mounts
+- Trainers (1920720223) — 19 trainers: Derby lifetime record, 2026 runners, flags
+- Pace (2028078595) — empty, for per-race pace projections (Wave 2)
+- TrackBias (2090673642) — CD spring 2026 bias by surface/distance + Saturday weather (FAST)
+- DerbyTrends (129919148) — 20yr post records, last 20 winners, chalk drought (0/7), feeder wins
+- Results (TBD) — empty, post-race
+- Bets (TBD) — empty, my bets + outcomes
+- Scorecard (TBD) — empty, cumulative metrics

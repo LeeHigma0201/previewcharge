@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "scraped_at": "2026-05-02T03:50:00Z",
+    "sources": ["DRF national leaderboard YTD 4/30/2026", "BloodHorse", "HRN", "Yahoo Sports", "CD spring meet pages"],
+    "purpose": "Per-jockey hot/cold signal for algo tier_jockey adjustment on Derby Day card"
+  },
+  "summary": {
+    "hot": [
+      "Jose L. Ortiz — 5-for-13 on Oaks Day (5/1) including Kentucky Oaks G1; reigning CD spring meet title holder",
+      "Irad Ortiz Jr. — 4-win card 4/30; led Keeneland spring; 3 Derby prep wins; $10.9M earnings, 24.9% YTD",
+      "Flavien Prat — 27.8% YTD (highest of marquee group); set AQU 7-win record Nov 2025",
+      "Luis Saez — 3 graded stakes in 20 days incl La Troienne G1 5/1; rides Commandment in Derby"
+    ],
+    "neutral": [
+      "Juan J. Hernandez — 22.4% YTD, 59.3% top3 (highest of group); 17 mounts booked Derby week; rides Potente",
+      "Tyler Gaffalione — 15.9% but 4x CD spring champ, returning from 2025 injury",
+      "Manuel Franco — 22.9% YTD; won Wood Memorial on Albus (Derby mount)",
+      "Junior Alvarado — defending Derby champ (2025 Sovereignty); selective volume"
+    ],
+    "cold": [
+      "John Velazquez — 19.3% YTD, 42% top3; selective volume; rides Further Ado (top algo pick by Beyer)",
+      "Javier Castellano — 16.5%, 26.5% top3 (very low); rides The Puma",
+      "Brian J. Hernandez Jr. — 14.5%, 27.5% top3; returning from Sept 2025 accident; rides Six Speed",
+      "Mike E. Smith — only 54 starts YTD (semi-retired pace); rides longshot So Happy",
+      "Joel Rosario, Florent Geroux, Adam Beschizza — limited CD spring presence"
+    ]
+  },
+  "jockeys": [
+    {"name": "Irad Ortiz, Jr.", "ytd_starts": 445, "ytd_wins": 111, "ytd_win_pct": 0.249, "ytd_top3_pct": 0.620, "ytd_earnings": 10953008, "derby_record": "0-for-9 (best 4th)", "derby_2026_mount": "Renegade PP1", "streak": "hot", "notes": "4-win card 4/30 CD; led Keeneland spring; 3 Derby prep wins (Jeff Ruby/Fulleffort, Arkansas Derby/Renegade, Blue Grass/Further Ado)"},
+    {"name": "Jose L. Ortiz", "ytd_starts": 401, "ytd_wins": 102, "ytd_win_pct": 0.254, "ytd_top3_pct": 0.636, "ytd_earnings": 7262652, "derby_record": "0-for-10 (best 2nd)", "derby_2026_mount": "Golden Tempo PP19", "streak": "hot", "notes": "5-for-13 Oaks Day 5/1 incl Oaks G1 — hottest single-card in meet; 2025 CD spring meet title holder"},
+    {"name": "Flavien Prat", "ytd_starts": 345, "ytd_wins": 96, "ytd_win_pct": 0.278, "ytd_top3_pct": 0.548, "ytd_earnings": 10008038, "derby_record": "1-for-8 (won 2019 Country House via DQ)", "derby_2026_mount": "Emerging Market PP15", "streak": "hot", "notes": "Highest YTD win% of marquee group"},
+    {"name": "John R. Velazquez", "ytd_starts": 290, "ytd_wins": 56, "ytd_win_pct": 0.193, "ytd_top3_pct": 0.421, "ytd_earnings": 5960256, "derby_record": "3-for-26 (won 2011, 2017, 2020)", "derby_2026_mount": "Further Ado PP18", "streak": "neutral", "notes": "Hall of Famer; selective volume; would tie 4-Derby record with win"},
+    {"name": "Luis Saez", "ytd_starts": 410, "ytd_wins": 70, "ytd_win_pct": 0.171, "ytd_top3_pct": 0.410, "ytd_earnings": 5993521, "derby_record": "0-for-12 (best 3rd 2021)", "derby_2026_mount": "Commandment PP6", "streak": "hot", "notes": "Won La Troienne G1 5/1, Ben Ali G3 4/18, Jenny Wiley G2 4/11 — 3 graded in 20 days"},
+    {"name": "Tyler Gaffalione", "ytd_starts": 479, "ytd_wins": 76, "ytd_win_pct": 0.159, "ytd_top3_pct": 0.514, "ytd_earnings": 7621530, "derby_record": "0-for-7 (best 2nd Sierra Leone 2024)", "derby_2026_mount": "Fulleffort PP20 [SCRATCHED]", "streak": "neutral", "notes": "4x CD spring meet champ; returning from 2025 injury; mount Fulleffort scratched 4/30 — likely off Derby card"},
+    {"name": "Javier Castellano", "ytd_starts": 279, "ytd_wins": 46, "ytd_win_pct": 0.165, "ytd_top3_pct": 0.265, "ytd_earnings": null, "derby_record": "1-for-17 (won 2023 Mage)", "derby_2026_mount": "The Puma PP9", "streak": "neutral", "notes": "Same Mage connections — may be intentional rebook"},
+    {"name": "Brian Joseph Hernandez, Jr.", "ytd_starts": 200, "ytd_wins": 29, "ytd_win_pct": 0.145, "ytd_top3_pct": 0.275, "ytd_earnings": null, "derby_record": "1-for-? (won 2024 Mystik Dan)", "derby_2026_mount": "Six Speed PP17", "streak": "cold", "notes": "Returning from Sept 2025 injury; CD hometown rider; 2024 Derby winner"},
+    {"name": "Juan J. Hernandez", "ytd_starts": 241, "ytd_wins": 54, "ytd_win_pct": 0.224, "ytd_top3_pct": 0.593, "ytd_earnings": 4270349, "derby_record": "0-for-0 (Derby debut)", "derby_2026_mount": "Potente PP14", "streak": "neutral", "notes": "Highest top3% of group; 17 mounts Derby week; SoCal leading rider"},
+    {"name": "Junior Alvarado", "ytd_starts": 251, "ytd_wins": 40, "ytd_win_pct": 0.159, "ytd_top3_pct": 0.275, "ytd_earnings": null, "derby_record": "1-for-6 (won 2025 Sovereignty)", "derby_2026_mount": "Chief Wallabee PP12", "streak": "neutral", "notes": "Defending Derby champ; Mott's first-call rider"},
+    {"name": "Manuel Franco", "ytd_starts": 388, "ytd_wins": 89, "ytd_win_pct": 0.229, "ytd_top3_pct": 0.616, "ytd_earnings": 5764946, "derby_record": "0-for-6 (best 2nd Tiz the Law 2020)", "derby_2026_mount": "Albus PP2", "streak": "neutral", "notes": "Won Wood Memorial on Albus"},
+    {"name": "Mike E. Smith", "ytd_starts": 54, "ytd_wins": 10, "ytd_win_pct": 0.185, "ytd_top3_pct": 0.296, "ytd_earnings": null, "derby_record": "2-for-29 (won 2005 Giacomo, 2018 Justify)", "derby_2026_mount": "So Happy PP8", "streak": "cold", "notes": "59yo, semi-retired pace; would set oldest-Derby-jockey record if won"}
+  ]
+}

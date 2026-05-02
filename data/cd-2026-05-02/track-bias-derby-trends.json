@@ -1,0 +1,82 @@
+{
+  "_meta": {"scraped_at": "2026-05-02T03:55:00Z", "purpose": "CD spring 2026 bias + Derby 20yr historical patterns + Saturday weather"},
+  "weather_saturday": {
+    "condition": "Mostly sunny through 6pm; 16% precip at 6:57pm post time",
+    "temp_f": 60,
+    "wind_mph": 6,
+    "wind_dir": "N",
+    "track_dirt": "FAST",
+    "track_turf": "Firm",
+    "off_turf_risk": "NO",
+    "actionable": "Speed horses get full benefit of fast track. Turf races run as scheduled. No mud/slop scenario."
+  },
+  "cd_meet_bias_2026": {
+    "data_status": "MODELED — Equibase scrape blocked. Based on dry-meet historical norms",
+    "dirt_sprint": {"speed_bias_pct": 58, "rail": "+", "post_1_3_iv": 1.12, "post_4_7_iv": 1.05, "post_8plus_iv": 0.91, "winning_styles": {"E": 28, "EP": 30, "P": 22, "S": 14, "C": 6}},
+    "dirt_route": {"speed_bias_pct": 42, "rail": "0", "post_1_3_iv": 0.95, "post_4_7_iv": 1.08, "post_8plus_iv": 1.02, "winning_styles": {"E": 14, "EP": 22, "P": 28, "S": 24, "C": 12}, "notes": "Derby distance 1¼M rewards presser-stalker; pure front-runners overextended"},
+    "turf_inner_firm": {"speed_bias_pct": 35, "rail": "-", "winning_styles": {"E": 8, "EP": 18, "P": 24, "S": 32, "C": 18}, "notes": "Rail dead when not watered; closers strong"},
+    "turf_outer_firm": {"speed_bias_pct": 38, "rail": "-", "post_8plus_iv": 1.18, "notes": "Mild outside post edge"}
+  },
+  "derby_post_records_91yr": {
+    "1": "0-for-91 since 1986 Ferdinand — RENEGADE 2026 4-1 chalk faces 40-year drought",
+    "5": "11.0% — best inside post; Always Dreaming 2017, California Chrome 2014",
+    "6": "2.2% — historically POOR; COMMANDMENT 2026 6-1",
+    "7": "7.8% — Justify 2018, Street Sense 2007, Mandaloun 2021",
+    "8": "8.9% — Mage 2023, Mine That Bird 2009, Barbaro 2006; SO HAPPY 2026",
+    "10": "10.7% — strongest win rate, highest ITM (28.6%)",
+    "12": "3.9% moderate; CHIEF WALLABEE 2026 8-1",
+    "15": "10.2% EXCELLENT — Orb 2013, American Pharoah 2015 (started here); EMERGING MARKET 2026 15-1",
+    "17": "0-for-42 ALL TIME — DEAD POST; SIX SPEED 2026 50-1",
+    "18": "6.1% — Sovereignty 2025, American Pharoah 2015; FURTHER ADO 2026 6-1",
+    "20": "Rich Strike 2022 (80-1)",
+    "modern_outside_edge": "Since 2000: 11 of 21 winners from Post 13+"
+  },
+  "derby_winners_last_20yr": [
+    {"year": 2006, "horse": "Barbaro", "post": 8, "odds": "6-1", "style": "C/S"},
+    {"year": 2007, "horse": "Street Sense", "post": 7, "odds": "9-2", "style": "C"},
+    {"year": 2008, "horse": "Big Brown", "post": 20, "odds": "2-1", "style": "E/EP"},
+    {"year": 2009, "horse": "Mine That Bird", "post": 8, "odds": "50-1", "style": "C", "track": "Sloppy"},
+    {"year": 2010, "horse": "Super Saver", "post": 4, "odds": "8-1", "style": "EP/P", "track": "Sloppy"},
+    {"year": 2011, "horse": "Animal Kingdom", "post": 16, "odds": "21-1", "style": "C"},
+    {"year": 2012, "horse": "I'll Have Another", "post": 19, "odds": "15-1", "style": "C"},
+    {"year": 2013, "horse": "Orb", "post": 15, "odds": "5-1", "style": "C", "track": "Sloppy"},
+    {"year": 2014, "horse": "California Chrome", "post": 5, "odds": "5-2", "style": "EP/P"},
+    {"year": 2015, "horse": "American Pharoah", "post": 18, "odds": "5-2", "style": "EP"},
+    {"year": 2016, "horse": "Nyquist", "post": 13, "odds": "2.3-1", "style": "P"},
+    {"year": 2017, "horse": "Always Dreaming", "post": 5, "odds": "4.7-1", "style": "E/EP"},
+    {"year": 2018, "horse": "Justify", "post": 7, "odds": "2.9-1", "style": "E", "track": "Sloppy"},
+    {"year": 2019, "horse": "Country House (DQ winner)", "post": 20, "odds": "65-1", "style": "C", "track": "Sloppy"},
+    {"year": 2020, "horse": "Authentic", "post": 18, "odds": "8-1", "style": "E"},
+    {"year": 2021, "horse": "Mandaloun (DQ elevated)", "post": 7, "odds": "26-1 actual", "style": "P"},
+    {"year": 2022, "horse": "Rich Strike", "post": 20, "odds": "80-1", "style": "C"},
+    {"year": 2023, "horse": "Mage", "post": 8, "odds": "15-1", "style": "C"},
+    {"year": 2024, "horse": "Mystik Dan", "post": 3, "odds": "18-1", "style": "P/S"},
+    {"year": 2025, "horse": "Sovereignty", "post": 18, "odds": "7-1", "style": "C", "track": "Sloppy"}
+  ],
+  "winning_style_pct_20yr": {"E": 15, "EP": 20, "P": 15, "S": 15, "C": 35, "summary": "Closers dominate 35% — 20-horse fields create brutal pace pressures, fast fractions favor late-runners"},
+  "favorite_record": {
+    "all_time": "56 of 151 (37.1%)",
+    "last_20yr": "5 of 20 (25%)",
+    "last_7yr": "0 of 7 (chalk drought since Justify 2018)",
+    "every_chalk_since_2018_failed": ["2019 Maximum Security DQ", "2020 Tiz the Law 2nd", "2021 Essential Quality 3rd", "2022 Epicenter 2nd", "2023 Forte scratched", "2024 Sierra Leone 2nd", "2025 Journalism 2nd"],
+    "2026_implication": "Renegade 4-1 from Post 1 = double historical headwind"
+  },
+  "best_beyer_typical_winner": "95-106 in final prep — Mine That Bird 2009 sloppy outlier; Mage 2023 modest figs but explosive late",
+  "feeder_race_wins_last_20yr": {
+    "florida_derby": 3,
+    "blue_grass": 4,
+    "arkansas_derby": 3,
+    "santa_anita_derby": 2,
+    "wood_memorial": 1,
+    "louisiana_derby": 1
+  },
+  "japanese_shipper_record": "0-for-~12 all time. Best: Forever Young 2024 3rd at 7-1 from Post 11. 2026 entries: Wonder Dean (Post 10, 30-1), Danon Bourbon (Post 7, 20-1)",
+  "female_trainer_record": "0 wins all-time. DeVaux 2026 with Golden Tempo (Post 19, 30-1) bidding to break record",
+  "field_2026_handicapping": {
+    "best_post_style_combo": "Emerging Market — Post 15 (10.2%), closer style, Chad Brown (0-for-9 but seeking first Derby)",
+    "double_headwind": "Renegade — Post 1 (40-year drought) + ML chalk during 7-year chalk drought",
+    "dead_post_kills": "Six Speed — Post 17 NEVER produced winner; already had stamina concern after fading UAE Derby late",
+    "favorable_post_underrated": "Further Ado — Post 18 won 2 of last 11 (Sovereignty 2025, American Pharoah 2015); already field-best Beyer 106",
+    "moderate_post_concern": "Chief Wallabee Post 12 (3.9%) and Commandment Post 6 (2.2%) both face post-position headwinds despite strong form"
+  }
+}
