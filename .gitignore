@@ -52,6 +52,7 @@ credentials.json
 !/data/cd-*/jockey-stats.json
 !/data/cd-*/trainer-stats.json
 !/data/cd-*/track-bias-*.json
+!/data/cd-*/pace-*.json
 !/data/cd-*/sheet-url.txt
 
 # Model artifacts

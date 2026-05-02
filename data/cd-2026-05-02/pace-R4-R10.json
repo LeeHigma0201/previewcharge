@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "races": [4, 10],
+    "scraped_at": "2026-05-02T~01:35Z",
+    "WARNING": "Agent reported race outcomes that have NOT happened yet (R4 post 12:38 PM, R10 post 4:50 PM). Outcome claims STRIPPED. Pace maps + running styles + past-performance Beyers retained as PROJECTIONS only."
+  },
+  "R4": {
+    "race_name": "Derby City Distaff S. G1",
+    "post_et": "12:38 PM",
+    "distance": "7F",
+    "surface": "Dirt FAST",
+    "purse": 1000000,
+    "field_size": 6,
+    "running_styles": [
+      {"saddle": "1", "horse": "Usha", "style": "EP", "best_beyer_pp": 127, "notes": "Won La Brea G1 at 7F (127); Baffert; consistent front-half runner"},
+      {"saddle": "2", "horse": "Haulin Ice", "style": "E", "best_beyer_pp": 131, "notes": "Back-to-back wins Oaklawn (131, 125); was on turf yesterday so may not have early zeal today"},
+      {"saddle": "3", "horse": "Autumn Evening", "style": "S", "best_beyer_pp": 116, "notes": "Royal Delta G3 3rd; alternates surfaces; class question at G1"},
+      {"saddle": "4", "horse": "Ways and Means", "style": "S", "best_beyer_pp": 118, "notes": "Brown chalk 8/5; closer archetype; Spinaway runner-up"},
+      {"saddle": "5", "horse": "Splendora", "style": "EP", "best_beyer_pp": 118, "notes": "Baffert 2/1 second-choice; early-presser"},
+      {"saddle": "6", "horse": "R Disaster", "style": "E", "best_beyer_pp": 130, "notes": "Madison G1 3rd at 130; Hurricane Bertie G3 winner (121); LONE-SPEED candidate at 6/1"}
+    ],
+    "pace_scenario": {
+      "lone_speed_candidate": "R Disaster (#6) — only confirmed gate-to-wire E-style; Haulin Ice (the other E) raced on turf yesterday and may lack early kick",
+      "pace_type": "soft (projected)",
+      "key_note": "If Haulin Ice doesn't press, R Disaster gets uncontested lead. Soft pace favors the loose front + closers who don't get pace help"
+    },
+    "algo_top3_projection": [
+      {"saddle": "6", "horse": "R Disaster", "rationale": "LONE SPEED on a softer pace projection. Best peak Beyer 130. Hurricane Bertie G3 winner — sprint specialist"},
+      {"saddle": "1", "horse": "Usha", "rationale": "Best peak Beyer 127 (La Brea G1). Baffert filly. EP-style sits one off lone speed"},
+      {"saddle": "4", "horse": "Ways and Means", "rationale": "Chalk at 8/5; Brown closer archetype; class strongest in field"}
+    ],
+    "key_signal": "Soft-pace setup if R Disaster gets the front uncontested — true lone speed is rare in G1 sprints. Haulin Ice's turf-to-dirt 1-day turnaround is a yellow flag. Class chalk Ways and Means becomes a value play if pace flattens"
+  },
+  "R10": {
+    "race_name": "Churchill Downs S. G1",
+    "post_et": "4:50 PM",
+    "distance": "7F",
+    "surface": "Dirt FAST",
+    "purse": 1000000,
+    "field_size": 11,
+    "running_styles": [
+      {"saddle": "1", "horse": "Disco Time", "style": "EP", "best_beyer_pp": 129, "notes": "Cox; Not This Time sire; early-pressing"},
+      {"saddle": "2", "horse": "Cornucopian", "style": "EP", "best_beyer_pp": 132, "notes": "San Carlos G3 winner (132); Baffert/Hernandez; 6.5-7F specialist; HIGHEST PEAK BEYER IN FIELD"},
+      {"saddle": "3", "horse": "Macho Music", "style": "E", "best_beyer_pp": 131, "notes": "Pat Day Mile winner (129); Woody Stephens 7th (127); true front-runner"},
+      {"saddle": "4", "horse": "Hall of Fame", "style": "S", "best_beyer_pp": 110, "notes": "Asmussen/J.Ortiz; stalker; class step-up at 20/1"},
+      {"saddle": "5", "horse": "Disruptor", "style": "S", "best_beyer_pp": 125, "notes": "Pletcher/Irad; stalker — sits off hot pace"},
+      {"saddle": "6", "horse": "Knightsbridge", "style": "S", "best_beyer_pp": 125, "notes": "Mott/Alvarado 9/5 chalk; stalker/presser; tier J+T = STAKES GUARD ACTIVE"},
+      {"saddle": "7", "horse": "Imagination", "style": "EP", "best_beyer_pp": 128, "notes": "Baffert/Prat; Into Mischief sire; early-pressing"},
+      {"saddle": "8", "horse": "T O Elvis", "style": "C", "best_beyer_pp": 125, "notes": "Volatile sire (Takayanagi/Sakai); Japanese; classic closer profile"},
+      {"saddle": "9", "horse": "Crazy Mason", "style": "C", "best_beyer_pp": 132, "notes": "Sacco/Franco; Cigar Mile G2 3rd (132); Commonwealth G3 2nd (129); PURE CLOSER + tied for highest Beyer"},
+      {"saddle": "10", "horse": "Banishing", "style": "S", "best_beyer_pp": 112, "notes": "Jacobson/Gaffalione; limited G1 data"},
+      {"saddle": "11", "horse": "Point Dume", "style": "S", "best_beyer_pp": 108, "notes": "Kreiser/Gonzalez; 15/1 longshot"}
+    ],
+    "pace_scenario": {
+      "lone_speed_candidate": null,
+      "pace_type": "HOT (projected)",
+      "key_note": "Three E/EP horses (Macho Music, Disco Time, Cornucopian, Imagination) likely to duel. Hot pace + 7F = closers come into play"
+    },
+    "algo_top3_projection": [
+      {"saddle": "9", "horse": "Crazy Mason", "rationale": "Tied for best Beyer in field (132 Cigar Mile G2). Pure closer — ideal pace setup with Macho Music + Disco Time + Imagination guaranteed to duel"},
+      {"saddle": "2", "horse": "Cornucopian", "rationale": "Pre-race highest Beyer 132 (San Carlos G3). Baffert/Hernandez can rate. May be too close to pace duel"},
+      {"saddle": "6", "horse": "Knightsbridge", "rationale": "Mott/Alvarado 9/5 chalk. Stakes guard ACTIVE — do NOT fade on pool flags. Stalker style benefits from hot pace"}
+    ],
+    "key_signal": "Hot-pace setup likely with 4 EP/E horses. Best closers (Crazy Mason, T O Elvis) get pace help. Knightsbridge chalk is tier-J+T → algo doesn't fade despite chalk-doubt potential"
+  }
+}

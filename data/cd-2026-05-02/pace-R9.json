@@ -1,0 +1,48 @@
+{
+  "_meta": {"race": 9, "race_name": "American Turf S. G1", "scraped_at": "2026-05-02T~01:30Z"},
+  "race_info": {
+    "post_et": "4:06 PM",
+    "distance": "1 1/16M",
+    "surface": "Turf FIRM",
+    "purse": 1000000,
+    "field_size": 14,
+    "division": "3yo"
+  },
+  "running_styles": {
+    "1_Street_Beast": "EP",
+    "2_Lets_Be_Frank": "EP",
+    "3_Blinging_It_Back": "P",
+    "4_Stark_Contrast": "EP/P",
+    "5_Blackout_Time": "P (FIRST TURF START — dirt horse)",
+    "6_Black_Hornet": "P/S",
+    "7_Alpyland": "P",
+    "8_Greenwich_Village": "S/C",
+    "9_Honey_Dutch": "E/EP (primary pace)",
+    "10_Vasy": "P",
+    "11_Steel_Imperium": "P/S",
+    "12_Remember_Mamba": "C (pure closer)",
+    "13_Thousandsticks": "EP",
+    "14_Final_Score": "P/S"
+  },
+  "pace_scenario": {
+    "lone_speed": null,
+    "hot_pace_risk": "MODERATE-HIGH — 3 E/EP horses (Honey Dutch, Thousandsticks, Let's Be Frank)",
+    "pace_type": "Pressured/honest, expected 46-47s half mile",
+    "key_note": "Honey Dutch + Thousandsticks + Let's Be Frank all press; pace tires the front but doesn't melt down. Setup favors mid-pack stalkers + late closers."
+  },
+  "cd_turf_bias_applied": {
+    "rail": "DEAD (firm + dry)",
+    "closer_pct": 32,
+    "outside_post_iv": 1.15,
+    "impact": "Pressured pace + dead rail = stalkers/closers favored. Posts 8+ get IV boost (Greenwich Village, Honey Dutch, Vasy, Steel Imperium, Remember Mamba, Thousandsticks, Final Score)."
+  },
+  "algo_top4": [
+    {"rank": 1, "horse": "Stark Contrast", "pp": 4, "ml": "4-1", "style": "EP/P", "rationale": "Best figure in field; bypassed Derby for this spot (rare commitment signal); McCarthy preferred turf; BC Juvenile Turf 2nd; mid-pack stalker style fits pressured pace + dead rail; Prat elite turf rider"},
+    {"rank": 2, "horse": "Remember Mamba", "pp": 12, "ml": "9-2", "style": "C", "rationale": "3-for-3 pure closer; G3 Transylvania winner; post 12 IV boost; Kitten's Joy turf pedigree; Jose Ortiz HOT (5-for-13 Oaks Day); needs pace to collapse — projected honest splits check out"},
+    {"rank": 3, "horse": "Greenwich Village", "pp": 8, "ml": "6-1", "style": "S/C", "rationale": "Last-to-first closer 2 straight turf wins (Baffle, Pasadena); Baffert sharp this meet; post 8 IV; Quality Road pedigree fits CD firm; Juan Hernandez handles traffic; BEST VALUE EXACTA PARTNER"},
+    {"rank": 4, "horse": "Final Score", "pp": 14, "ml": "8-1", "style": "P/S", "rationale": "3-for-3 lifetime all turf; G2 Bourbon winner at 2; Pletcher/Irad don't spot-start without confidence; off layoff; wide post avoids rail dead zone; closer setup suits"}
+  ],
+  "fade": ["Honey Dutch (pace will catch up)", "Blackout Time (first turf start, was a dirt horse)"],
+  "exotics_angle": "Trifecta key: 4 (Stark Contrast) over [12 Remember Mamba, 8 Greenwich Village, 14 Final Score, 7 Alpyland]. Exacta: 4 over 12,8,14. Wide track-bias-aware tri 4-box: 4-12-8-14 → $12 at $0.50.",
+  "best_figure_in_field": "Stark Contrast (BC Juvenile Turf 2nd; consistent 90+ Beyer range)"
+}
