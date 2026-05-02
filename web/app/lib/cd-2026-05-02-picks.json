@@ -4889,5 +4889,3343 @@
       "unit": 0.5,
       "cost": 13.5
     }
-  ]
+  ],
+  "publicBias": {
+    "1": [
+      {
+        "program": "11",
+        "name": "Powershift",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 7,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Todd A. Pletcher (3)",
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 3.0
+      },
+      {
+        "program": "6",
+        "name": "Cromwell",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 7,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "trainer star: Cherie Devaux (2)",
+          "jockey star: Jose L. Ortiz (2)",
+          "sire star: Quality Road (2)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "9",
+        "name": "Winston Ave",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "sire star: Quality Road (2)"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "8",
+        "name": "Bourbon Dream",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): dream",
+          "sire star: Quality Road (2)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 5.0
+      },
+      {
+        "program": "1",
+        "name": "Bhatia",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Luis Saez (3)",
+          "sire star: Medaglia d'Oro (2)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "7",
+        "name": "Time to Strike",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: alliteration",
+          "trainer star: Mark E. Casse (1)",
+          "jockey star: John R. Velazquez (3)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "5",
+        "name": "Get Them Roses",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Tyler Gaffalione (1)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "2",
+        "name": "Stakeholder",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Brian J. Hernandez Jr. (1)",
+          "sire star: Authentic (2)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "3",
+        "name": "Silent Way",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Flavien Prat (2)"
+        ],
+        "mlOdds": 4.0
+      },
+      {
+        "program": "10",
+        "name": "Midnight Playboy",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Junior Alvarado (1)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "4",
+        "name": "Ingleborough",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)"
+        ],
+        "mlOdds": 20.0
+      }
+    ],
+    "2": [
+      {
+        "program": "8",
+        "name": "Taptastic",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 10,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Steven M. Asmussen (2)",
+          "jockey star: Irad Ortiz Jr. (3)",
+          "sire star: Tapit (3)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 3.0
+      },
+      {
+        "program": "4",
+        "name": "Memory",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 2,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "jockey star: Flavien Prat (2)",
+          "sire star: Uncle Mo (2)"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "6",
+        "name": "Make My Day",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); alliteration",
+          "trainer star: Todd A. Pletcher (3)",
+          "jockey star: Luis Saez (3)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "2",
+        "name": "Sovereign Law",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 1,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 7,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: Manuel Franco (1)",
+          "sire star: Into Mischief (3)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "3",
+        "name": "Steel",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (1 syllables)",
+          "jockey star: Junior Alvarado (1)",
+          "sire star: Tapit (3)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "1",
+        "name": "Out of the Woods",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); alliteration",
+          "jockey star: John R. Velazquez (3)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "5",
+        "name": "Seal Bay",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 1,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "sire star: Munnings (1)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "11",
+        "name": "Lincoln's Law",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); alliteration",
+          "jockey star: Tyler Gaffalione (1)"
+        ],
+        "mlOdds": 10.0
+      },
+      {
+        "program": "10",
+        "name": "J J Grey",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); alliteration",
+          "jockey star: Brian J. Hernandez Jr. (1)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "12",
+        "name": "Spirit of Royal",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): spirit"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "9",
+        "name": "Our Moneyman",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "7",
+        "name": "Very Connected",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 0,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [],
+        "mlOdds": 12.0
+      }
+    ],
+    "3": [
+      {
+        "program": "10",
+        "name": "Vibe",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 10,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "trainer star: Todd A. Pletcher (3)",
+          "jockey star: Luis Saez (3)",
+          "sire star: Into Mischief (3)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "12",
+        "name": "Praetor",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "trainer star: Chad C. Brown (2)",
+          "jockey star: Flavien Prat (2)",
+          "sire star: Into Mischief (3)"
+        ],
+        "mlOdds": 3.0
+      },
+      {
+        "program": "5",
+        "name": "John Hancock",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: Irad Ortiz Jr. (3)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "14",
+        "name": "Bullard",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: John R. Velazquez (3)",
+          "Outside posts mildly feared by casual public"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "4",
+        "name": "Comport",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "7",
+        "name": "Mitochondria",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "sire star: Medaglia d'Oro (2)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "6",
+        "name": "Who Dey",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Brian J. Hernandez Jr. (1)"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "8",
+        "name": "Racing Driver",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "9",
+        "name": "Keewaydin",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "2",
+        "name": "Vamos Carlitos",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "jockey star: Tyler Gaffalione (1)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "13",
+        "name": "Attache",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "11",
+        "name": "Aleman",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "1",
+        "name": "Arro Smash",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 0,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "3",
+        "name": "Special Caliber",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 0,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [],
+        "mlOdds": 30.0
+      }
+    ],
+    "4": [
+      {
+        "program": "5",
+        "name": "Splendora",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "jockey star: Flavien Prat (2)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 2.0
+      },
+      {
+        "program": "4",
+        "name": "Ways and Means",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Chad C. Brown (2)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 1.6
+      },
+      {
+        "program": "1",
+        "name": "Usha",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "6",
+        "name": "R Disaster",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Saffie A. Joseph Jr. (1)",
+          "jockey star: Tyler Gaffalione (1)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "3",
+        "name": "Autumn Evening",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "2",
+        "name": "Haulin Ice",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Saffie A. Joseph Jr. (1)"
+        ],
+        "mlOdds": 4.0
+      }
+    ],
+    "5": [
+      {
+        "program": "3",
+        "name": "My Boy Prince",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): prince",
+          "trainer star: Mark E. Casse (1)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 2.5
+      },
+      {
+        "program": "9",
+        "name": "Litigation",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 3.0
+      },
+      {
+        "program": "7",
+        "name": "Yellow Card",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Flavien Prat (2)"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "5",
+        "name": "Possiblemente",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "jockey star: Manuel Franco (1)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 10.0
+      },
+      {
+        "program": "8",
+        "name": "Mondogetsbuckets",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "jockey star: Tyler Gaffalione (1)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "10",
+        "name": "Joe Shiesty",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "1",
+        "name": "Wendelssohn",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Brian J. Hernandez Jr. (1)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "2",
+        "name": "Bear River",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "6",
+        "name": "Its Bourbon Thirty",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 0,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "4",
+        "name": "Full Disclosure",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 0,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [],
+        "mlOdds": 30.0
+      }
+    ],
+    "6": [
+      {
+        "program": "4",
+        "name": "Be You",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 9,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "trainer star: Todd A. Pletcher (3)",
+          "jockey star: John R. Velazquez (3)",
+          "sire star: Curlin (2)"
+        ],
+        "mlOdds": 3.5
+      },
+      {
+        "program": "2",
+        "name": "Dragoon Guard",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 3.0
+      },
+      {
+        "program": "6",
+        "name": "Tour Player",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Flavien Prat (2)",
+          "sire star: American Pharoah (2)"
+        ],
+        "mlOdds": 4.0
+      },
+      {
+        "program": "7",
+        "name": "Will Take It",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Brian J. Hernandez Jr. (1)",
+          "sire star: Tapit (3)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "9",
+        "name": "Scotland",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Luis Saez (3)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "11",
+        "name": "Moonlight",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "5",
+        "name": "Prince of Power",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: positive-connotation word(s): prince",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "8",
+        "name": "Bernin Hot",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 1,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "sire star: Bernardini (1)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "10",
+        "name": "Capital Idea",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "",
+        "rationale": [
+          "jockey star: Junior Alvarado (1)"
+        ],
+        "mlOdds": 5.0
+      },
+      {
+        "program": "1",
+        "name": "Brotha Keny",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Manuel Franco (1)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "3",
+        "name": "Banjo Chris",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 20.0
+      }
+    ],
+    "7": [
+      {
+        "program": "5",
+        "name": "Classic Q",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 7,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Mark E. Casse (1)",
+          "jockey star: John R. Velazquez (3)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "9",
+        "name": "Maggie Go",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Chad C. Brown (2)",
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "2",
+        "name": "Sweet Rebecca",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Tyler Gaffalione (1)",
+          "sire star: American Pharoah (2)"
+        ],
+        "mlOdds": 2.5
+      },
+      {
+        "program": "3",
+        "name": "Portfolio Duration",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "trainer star: Chad C. Brown (2)",
+          "jockey star: Flavien Prat (2)"
+        ],
+        "mlOdds": 4.0
+      },
+      {
+        "program": "7",
+        "name": "Movin' On Up",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Saffie A. Joseph Jr. (1)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "8",
+        "name": "Pin Up Betty",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 3.5
+      },
+      {
+        "program": "4",
+        "name": "Temptable",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Junior Alvarado (1)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "1",
+        "name": "Italian Soiree",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "jockey star: Manuel Franco (1)",
+          "sire star: Uncle Mo (2)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 10.0
+      },
+      {
+        "program": "6",
+        "name": "Vina Arana",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 0,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [],
+        "mlOdds": 20.0
+      }
+    ],
+    "8": [
+      {
+        "program": "10",
+        "name": "Great White",
+        "colorScore": 2,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 4,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "",
+        "rationale": [
+          "Gray (high public over-bet \u2014 visual salience)",
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): great,white",
+          "story: Gray + late-add scratchee like Rich Strike 2022 + name fluency stack"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "8",
+        "name": "Creole Chrome",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); alliteration",
+          "jockey star: Irad Ortiz Jr. (3)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "1",
+        "name": "Englishman",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 1,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Cherie Devaux (2)",
+          "jockey star: Jose L. Ortiz (2)",
+          "sire star: Maxfield (1)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 3.0
+      },
+      {
+        "program": "6",
+        "name": "Crude Velocity",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "trainer star: Bob Baffert (3)",
+          "jockey star: Florent Geroux (1)"
+        ],
+        "mlOdds": 2.5
+      },
+      {
+        "program": "2",
+        "name": "Trouble Calling",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Luis Saez (3)"
+        ],
+        "mlOdds": 5.0
+      },
+      {
+        "program": "5",
+        "name": "Stop the Car",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Tyler Gaffalione (1)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "3",
+        "name": "Work",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (1 syllables)",
+          "trainer star: Doug F. O'Neill (1)",
+          "sire star: American Pharoah (2)"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "7",
+        "name": "Crown the Buckeye",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Flavien Prat (2)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "9",
+        "name": "Lockstocknpharoah",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "sire star: American Pharoah (2)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "4",
+        "name": "Secured Freedom",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "jockey star: John R. Velazquez (3)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "12",
+        "name": "Baytown Dreamer",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "11",
+        "name": "One More Freud",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 0,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [],
+        "mlOdds": 15.0
+      }
+    ],
+    "9": [
+      {
+        "program": "8",
+        "name": "Greenwich Village",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "trainer star: Bob Baffert (3)",
+          "sire star: Quality Road (2)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "5",
+        "name": "Blackout Time",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Luis Saez (3)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 10.0
+      },
+      {
+        "program": "14",
+        "name": "Final Score",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Todd A. Pletcher (3)",
+          "jockey star: Irad Ortiz Jr. (3)",
+          "Outside posts mildly feared by casual public"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "12",
+        "name": "Remember Mamba",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "trainer star: Cherie Devaux (2)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "7",
+        "name": "Alpyland",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Mark E. Casse (1)",
+          "jockey star: Javier Castellano (2)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "10",
+        "name": "Vasy",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: John R. Velazquez (3)"
+        ],
+        "mlOdds": 10.0
+      },
+      {
+        "program": "4",
+        "name": "Stark Contrast",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Flavien Prat (2)"
+        ],
+        "mlOdds": 4.0
+      },
+      {
+        "program": "13",
+        "name": "Thousandsticks",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Joel Rosario (2)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "9",
+        "name": "Honey Dutch",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Tyler Gaffalione (1)"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "2",
+        "name": "Let's Be Frank",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Manuel Franco (1)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "3",
+        "name": "Blinging It Back",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Mark E. Casse (1)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "1",
+        "name": "Street Beast",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 1,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "sire star: Street Sense (1)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "6",
+        "name": "Black Hornet",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "11",
+        "name": "Steel Imperium",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)"
+        ],
+        "mlOdds": 30.0
+      }
+    ],
+    "10": [
+      {
+        "program": "5",
+        "name": "Disruptor",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 9,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Todd A. Pletcher (3)",
+          "jockey star: Irad Ortiz Jr. (3)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "7",
+        "name": "Imagination",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 2,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "trainer star: Bob Baffert (3)",
+          "jockey star: Flavien Prat (2)",
+          "sire star: Into Mischief (3)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "2",
+        "name": "Cornucopian",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 0,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 7,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "sire star: Into Mischief (3)"
+        ],
+        "mlOdds": 3.5
+      },
+      {
+        "program": "1",
+        "name": "Disco Time",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: John R. Velazquez (3)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "4",
+        "name": "Hall of Fame",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Steven M. Asmussen (2)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "11",
+        "name": "Point Dume",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "sire star: Into Mischief (3)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "3",
+        "name": "Macho Music",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); alliteration",
+          "jockey star: Javier Castellano (2)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "6",
+        "name": "Knightsbridge",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Junior Alvarado (1)"
+        ],
+        "mlOdds": 1.8
+      },
+      {
+        "program": "10",
+        "name": "Banishing",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Tyler Gaffalione (1)"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "9",
+        "name": "Crazy Mason",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Manuel Franco (1)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "8",
+        "name": "T O Elvis",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 30.0
+      }
+    ],
+    "11": [
+      {
+        "program": "1",
+        "name": "Corruption",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 3,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Mark E. Casse (1)",
+          "jockey star: John R. Velazquez (3)",
+          "sire star: Medaglia d'Oro (2)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "10",
+        "name": "Make Me King",
+        "colorScore": 0,
+        "nameFluencyScore": 3,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): king; alliteration",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "3",
+        "name": "Asbury Park",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Chad C. Brown (2)",
+          "jockey star: Flavien Prat (2)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "6",
+        "name": "Rhetorical",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 2.5
+      },
+      {
+        "program": "4",
+        "name": "Program Trading",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Chad C. Brown (2)",
+          "jockey star: Tyler Gaffalione (1)"
+        ],
+        "mlOdds": 4.0
+      },
+      {
+        "program": "8",
+        "name": "Astronomer",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Javier Castellano (2)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "5",
+        "name": "Mercante",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "2",
+        "name": "Dashman",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Joel Rosario (2)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "9",
+        "name": "Test Score",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Manuel Franco (1)"
+        ],
+        "mlOdds": 3.5
+      },
+      {
+        "program": "7",
+        "name": "Gold Phoenix",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 10.0
+      }
+    ],
+    "12": [
+      {
+        "program": "1",
+        "name": "Renegade",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 3,
+        "storyScore": 2,
+        "postSuperstitionScore": -1,
+        "consensusTrap": true,
+        "total": 12,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): renegade",
+          "trainer star: Todd A. Pletcher (3)",
+          "jockey star: Irad Ortiz Jr. (3)",
+          "sire star: Into Mischief (3)",
+          "story: ML chalk + Pletcher/Ortiz star stack \u2014 consensus trap dynamics",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)",
+          "AI/expert CONSENSUS pick \u2014 pool compressed; overlay gone"
+        ],
+        "mlOdds": 4.0
+      },
+      {
+        "program": "6",
+        "name": "Commandment",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 3,
+        "storyScore": 2,
+        "postSuperstitionScore": 0,
+        "consensusTrap": true,
+        "total": 12,
+        "flag": "PUBLIC_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): commandment",
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: Luis Saez (3)",
+          "sire star: Into Mischief (3)",
+          "story: AI consensus #1 \u2014 pool compressor",
+          "AI/expert CONSENSUS pick \u2014 pool compressed; overlay gone"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "19",
+        "name": "Golden Tempo",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 2,
+        "storyScore": 4,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 12,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): golden",
+          "trainer star: Cherie Devaux (2)",
+          "jockey star: Jose L. Ortiz (2)",
+          "sire star: Curlin (2)",
+          "story: Cherie DeVaux first-female-Derby-winner narrative \u2014 NBC pre-race feature"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "8",
+        "name": "So Happy",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 5,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): happy",
+          "story: Mike Smith oldest-winning-jockey chase + trainer Glatt tragedy stack",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "21",
+        "name": "Great White",
+        "colorScore": 2,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 4,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 8,
+        "flag": "",
+        "rationale": [
+          "Gray (high public over-bet \u2014 visual salience)",
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): great,white",
+          "story: Gray + late-add scratchee like Rich Strike 2022 + name fluency stack"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "18",
+        "name": "Further Ado",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": true,
+        "total": 6,
+        "flag": "CONSENSUS_TRAP",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: John R. Velazquez (3)",
+          "AI/expert CONSENSUS pick \u2014 pool compressed; overlay gone"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "14",
+        "name": "Potente",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 0,
+        "sireStarScore": 3,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "sire star: Into Mischief (3)",
+          "Outside posts mildly feared by casual public"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "7",
+        "name": "Danon Bourbon",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 1,
+        "storyScore": 3,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "sire star: Maxfield (1)",
+          "story: Japan undefeated 3-for-3 / 'homecoming' international story"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "4",
+        "name": "Litmus Test",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 1,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "story: Baffert name on a longshot"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "20",
+        "name": "Fulleffort",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: Tyler Gaffalione (1)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "16",
+        "name": "Pavlovian",
+        "colorScore": 2,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 1,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "Gray (high public over-bet \u2014 visual salience)",
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Doug F. O'Neill (1)",
+          "story: Gray (secondary; Great White soaks the gray narrative)",
+          "Outside posts mildly feared by casual public"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "10",
+        "name": "Wonder Dean",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 2,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): wonder",
+          "story: Japan secondary international hype"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "12",
+        "name": "Chief Wallabee",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): chief",
+          "jockey star: Junior Alvarado (1)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "9",
+        "name": "The Puma",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Javier Castellano (2)"
+        ],
+        "mlOdds": 10.0
+      },
+      {
+        "program": "15",
+        "name": "Emerging Market",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "trainer star: Chad C. Brown (2)",
+          "jockey star: Flavien Prat (2)",
+          "Outside posts mildly feared by casual public"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "5",
+        "name": "Right to Party",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "17",
+        "name": "Six Speed",
+        "colorScore": 0,
+        "nameFluencyScore": 3,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables); positive-connotation word(s): speed; alliteration",
+          "jockey star: Brian J. Hernandez Jr. (1)",
+          "Post 17 is feared as 'death post' but recent winners came from there \u2014 slight overlay"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "13",
+        "name": "Silent Tactic",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "trainer star: Mark E. Casse (1)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "2",
+        "name": "Albus",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Manuel Franco (1)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "23",
+        "name": "Robusta",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 1,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Doug F. O'Neill (1)"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "11",
+        "name": "Incredibolt",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "3",
+        "name": "Intrepido",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "24",
+        "name": "Corona de Oro",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "jockey star: Brian J. Hernandez Jr. (1)"
+        ],
+        "mlOdds": 50.0
+      },
+      {
+        "program": "22",
+        "name": "Ocelli",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)"
+        ],
+        "mlOdds": 50.0
+      }
+    ],
+    "13": [
+      {
+        "program": "10",
+        "name": "Buetane",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 7,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 2.5
+      },
+      {
+        "program": "11",
+        "name": "Noble Affair",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): noble",
+          "trainer star: Steven M. Asmussen (2)",
+          "jockey star: Jose L. Ortiz (2)"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "9",
+        "name": "Thunder Buck",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): thunder",
+          "jockey star: Luis Saez (3)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "5",
+        "name": "Hulkamania",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Tyler Gaffalione (1)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "2",
+        "name": "Heartily",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: John R. Velazquez (3)"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "8",
+        "name": "Gilded Bandit",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)",
+          "jockey star: Junior Alvarado (1)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 3.0
+      },
+      {
+        "program": "1",
+        "name": "Small Town",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 1,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: Flavien Prat (2)",
+          "sire star: Speightstown (1)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "4",
+        "name": "Ring Curl",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "sire star: Curlin (2)"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "3",
+        "name": "Red Lad",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "sire star: American Pharoah (2)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "6",
+        "name": "Cruisin Chuck",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); alliteration"
+        ],
+        "mlOdds": 15.0
+      },
+      {
+        "program": "7",
+        "name": "Sav'n Money",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Brian J. Hernandez Jr. (1)"
+        ],
+        "mlOdds": 20.0
+      }
+    ],
+    "14": [
+      {
+        "program": "7",
+        "name": "Act Of Parliament",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 7,
+        "flag": "",
+        "rationale": [
+          "trainer star: Brad H. Cox (2)",
+          "jockey star: Luis Saez (3)",
+          "sire star: Quality Road (2)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "5",
+        "name": "Don's Winner",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 2,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): winner",
+          "jockey star: Jose L. Ortiz (2)",
+          "Post 5 is the most-winning Derby post \u2014 public over-bets the superstition"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "9",
+        "name": "Big Jake",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 3,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 6,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "trainer star: Bob Baffert (3)",
+          "jockey star: Flavien Prat (2)"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "3",
+        "name": "Interrogator",
+        "colorScore": 0,
+        "nameFluencyScore": 0,
+        "trainerStarScore": 2,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 5,
+        "flag": "",
+        "rationale": [
+          "trainer star: Steven M. Asmussen (2)",
+          "jockey star: Irad Ortiz Jr. (3)"
+        ],
+        "mlOdds": 6.0
+      },
+      {
+        "program": "6",
+        "name": "Prize Pick",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); alliteration",
+          "jockey star: Joel Rosario (2)"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "13",
+        "name": "Noble Anthem",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 2,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): noble",
+          "jockey star: Javier Castellano (2)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "12",
+        "name": "Big Braciole",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 4,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); alliteration",
+          "sire star: Justify (2)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "8",
+        "name": "Find No Fault",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 1,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "jockey star: Tyler Gaffalione (1)",
+          "Post 8 historically strong \u2014 modest public premium"
+        ],
+        "mlOdds": 4.5
+      },
+      {
+        "program": "1",
+        "name": "Boylston",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 3,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "jockey star: John R. Velazquez (3)",
+          "Post 1 carries 'rail curse' narrative \u2014 public UNDER-bets (creates overlay)"
+        ],
+        "mlOdds": 10.0
+      },
+      {
+        "program": "2",
+        "name": "Bestball",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 2,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 3,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (2 syllables)",
+          "sire star: Justify (2)"
+        ],
+        "mlOdds": 30.0
+      },
+      {
+        "program": "11",
+        "name": "Great Moment",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables); positive-connotation word(s): great"
+        ],
+        "mlOdds": 12.0
+      },
+      {
+        "program": "10",
+        "name": "Chianti Town",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 1,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 2,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (3 syllables)",
+          "sire star: Speightstown (1)"
+        ],
+        "mlOdds": 20.0
+      },
+      {
+        "program": "14",
+        "name": "Brave Pilot",
+        "colorScore": 0,
+        "nameFluencyScore": 2,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": -1,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables); positive-connotation word(s): brave",
+          "Outside posts mildly feared by casual public"
+        ],
+        "mlOdds": 8.0
+      },
+      {
+        "program": "4",
+        "name": "Sleeping Warrior",
+        "colorScore": 0,
+        "nameFluencyScore": 1,
+        "trainerStarScore": 0,
+        "jockeyStarScore": 0,
+        "sireStarScore": 0,
+        "storyScore": 0,
+        "postSuperstitionScore": 0,
+        "consensusTrap": false,
+        "total": 1,
+        "flag": "PUBLIC_OVERLAY",
+        "rationale": [
+          "name fluency: easy phonology (4 syllables)"
+        ],
+        "mlOdds": 15.0
+      }
+    ]
+  },
+  "smartDerby": {
+    "super": {
+      "structure": "Anti-Public Derby Super (fade traps in keys)",
+      "keys_pos1": "12,9,15",
+      "keys_pos2_4": "1,6,18,12,9,8,15",
+      "ticket": "SUPER 12,9,15 / 1,6,18,12,9,8,15 / 1,6,18,12,9,8,15 / 1,6,18,12,9,8,15 @ $0.10",
+      "cost": 9.0,
+      "rationale": "Public traps in this Derby: #1,6,18 (over-bet by casual money + AI consensus). Smart structure keys non-trap algo picks (12,9) + top overlay #15 (Emerging Market @ 15.0/1) \u2014 uses traps in ITM coverage.",
+      "traps_faded": [
+        "1",
+        "6",
+        "18"
+      ],
+      "overlays_used": [
+        "15",
+        "13",
+        "11"
+      ]
+    },
+    "place": {
+      "structure": "Place bet on top public overlay",
+      "horse": "#15 Emerging Market",
+      "ticket": "PLACE #15 $2.00",
+      "cost": 2.0,
+      "rationale": "#15 Emerging Market (15.0/1) is a PUBLIC_OVERLAY \u2014 under-bet by casual money (low fluency name, no story, unfamiliar trainer/jockey). Place bet returns capital if hits 1st OR 2nd \u2014 Derby chaos covers a lot at this price."
+    },
+    "totalCost": 11.0
+  }
 }

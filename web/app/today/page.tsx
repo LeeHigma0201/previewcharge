@@ -44,6 +44,36 @@ interface PickChain {
   unit: number;
   cost: number;
 }
+interface BiasRow {
+  program: string;
+  name: string;
+  total: number;
+  flag: string;
+  rationale: string[];
+  mlOdds: number | null;
+  colorScore: number;
+  storyScore: number;
+  trainerStarScore: number;
+  jockeyStarScore: number;
+  consensusTrap: boolean;
+}
+interface SmartDerbySuper {
+  structure: string;
+  keys_pos1: string;
+  keys_pos2_4: string;
+  ticket: string;
+  cost: number;
+  rationale: string;
+  traps_faded: string[];
+  overlays_used: string[];
+}
+interface SmartDerbyPlace {
+  structure: string;
+  horse: string;
+  ticket: string;
+  cost: number;
+  rationale: string;
+}
 
 const TIER_BADGE: Record<string, string> = {
   FULL_EDGE: "bg-emerald-600 text-white",
@@ -69,6 +99,8 @@ export default function TodayPage() {
   const totalV3 = picks.exoticV3Total ?? 0;
   const totalChains = chains.reduce((s, c) => s + c.cost, 0);
   const bettable = v3.filter((r) => r.totalCost > 0).length;
+  const bias = (picks.publicBias ?? {}) as Record<string, BiasRow[]>;
+  const smartDerby = picks.smartDerby as { super: SmartDerbySuper; place: SmartDerbyPlace; totalCost: number } | undefined;
 
   return (
     <main className="min-h-screen bg-black text-white p-4 md:p-8 space-y-6">
@@ -94,6 +126,45 @@ export default function TodayPage() {
         </p>
       </header>
 
+      {smartDerby && (
+        <section className="border-2 border-emerald-400 rounded-lg bg-gradient-to-br from-emerald-950/40 to-black p-5">
+          <header className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
+            <div>
+              <h2 className="text-3xl font-black text-emerald-300">SMART DERBY — Anti-Public Strategy</h2>
+              <p className="text-xs text-zinc-400">R12 Kentucky Derby 152 · structured to fade public-money traps + key under-bet overlays</p>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-zinc-500">Total smart-Derby outlay</div>
+              <div className="text-2xl font-black text-emerald-400">${smartDerby.totalCost.toFixed(2)}</div>
+            </div>
+          </header>
+          <div className="space-y-3 mt-3">
+            <div className="border border-emerald-700/40 rounded p-3 bg-black/40">
+              <div className="flex items-baseline justify-between flex-wrap gap-2 mb-1">
+                <span className="text-sm font-bold text-emerald-300">{smartDerby.super.structure}</span>
+                <span className="font-mono font-bold text-emerald-400">${smartDerby.super.cost.toFixed(2)}</span>
+              </div>
+              <div className="font-mono text-sm text-emerald-300 break-all mb-2">{smartDerby.super.ticket}</div>
+              <p className="text-xs text-zinc-400 leading-relaxed mb-1">{smartDerby.super.rationale}</p>
+              <div className="text-[11px] mt-2 flex gap-4 flex-wrap">
+                <span className="text-rose-400">Faded (traps): #{smartDerby.super.traps_faded.join(", #")}</span>
+                <span className="text-emerald-400">Keyed (overlays): #{smartDerby.super.overlays_used.join(", #")}</span>
+              </div>
+            </div>
+            {smartDerby.place && (
+              <div className="border border-emerald-700/40 rounded p-3 bg-black/40">
+                <div className="flex items-baseline justify-between flex-wrap gap-2 mb-1">
+                  <span className="text-sm font-bold text-emerald-300">{smartDerby.place.structure}: {smartDerby.place.horse}</span>
+                  <span className="font-mono font-bold text-emerald-400">${smartDerby.place.cost.toFixed(2)}</span>
+                </div>
+                <div className="font-mono text-sm text-emerald-300 mb-2">{smartDerby.place.ticket}</div>
+                <p className="text-xs text-zinc-400 leading-relaxed">{smartDerby.place.rationale}</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       <section className="space-y-3">
         {v3.map((r) => {
           const tier = TIER_BADGE[r.edgeTier] ?? "bg-zinc-700 text-zinc-300";
@@ -111,6 +182,27 @@ export default function TodayPage() {
                 </div>
                 <span className="text-emerald-300 font-mono font-bold text-lg">${r.totalCost.toFixed(2)}</span>
               </header>
+
+              {bias[String(r.raceNumber)] && bias[String(r.raceNumber)].some((b) => b.flag) && (
+                <div className="px-4 py-2 border-b border-zinc-900 bg-black/40">
+                  <div className="text-[10px] uppercase text-zinc-500 mb-1">Public-money flags</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {bias[String(r.raceNumber)].filter((b) => b.flag).map((b) => {
+                      const cls =
+                        b.flag === "PUBLIC_TRAP"
+                          ? "bg-rose-700/40 text-rose-300 border border-rose-700/40"
+                          : b.flag === "PUBLIC_OVERLAY"
+                          ? "bg-emerald-700/30 text-emerald-300 border border-emerald-700/40"
+                          : "bg-amber-700/30 text-amber-300 border border-amber-700/40";
+                      return (
+                        <span key={b.program} className={`text-[10px] px-2 py-0.5 rounded ${cls}`} title={b.rationale.join(" · ")}>
+                          {b.flag === "PUBLIC_TRAP" ? "FADE" : b.flag === "PUBLIC_OVERLAY" ? "KEY" : "TRAP"} #{b.program} {b.name} ({b.mlOdds ?? "—"}/1) [score {b.total}]
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {r.angles.length > 0 && (
                 <div className="px-4 py-2 border-b border-zinc-900 bg-black/40">
