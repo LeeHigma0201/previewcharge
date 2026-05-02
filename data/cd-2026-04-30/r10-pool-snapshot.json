@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "race": 10,
+    "name": "St. Matthews Overnight S.",
+    "track": "Churchill Downs",
+    "date": "2026-04-30",
+    "scraped_at": "2026-04-30T21:27Z",
+    "mtp_at_scrape": 23,
+    "post_time_local": "5:50 PM ET",
+    "purse": 200000,
+    "distance": "6F",
+    "surface": "Dirt: Fast",
+    "field_size_after_scratches": 8,
+    "scratches": ["3", "7", "10"],
+    "source": "twinspires.com /bet/program/.../10/pools"
+  },
+  "pools": {
+    "win_total": 92448,
+    "place_total": 27340,
+    "show_total": 19182
+  },
+  "runners": [
+    {"saddle": "1", "horse": "Concrete Glory", "trainer": "Saffie A. Joseph Jr.", "jockey": "Irad Ortiz Jr.", "live_odds": "3", "win_pool": 17472, "place_pool": 4632, "show_pool": 3704, "win_pct": 18.9, "place_pct": 16.9, "show_pct": 19.3, "wp_gap": 2.0, "ws_gap": -0.4, "flag": null, "algo_rank": 4, "algo_score": 14.6},
+    {"saddle": "2", "horse": "Built", "trainer": "Wayne M. Catalano", "jockey": "Jareth Loveberry", "live_odds": "9/5", "win_pool": 26760, "place_pool": 7976, "show_pool": 4618, "win_pct": 28.9, "place_pct": 29.2, "show_pct": 24.1, "wp_gap": -0.2, "ws_gap": 4.9, "flag": null, "algo_rank": 1, "algo_score": 30.3, "_note": "Algo top pick. Balanced W/P but show pool light — minor concern."},
+    {"saddle": "4", "horse": "Billal", "trainer": "William I. Mott", "jockey": "Junior Alvarado", "live_odds": "23", "win_pool": 3059, "place_pool": 1379, "show_pool": 926, "win_pct": 3.3, "place_pct": 5.0, "show_pct": 4.8, "wp_gap": -1.7, "ws_gap": -1.5, "flag": null},
+    {"saddle": "5", "horse": "Lofty Adjudicator", "trainer": "Anna Navarrete", "jockey": "Sonny Leon", "live_odds": "26", "win_pool": 2796, "place_pool": 974, "show_pool": 889, "win_pct": 3.0, "place_pct": 3.6, "show_pct": 4.6, "wp_gap": -0.5, "ws_gap": -1.6, "flag": null},
+    {"saddle": "6", "horse": "Back Em Up", "trainer": "Bobby S. Dibona", "jockey": "Luis Saez", "live_odds": "6", "win_pool": 10316, "place_pool": 3888, "show_pool": 3031, "win_pct": 11.2, "place_pct": 14.2, "show_pct": 15.8, "wp_gap": -3.1, "ws_gap": -4.6, "flag": "smart_money_board", "algo_rank": 3, "algo_score": 15.9},
+    {"saddle": "8", "horse": "Bourbon Bash", "trainer": "Steven M. Asmussen", "jockey": "Joel Rosario", "live_odds": "13", "win_pool": 5405, "place_pool": 2052, "show_pool": 1773, "win_pct": 5.8, "place_pct": 7.5, "show_pct": 9.2, "wp_gap": -1.7, "ws_gap": -3.4, "flag": null, "algo_rank": 5, "algo_score": 9.6},
+    {"saddle": "9", "horse": "Maximum Bourbon", "trainer": "Philip D'Amato", "jockey": "Flavien Prat", "live_odds": "2", "win_pool": 24981, "place_pool": 5807, "show_pool": 3672, "win_pct": 27.0, "place_pct": 21.2, "show_pct": 19.1, "wp_gap": 5.8, "ws_gap": 7.9, "flag": "chalk_doubt + dry_show", "is_top3_odds": true, "algo_rank": 2, "algo_score": 19.7, "_note": "TWO-POOL divergence — both W-P and W-S gaps large. Strongest fade signal of any race today."},
+    {"saddle": "11", "horse": "Air Invasion", "trainer": "Martin Paramo", "jockey": "*Axel Concepcion", "live_odds": "45", "win_pool": 1656, "place_pool": 629, "show_pool": 565, "win_pct": 1.8, "place_pct": 2.3, "show_pct": 2.9, "wp_gap": -0.5, "ws_gap": -1.2, "flag": null}
+  ],
+  "flags": {
+    "chalk_doubt": [{"saddle": "9", "horse": "Maximum Bourbon", "wp_gap": 5.8, "rationale": "Top-3 odds (live 2/1, 2nd-shortest), W>>P by 5.8pts AND W>>S by 7.9pts. Two-pool divergence is novel — public driving WIN exclusively, neither place nor show following. Stronger signal than either gap alone."}],
+    "smart_money_board": [{"saddle": "6", "horse": "Back Em Up", "wp_gap": -3.1, "rationale": "Place + show pools both over-weighted vs win. Sharp money targeting board play at 6/1."}]
+  },
+  "predicted_implications": {
+    "if_flag_holds": {
+      "expected_winner": "#2 Built (algo's top, balanced pools, no flags)",
+      "key_under_spread": ["#1 Concrete Glory", "#6 Back Em Up", "#8 Bourbon Bash"],
+      "fade_specifically": "#9 Maximum Bourbon",
+      "suggested_play": "Trifecta KEY #2 / #1 #6 #8 / #1 #6 #8 @ $0.50 = $3.00. Avoid #9."
+    },
+    "if_flag_fails_again": {
+      "implication": "Two consecutive misses (R9 + R10) on a previously 4-for-4 signal. Track-day pattern broken — pivot to algo-only top-3 for remaining races."
+    }
+  },
+  "test_hypothesis_from_r9": "R9 hypothesis was that chalk-doubt fails on stakes races with top connections. R10 is a $200K stakes (smaller than R9) with Maximum Bourbon (Prat/D'Amato — top connections). If flag holds here, the hypothesis is UNDERMINED (signal generalizes to stakes after all). If flag fails again, hypothesis STRENGTHENED.",
+  "_outcome": {
+    "official_finish": ["9", "?", "?"],
+    "winner": "#9 Maximum Bourbon",
+    "_note": "Result reported by user; TwinSpires page was still showing 'RESULTS ARE NOT PRESENTLY AVAILABLE' at write time. Will populate full finish + payouts when page updates.",
+    "flag_results": {
+      "chalk_doubt_9_max_bourbon": {
+        "predicted": "does NOT win",
+        "actual": "WON",
+        "outcome": "FAILED",
+        "consecutive_stakes_misses": 2,
+        "track_record_after_R10": "4 hits / 2 misses = 67% (6 chances)"
+      }
+    },
+    "key_learning": [
+      "TWO consecutive stakes failures (R9 + R10) for chalk-doubt flag. Hypothesis from R9 (flag doesn't generalize to stakes with top connections) is now N=2 same direction.",
+      "Override of algo's default super box `2-9-6-1` was a mistake. Substituting #8 for #9 (commits to fade) blew up the box. Lesson: don't override the algo's top-N picks based on a single signal whose segmentation hasn't been validated.",
+      "Stakes-grade fields with top trainer/jockey combinations behave differently from claiming/maiden fields. The market 'sharp money' that the W-P gap measures is, in stakes, the smart sharps respecting the chalk's pedigree — not a chalk-trap warning.",
+      "Real-time betting takeaway: when flag fires on a stakes-grade chalk with Asmussen/Pletcher/Cox/Brown/Mott/Casse/Joseph trainer + top jockey (Irad/J.Ortiz/Prat/Velazquez), TRUST THE CHALK, do not fade."
+    ],
+    "code_change_proposed": "Add `is_stakes_with_top_connections` guard to `_pool_disparity_factor`: if race purse > $100K AND chalk's trainer in TIER_TRAINERS AND chalk's jockey in TIER_JOCKEYS, skip the chalk-doubt penalty for that horse. Smart-money board signal (P>W) still fires for non-chalk horses."
+  }
+}

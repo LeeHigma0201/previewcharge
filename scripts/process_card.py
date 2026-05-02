@@ -100,6 +100,9 @@ TIER_TRAINERS = {
     "philip damato": 0.03,
     "thomas drury jr.": 0.03, "thomas drury": 0.03,
     "lauren robson": 0.03,
+    # Added after R2 audit on 4-30 — Foley won R2 with She'z the Law (15/1 ML → 1.6 live).
+    # Handoff doc explicitly flagged this gap.
+    "gregory d. foley": 0.04, "greg foley": 0.04,
 }
 TIER_JOCKEYS = {
     "irad ortiz, jr.": 0.05, "irad ortiz jr.": 0.05, "irad ortiz": 0.05,

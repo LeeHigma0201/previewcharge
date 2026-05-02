@@ -351,6 +351,77 @@ export default function BetSheet() {
             </div>
           </div>
         )}
+        {/* R10 lesson — chalk-doubt failed in stakes (2nd time today). Correction. */}
+        {results[10] && (
+          <div className="mb-3 p-3 rounded-lg border-2 border-rose-700 bg-rose-950/40">
+            <div className="text-xs font-bold text-rose-300 mb-1">R10 LEARNED ({results[10].join("-")}) — CHALK-DOUBT NEEDS SEGMENTATION</div>
+            <div className="text-[11px] text-rose-100/90 leading-snug space-y-1">
+              <p><span className="font-semibold">#9 Maximum Bourbon won at $3.92.</span> Algo had him #2 (19.7%). Pool-disparity flag fired huge against #9 (+5.2 W-P, +7.3 W-S compound) — and FAILED. Second consecutive stakes failure for the flag (after R9 Lagynos).</p>
+              <p><span className="font-semibold">Pattern (N=2 same direction):</span> Chalk-doubt flag is 4-for-4 on claiming/maiden/allowance, 0-for-2 on stakes with top-tier J+T. Don&apos;t override the algo&apos;s top-2 ranking based on pool flags in stakes races.</p>
+              <p><span className="font-semibold">Framework correction:</span> Pool flags are SECONDARY signals. Use them to identify smart-money board horses (P{'>'}W) and sharp-show horses (S{'>'}W) for under-spread construction. Do NOT use them to fade the algo&apos;s top-1 win pick.</p>
+              <p><span className="font-semibold">Algo today:</span> top-1 4/9 = 44%, top-2 in last 5 races = 5/5 = 100%, top-3 8/9 = 88.9%. Trust the model.</p>
+            </div>
+          </div>
+        )}
+        {/* HONEST end-of-day scorecard — no cherry-picking, no celebration emojis */}
+        {results[5] && (
+          <div className="mb-3 p-3 rounded-lg border border-sky-700 bg-sky-950/30">
+            <div className="text-xs font-bold text-sky-300 mb-1">TODAY&apos;S SCORECARD — HONEST</div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-sky-100/90 leading-snug">
+              <div>Algo top-1 hit rate:</div>
+              <div className="font-mono font-bold text-amber-300">5/10 (50%)</div>
+              <div>ML chalk top-1 (control):</div>
+              <div className="font-mono font-bold text-amber-300">5/10 (50%)</div>
+              <div className="col-span-2 text-[10px] text-amber-300/90 italic">
+                → Algo top-1 was TIED with chalk today. No top-1 edge.
+              </div>
+              <div className="mt-1">Algo top-3 hit rate:</div>
+              <div className="font-mono text-emerald-300 mt-1">8/10 (80%) ← wide net</div>
+              <div>Forward exacta (top-2 in order):</div>
+              <div className="font-mono text-emerald-300">3/11 (27%) — R5, R8, R11</div>
+              <div>Chalk-doubt flag:</div>
+              <div className="font-mono text-amber-300">4/7 (57%)</div>
+              <div>↳ on claiming/maiden:</div>
+              <div className="font-mono font-bold text-emerald-300">4/4</div>
+              <div>↳ on stakes:</div>
+              <div className="font-mono font-bold text-rose-300">0/3</div>
+              <div>Smart-money board (P{'>'}W):</div>
+              <div className="font-mono text-amber-300">2/3 (67%)</div>
+            </div>
+            <div className="mt-2 pt-2 border-t border-sky-800 text-[11px] text-sky-100/90">
+              <div className="font-bold text-sky-300 mb-0.5">Theoretical flat-bet ROI ($1 EX BOX top-2 every race):</div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                <div>Wagered (11 × $2):</div>
+                <div className="font-mono">$22.00</div>
+                <div>Returned (R5 $56 + R8 $8 + R11 $7):</div>
+                <div className="font-mono">$71.00</div>
+                <div>Net / ROI:</div>
+                <div className="font-mono text-emerald-300">+$49.00 / +222.7%</div>
+                <div className="font-bold text-rose-300">Without R5 outlier:</div>
+                <div className="font-mono font-bold text-rose-300">-$7.00 / -31.8%</div>
+                <div className="col-span-2 text-[10px] text-rose-300/90 italic mt-1">
+                  → The +222.7% ROI is driven by ONE race (R5 paid $56). Without R5, the strategy LOSES money. N=1 day. Don&apos;t overclaim.
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 pt-2 border-t border-rose-900 text-[11px] text-rose-100/80">
+              <div className="font-bold text-rose-300 mb-0.5">User&apos;s actual bets (Mac Claude recs):</div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                <div>R10 ($6 super, faded #9):</div>
+                <div className="font-mono text-rose-300">$0 — chalk #9 won</div>
+                <div>R11 ($6 EX BOX top-4 5-8-6-3):</div>
+                <div className="font-mono text-rose-300">~$3.50 — paid less than wagered</div>
+                <div>R12 ($5 dual super keys):</div>
+                <div className="font-mono text-rose-300">missed (assumed)</div>
+                <div className="font-bold mt-1">Net on the recs:</div>
+                <div className="font-mono font-bold text-rose-300 mt-1">~-$13.50 on $17 wagered</div>
+                <div className="col-span-2 text-[10px] text-rose-300/90 italic mt-1">
+                  → The Mac session&apos;s ticket structures lost money. Algo had its picks; the bet structure I built around them was wrong. Lesson next session: tighter top-2 box, no flag-fade overrides.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* HUGE next-race block — write these on your ticket */}
         {nextRace && (() => {
           const recs = allRecs.find((r) => r.raceNumber === nextRace.raceNumber);

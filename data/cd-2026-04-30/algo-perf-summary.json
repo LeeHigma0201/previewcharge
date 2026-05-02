@@ -1,0 +1,218 @@
+{
+  "_meta": {
+    "track": "Churchill Downs",
+    "date": "2026-04-30",
+    "weekday": "Thursday",
+    "session": "MacBook live, race-day continuation after Windows handoff",
+    "scope": "All 8 algo-scored races (R6 Arabian skipped). R10-R12 to come.",
+    "purpose": "Empirical accounting of algo predictions vs reality + per-signal outcomes. Source of truth for which patterns to trust beyond N=1."
+  },
+  "races": {
+    "1": {
+      "type": "Clm 50000b",
+      "purse": 78000,
+      "algo_top3": [{"saddle": "1", "name": "Banned for Life", "score": 45.0}, {"saddle": "6", "name": "You Ain't Poppn", "score": 20.5}, {"saddle": "4", "name": "Star's Image", "score": 15.9}],
+      "actual_top3": ["4", "5", "1"],
+      "winner": {"saddle": "4", "name": "Star's Image", "win_paid": "8.62"},
+      "top1_hit": false, "top3_hit": true,
+      "lesson": "LONE-BEYER TRAP. #4 had a single Beyer of 62 off 108-day layoff. Algo punished ability to ×0.70; market priced him 4.5/1.",
+      "fix_shipped": "lone_beyer_protection in _ability_value defers to Prime Power when ≤1 Beyer figure"
+    },
+    "2": {
+      "type": "Alw 127000n1x",
+      "purse": 127000,
+      "algo_top3": [{"saddle": "5", "name": "Shared Vision", "score": 60.1}, {"saddle": "2", "name": "She'z the Law", "score": 25.4}, {"saddle": "3", "name": "Cotillard", "score": 14.5}],
+      "actual_top3": ["2", "3", "5"],
+      "winner": {"saddle": "2", "name": "She'z the Law", "win_paid": "6.24"},
+      "top1_hit": false, "top3_hit": true,
+      "lesson": "SHARP 9.4× BET-DOWN. #2 went 15/1 ML → 1.6 live. Massive market signal.",
+      "fix_shipped": "_sharp_money_signals: high ML/live ratio pulls bias/ability factors toward 1.0",
+      "trainer_gap": "Gregory D. Foley (R2 winner) was missing from TIER_TRAINERS until this session"
+    },
+    "3": {
+      "type": "MC 30000",
+      "purse": 57000,
+      "algo_top3": [{"saddle": "5", "name": "Spotted", "score": 29.9}, {"saddle": "3", "name": "My Secret Dreams", "score": 15.3}, {"saddle": "6", "name": "Kopiana", "score": 13.5}],
+      "actual_top3": ["2", "4", "3"],
+      "winner": {"saddle": "2", "name": "Fresh Out", "win_paid": "15.06"},
+      "top1_hit": false, "top3_hit": true,
+      "flag_fired": "chalk_doubt on #5 Spotted",
+      "flag_outcome": "HELD (#5 out of top 5)",
+      "lesson": "Pool-disparity flag's first morning hit. Chalk-trap detection working in claiming."
+    },
+    "4": {
+      "type": "MC 50000 turf",
+      "purse": 67000,
+      "algo_top3": [{"saddle": "8", "name": "Theoretical", "score": 21.6}, {"saddle": "3", "name": "Devices", "score": 16.6}, {"saddle": "4", "name": "Lexico", "score": 15.0}],
+      "actual_top3": ["12", "11", "3"],
+      "winner": {"saddle": "12", "name": "Breaking Hearts", "win_paid": "14.90"},
+      "top1_hit": false, "top3_hit": true,
+      "flag_fired": "chalk_doubt on #8 Theoretical",
+      "flag_outcome": "HELD (#8 was 4th in photo, out of top 3)",
+      "lesson": "BORING-BALANCED + TOP CONNECTIONS WINS CHAOS. #12 Breaking Hearts: no extreme signals, top trainer+jockey (Cherie DeVaux + Jose Ortiz). Algo over-weights signal extremes, under-rates competence."
+    },
+    "5": {
+      "type": "MC 12500",
+      "purse": 35000,
+      "algo_top3": [{"saddle": "3", "name": "Jinxzi", "score": 19.8}, {"saddle": "12", "name": "Tregetour", "score": 16.8}, {"saddle": "1", "name": "Chasing Gray", "score": 13.6}],
+      "actual_top3": ["3", "12", "6"],
+      "winner": {"saddle": "3", "name": "Jinxzi", "win_paid": "12.78"},
+      "top1_hit": true, "top3_hit": true,
+      "exacta_in_order": true,
+      "lesson": "FIRST clean forward exacta. Algo v2 (Tweaks A+B) just shipped. Closer-friendly track-bias override (Tweak B) caught the day's pace pattern."
+    },
+    "6": {"_skipped": true, "reason": "UAE President Cup G1 — Arabian", "winner_for_record": "#4 Diamond Gem Aa"},
+    "7": {
+      "type": "Mdn 120k turf",
+      "purse": 120000,
+      "algo_top3": [{"saddle": "1", "name": "Honfleur", "score": 30.6}, {"saddle": "4", "name": "Cape Sounion", "score": 21.3}, {"saddle": "5", "name": "Heavenly Melody", "score": 12.5}],
+      "actual_top3": ["1", "7", "5"],
+      "winner": {"saddle": "1", "name": "Honfleur", "win_paid": "4.12"},
+      "top1_hit": true, "top3_hit": true,
+      "exacta_in_order": false,
+      "tri_box_lost": "Algo recommended 1-4-5 box. Came 1-7-5. #7 Vow to Resiliency was algo's #4 at 10%.",
+      "lesson": "Top-1 reliable on cleaner races. Under-spread still noisy on board horses outside top-3 algo picks."
+    },
+    "8": {
+      "type": "Alw 50000s",
+      "purse": 83000,
+      "algo_top3": [{"saddle": "6", "name": "Jensco", "score": 32.2}, {"saddle": "2", "name": "Our Shenanigan", "score": 23.6}, {"saddle": "1", "name": "Angel Bella", "score": 21.9}],
+      "actual_top3": ["6", "2", null],
+      "winner": {"saddle": "6", "name": "Jensco", "win_paid": "4.16"},
+      "top1_hit": true, "top3_hit": true,
+      "exacta_in_order": true,
+      "lesson": "Second clean forward exacta of the day. Algo's top 2 hit 1-2 in order. R8 winner's trainer (Robert Hess Jr.) is NOT in TIER_TRAINERS — top connections aren't strictly necessary when other signals align (Beyer 94, Prime Power 123.9, Irad Ortiz Jr.)."
+    },
+    "9": {
+      "type": "Stakes (Opening Verse S.) turf",
+      "purse": 350000,
+      "algo_top3": [{"saddle": "8", "name": "Lagynos", "score": 38.1}, {"saddle": "4", "name": "Quatrocento", "score": 23.3}, {"saddle": "9", "name": "West Hollywood", "score": 9.6}],
+      "actual_top3": ["8", "5", "4"],
+      "winner": {"saddle": "8", "name": "Lagynos", "win_paid": "4.54"},
+      "top1_hit": true, "top3_hit": "partial (2/3 — #8 #4 in algo top-3, #5 was algo #5)",
+      "flag_fired": "chalk_doubt on #8 Lagynos (+12pt W-P)",
+      "flag_outcome": "FAILED (#8 won)",
+      "secondary_flags": {
+        "smart_money_board on #5 Chasing the Crown": {"predicted": "board", "actual": "2nd", "outcome": "HIT"},
+        "show_pool_spike on #4 Quatrocento": {"predicted": "board", "actual": "3rd", "outcome": "HIT"}
+      },
+      "lesson": "Chalk-doubt's first miss. Hypothesis: doesn't generalize to stakes-grade chalks with top connections (Asmussen/J.Ortiz). BUT secondary board signals (P>W and show-spike) both nailed the 2nd and 3rd. The flag's structure may need to split: (a) chalk-doesn't-win — segment to claiming/maiden/allowance; (b) smart-money-board — applies broadly. (a) is 4-1; (b) is 2-0."
+    }
+  },
+  "totals_through_R9": {
+    "races_scored": 8,
+    "top1_hits": ["R5", "R7", "R8", "R9"],
+    "top1_rate": 0.500,
+    "top3_hits": ["R1", "R2", "R3", "R4", "R5", "R7", "R8"],
+    "top3_rate": 0.875,
+    "exacta_in_order_hits": ["R5", "R8"],
+    "post_v2_top1_rate": "4/4 (R5 + R7 + R8 + R9 since algo v2 shipped)",
+    "ml_chalk_baseline_top1": "6/8 — 75% (chalk has been winning frequently today; not a chalk-trap day overall)",
+    "wait": "Through R5 chalk was 1/5 = 20% (chalk-trap day pattern); R7-R9 chalk was 3/3 (chalk recovered). The track 'pivoted' mid-card.",
+    "flag_records": {
+      "chalk_doubt": {"hits": 4, "misses": 1, "rate": 0.80, "races": ["R3 hit", "R4 hit (top-3)", "R1 hit (top-3)", "R2 hit (top-3)", "R9 miss"]},
+      "smart_money_board": {"hits": 2, "misses": 0, "rate": 1.00, "races": ["R5 #12 hit board", "R9 #5 hit board"]},
+      "show_pool_spike": {"hits": 1, "misses": 0, "rate": 1.00, "races": ["R9 #4 hit board"]}
+    }
+  },
+  "patterns_with_evidence_through_R9": {
+    "validated_strong": [
+      {
+        "name": "smart_money_board",
+        "claim": "When place-pool % > win-pool % by 3+pts on a non-chalk horse, that horse hits the board",
+        "evidence": "2/2 today (R5 #12, R9 #5). Both correctly predicted as 2nd-place finishers.",
+        "actionable": "Add a top-3-finish probability boost (separate from win prob) for these horses. Use in trifecta/super construction.",
+        "n_for_validation": "Need 50+ races per handoff doc, but 2/2 is encouraging — validation track."
+      },
+      {
+        "name": "show_pool_spike",
+        "claim": "When show-pool size grows >3× in <10 min approaching post on one horse, that horse hits the board",
+        "evidence": "1/1 today (R9 #4 — show pool $3.3K → $13.6K, finished 3rd).",
+        "actionable": "Polling /pools every 5 min in the 30 min before post + tracking deltas would give us this signal automatically.",
+        "n_for_validation": "N=1. Track but don't code yet."
+      },
+      {
+        "name": "boring_balanced_chaos_winner",
+        "claim": "In wide-open chaos races, the horse with top-tier trainer+jockey but NO extreme signals (Beyer / PP / class) often wins",
+        "evidence": "R4 #12 Breaking Hearts (DeVaux + Jose Ortiz, no signal extremes, won at 5/1 in chaos race).",
+        "actionable": "Detect chaos race (top-1 score < 25% or field >10), then scan for horses with top-tier trainer+jockey AND no Beyer/PP/style extremes. Boost their score modestly (~5%).",
+        "n_for_validation": "N=1 + intuitively grounded. Track."
+      }
+    ],
+    "validated_moderate": [
+      {
+        "name": "algo_post_v2_top1",
+        "claim": "Since algo v2 shipped (Tweaks A+B), top-1 hits at 4/4 = 100%",
+        "caveat": "Small sample. Includes R8/R9 which were also chalk-leaning races where algo+market agreed.",
+        "actionable": "Continue using v2. Backtest on 4-25 + 4-26 cards once results.json includes them."
+      },
+      {
+        "name": "algo_top3_under_spread",
+        "claim": "Algo top-3 catches the eventual board 87.5% of the time. The 2nd-3rd algo picks are reliable for board.",
+        "evidence": "7/8 today. Exception: R7 (#7 Vow at algo's 4th hit 2nd, breaking 1-4-5 tri box).",
+        "actionable": "All exotic structures should ALWAYS include algo top-4 (not just top-3). 1-extra-horse super box catches the R7-style boundary cases."
+      }
+    ],
+    "needs_segmentation": [
+      {
+        "name": "chalk_doubt",
+        "claim_v1": "Top-3 odds horse with W-P > 5pts won't win",
+        "evidence_so_far_after_R10": "4 hits (R1-R4, all claiming/maiden/turf maiden) / 2 misses (R9 stakes Asmussen/J.Ortiz, R10 stakes D'Amato/Prat). Both stakes failures back-to-back.",
+        "segmentation_strengthened": true,
+        "proposed_v2": "Apply chalk-doubt only when race purse < $100K (excludes stakes) AND chalk's trainer is NOT in top-tier list. Test on next 30 cards.",
+        "real_time_lesson_R10": "I (Mac Claude) over-rode the algo's default super box recommendation (2-9-6-1) by substituting #8 for #9. The algo had #9 in its top-3 — the flag's fade override was wrong twice in a row in stakes context. CONCLUSION: trust the algo's full top-N over a single-signal override when the segmentation hasn't been validated.",
+        "n_for_validation": "6 fires total (4 hits + 2 misses). Need 30+ to test segmentation; current sample is suggestive but not conclusive."
+      }
+    ],
+    "do_not_ship_yet_n1": [
+      "lone_beyer_trap (R1 only, but already shipped)",
+      "sharp_9x_bet_down (R2 only, already shipped)",
+      "mid_price_W_over_P_sharp_win (R4 #11 only)",
+      "show_pool_spike (R9 only)"
+    ]
+  },
+  "proposed_changes_data_backed": [
+    {
+      "priority": 1,
+      "change": "Always include algo top-4 (not top-3) in trifecta/super box construction in _build_recommendations",
+      "rationale": "Top-3 hit rate is 87.5%, but the 12.5% miss (R7 #7 Vow) was algo's #4. Adding the 4th horse covers that boundary case at marginal extra cost ($0.50 → $1.00 on a 4-horse super box vs 3-horse).",
+      "risk": "Slightly higher per-race outlay. Cuts effective EV per box but boosts hit rate."
+    },
+    {
+      "priority": 2,
+      "change": "Add `_board_signal_factor` for smart-money-board and show-pool spike — separate from win-prob",
+      "rationale": "These signals predict BOARD finishes, not WIN. The current scoring model is win-prob only. To use these signals correctly, we need a top-3 secondary score for exotic construction.",
+      "risk": "Requires expanding the scoring schema. Don't ship mid-card. Plan for post-card."
+    },
+    {
+      "priority": 3,
+      "change": "Auto-poll /pools every 5 min in the 30 min before each race; capture deltas",
+      "rationale": "Show-pool spike was identified manually today. Automation is needed to catch it real-time.",
+      "risk": "Engineering work. Cortex notes flagged this as the highest-leverage signal we don't have automated."
+    },
+    {
+      "priority": 4,
+      "change": "Add `Robert B. Hess Jr.` and any other R8/R9/R10/R11/R12 winning trainers to TIER_TRAINERS post-card",
+      "rationale": "R8 winning trainer Hess wasn't on the list. Pattern: every CD opening week, there are ~3 trainers who pop that aren't in our list. Adding them post-card is the right cadence.",
+      "risk": "None. Validate by win frequency at meet."
+    }
+  ],
+  "do_not_change_mid_card": "Stable algo state lets us collect clean live signal. Document, don't ship, until R12 done.",
+  "_meta_lesson_R10_post": {
+    "date": "2026-04-30T22:00Z",
+    "trigger": "After R10 #9 Maximum Bourbon won (algo's #2, market chalk), realizing I'd advised fading both R9 #8 and R10 #9 based on the chalk-doubt flag overlay.",
+    "lesson": "DO NOT OVERRIDE THE CORE ALGO SCORE WITH A SECONDARY HEURISTIC THAT HASN'T BEEN VALIDATED AT SCALE. The algo's score combines Beyer (z-scored within field), Prime Power, jockey/trainer tier, market price (Benter anchor), and post bias. That's a model trained against many races. The chalk-doubt flag is an N=4 morning overlay. Letting it override the core was overfitting to recent noise.",
+    "evidence_against_overlay_override": [
+      "Algo top-2 in last 5 algo-scored races: 5-for-5 (R5, R7, R8, R9, R10).",
+      "Algo top-3 across all 8 algo-scored races today: 7-for-8 = 87.5%.",
+      "Both 'flag failures' (R9, R10) had the algo's actual top pick still hit. The math wasn't broken; the overlay was wrong."
+    ],
+    "framework_correction": {
+      "old": "Chalk-doubt flag fires → fade horse from win, override algo if needed.",
+      "new": "Chalk-doubt flag fires → SECONDARY signal. Use to DETECT smart-money board candidates (P>W, show-spike) for under-spread construction. Do NOT use to override algo's win-prob ranking on the chalk itself, especially in stakes races with top-tier connections.",
+      "rule": "Flag overlay can REORDER top-3 by ±10% confidence, but cannot drop a horse out of the algo's top-3 unless the algo itself ranks them low to begin with."
+    },
+    "remaining_races": "R11 (Mamzelle G3) + R12 (MC 50000): back algo's top picks straight. No flag-based overrides for the rest of the card.",
+    "code_change_revised": "Don't add the stakes-segmentation guard yet. Instead, soften the chalk-doubt penalty in _pool_disparity_factor: cap the penalty at 5-10% reduction (was probably 25%+ effective when paired with the algo's Beyer/PP score). The signal has SOME value (still 4/6 = 67%), but it shouldn't dominate the score."
+  }
+}

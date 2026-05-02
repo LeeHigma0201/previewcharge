@@ -43,6 +43,9 @@ credentials.json
 /data/cd-*/*
 !/data/cd-*/*.csv
 !/data/cd-*/*.md
+!/data/cd-*/results.json
+!/data/cd-*/algo-perf-summary.json
+!/data/cd-*/r*-pool-snapshot.json
 
 # Model artifacts
 artifacts/

@@ -1,0 +1,105 @@
+{
+  "_meta": {
+    "race": 9,
+    "name": "Opening Verse S.",
+    "track": "Churchill Downs",
+    "date": "2026-04-30",
+    "scraped_at": "2026-04-30T20:55Z",
+    "mtp_at_scrape": 21,
+    "post_time_local": "5:14 PM ET",
+    "purse": 350000,
+    "distance": "1M",
+    "surface": "Turf: Firm",
+    "condition": "4yo+",
+    "source": "twinspires.com /bet/program/.../9/pools",
+    "_purpose": "Pre-race pool % capture for chalk-disparity flag validation. Race has not yet run."
+  },
+  "pools": {
+    "win_total": 91474,
+    "place_total": 28630,
+    "show_total": 23577
+  },
+  "runners": [
+    {"saddle": "1", "horse": "Layabout", "live_odds": "SCR", "win_pool": null, "place_pool": null, "show_pool": null, "scratched": true},
+    {"saddle": "2", "horse": "Minaret Station", "live_odds": "11", "win_pool": 6020, "place_pool": 2239, "show_pool": 1437, "win_pct": 6.6, "place_pct": 7.8, "show_pct": 6.1, "wp_gap": -1.2, "flag": null},
+    {"saddle": "3", "horse": "Balnikhov", "live_odds": "14", "win_pool": 5076, "place_pool": 1858, "show_pool": 1246, "win_pct": 5.5, "place_pct": 6.5, "show_pct": 5.3, "wp_gap": -0.9, "flag": null},
+    {"saddle": "4", "horse": "Quatrocento", "live_odds": "5", "win_pool": 12066, "place_pool": 4173, "show_pool": 3265, "win_pct": 13.2, "place_pct": 14.6, "show_pct": 13.8, "wp_gap": -1.4, "flag": null},
+    {"saddle": "5", "horse": "Chasing the Crown", "live_odds": "5", "win_pool": 12132, "place_pool": 5050, "show_pool": 4244, "win_pct": 13.3, "place_pct": 17.6, "show_pct": 18.0, "wp_gap": -4.4, "flag": "smart_money_board"},
+    {"saddle": "6", "horse": "Giocoso", "live_odds": "14", "win_pool": 5012, "place_pool": 1887, "show_pool": 1850, "win_pct": 5.5, "place_pct": 6.6, "show_pct": 7.8, "wp_gap": -1.1, "flag": null},
+    {"saddle": "7", "horse": "Mi Bago", "live_odds": "14", "win_pool": 4596, "place_pool": 1877, "show_pool": 1240, "win_pct": 5.0, "place_pct": 6.6, "show_pct": 5.3, "wp_gap": -1.5, "flag": null},
+    {"saddle": "8", "horse": "Lagynos", "live_odds": "6/5", "win_pool": 32193, "place_pool": 6649, "show_pool": 6316, "win_pct": 35.2, "place_pct": 23.2, "show_pct": 26.8, "wp_gap": 12.0, "flag": "chalk_doubt", "is_top3_odds": true, "algo_pick": 1, "algo_score": 38.1},
+    {"saddle": "9", "horse": "West Hollywood", "live_odds": "4", "win_pool": 14375, "place_pool": 4892, "show_pool": 3975, "win_pct": 15.7, "place_pct": 17.1, "show_pct": 16.9, "wp_gap": -1.4, "flag": null}
+  ],
+  "flags": {
+    "chalk_doubt": [{"saddle": "8", "horse": "Lagynos", "wp_gap": 12.0, "rationale": "Top-3 odds + WIN over-bet by 12pts vs PLACE. Largest gap of the day. If flag holds (4-for-4 prior), Lagynos does NOT win."}],
+    "smart_money_board": [{"saddle": "5", "horse": "Chasing the Crown", "wp_gap": -4.4, "rationale": "P>W by 4.4pts. Place-pool over-weight signals smart money for board play."}],
+    "balanced_value": [{"saddle": "9", "horse": "West Hollywood", "rationale": "All three pools within 1.5pts of each other at 4/1. Good value if chalk fades."}]
+  },
+  "predicted_implications": {
+    "if_flag_holds": {
+      "expected_winner_pool": ["#4 Quatrocento", "#9 West Hollywood"],
+      "key_under_spread": ["#5 Chasing the Crown", "#9 West Hollywood", "#4 Quatrocento"],
+      "suggested_play": "Trifecta key #4 OR #9 ALL / #5 / ALL. Ex box 4-9-5 if budget-limited."
+    },
+    "if_flag_breaks": {
+      "implication": "First miss for the chalk-doubt flag in 5+ chances today. Would warrant immediate algo audit."
+    }
+  },
+  "_update_15mtp": {
+    "scraped_at": "2026-04-30T21:00Z",
+    "pools": {"win_total": 153023, "place_total": 50258, "show_total": 58062},
+    "deltas_since_21mtp": {
+      "win_pool_growth": "+67%",
+      "place_pool_growth": "+76%",
+      "show_pool_growth": "+146% (4: $3.3K → $13.6K)"
+    },
+    "flag_status": {
+      "8_lagynos_chalk_doubt": {"wp_gap": 11.3, "delta": -0.7, "still_firing": true},
+      "5_chasing_crown_smart_board": {"wp_gap": -1.0, "delta": 3.4, "weakened": true},
+      "4_quatrocento_show_money": {
+        "ws_gap": -8.8,
+        "show_pool_4x_growth": true,
+        "rationale": "Show pool grew from $3.3K to $13.6K (+311%). Someone took a heavy SHOW position on #4. This is sharp money signaling #4 to hit the board with high confidence — a stronger signal than W-P disparity."
+      }
+    },
+    "refined_play": "Trifecta KEY #4 OR #9 / spread #5 #2 #8 / ALL. The show-pool spike on #4 is the cleanest live signal we've seen today.",
+    "new_pattern_to_validate": "When the SHOW pool size grows >3x in <10 min on one horse approaching post, that horse is materially more likely to hit the board than its odds imply. N=1 — needs validation but worth tracking."
+  },
+  "_outcome": {
+    "scraped_at": "2026-04-30T21:26Z",
+    "official_finish": ["8", "5", "4"],
+    "winner": "#8 Lagynos",
+    "win_paid": "$4.54",
+    "place_paid": "$2.84",
+    "show_paid": "$2.26",
+    "exacta": {"runners": "8-5", "payout": "$25.12"},
+    "trifecta": {"runners": "8-5-4", "payout_50c": "$16.71"},
+    "flag_results": {
+      "chalk_doubt_8_lagynos": {
+        "predicted": "does NOT win",
+        "actual": "WON",
+        "outcome": "FAILED",
+        "track_record_after_today": "4 hits / 1 miss = 80% (5 chances total)"
+      },
+      "smart_money_board_5_chasing_crown": {
+        "predicted": "hits board",
+        "actual": "2nd",
+        "outcome": "HIT",
+        "track_record_after_today": "2 hits / 0 misses on board prediction"
+      },
+      "show_pool_spike_4_quatrocento": {
+        "predicted": "hits board",
+        "actual": "3rd",
+        "outcome": "HIT",
+        "track_record_after_today": "1 hit / 0 misses (N=1, log don't ship)"
+      }
+    },
+    "key_learnings": [
+      "Chalk-doubt flag's morning 4-for-4 was on maiden/claiming chalks (#1 BFL 1.0, #5 SV 0.5, #5 Spotted 2.0, #8 Theoretical 2.0). R9 was a $350K stakes with Asmussen/J.Ortiz — stakes-grade chalk with top connections. The flag's category may not extend to top-end stakes races where the connections grind out wins despite over-betting.",
+      "The flag's SECONDARY signals (P>W = board, show spike = board) were both right — they correctly identified the actual 2nd and 3rd finishers. So the flag has predictive power even when the primary chalk-doubt prediction fails.",
+      "Hypothesis (NOT YET VALIDATED): split the flag into two distinct claims — (a) chalk doesn't win, segment to maiden/claiming/allowance only, and (b) the P-pool/S-pool divergent horse hits board, applies broadly. (a) goes 4-1; (b) goes 2-0.",
+      "Lagynos paid $4.54 — that's 1.27/1, tighter than his 6/5 ML. The market actually bet him DOWN further, suggesting the 6/5 ML was already conservative. Heavy sharp money on the chalk in stakes — opposite of what the flag interpreted."
+    ],
+    "do_not_ship": "N=1 miss on a previously 4-for-4 signal. Wait for 50+ races as handoff doc recommends. Document the segment hypothesis but don't add code branches yet."
+  }
+}

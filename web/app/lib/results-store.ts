@@ -33,9 +33,33 @@ export const RESULTS_STORAGE_KEY = `horsegpt_results_${RESULTS_DATE}`;
 // pattern — when top-2 model_prob clusters ≥35% with a flat tail, the exacta box should
 // promote from alternate to primary.
 // R6 OFFICIAL (4-6-5-8): UAE President Cup Arabian S. — algo skipped (Arabian flag working).
-// Diamond Gem AA was 5/2 chalk and won by daylight; nothing to learn here.
-// R7 OFFICIAL (1-7-5-4): Honfleur won at 4/5 (chalk). Algo top-1, model_prob 30.6%. Top-1 hit.
-// Through R7 (excl Arabian R6): top-1 2/6 (33%), top-3 4/6 (67%). Win-pool ROI +$4.90 on $12 cost (+41%).
+// Diamond Gem AA was 5/2 chalk and won by daylight; nothing algorithmic to learn here.
+// R7 OFFICIAL (1-7-5-4): #1 Honfleur (Prat/Chad Brown) WON at 4/5. ALGO TOP-1 HIT (had him 30.6%).
+//   2nd #7 Vow to Resiliency was algo's #4 — algo's R7 trifecta box 1-4-5 lost (came in 1-7-5).
+//   #5 Heavenly Melody hit 3rd as algo's #3 pick.
+//   Lesson: algo's top-1 is reliable on cleaner races; the under-spread is still noisy outside top-3.
+// R8 OFFICIAL (6-2-...): #6 Jensco (Irad/Hess) WON. Algo had him #1 at 32.2% — TOP-1 HIT + EXACTA IN ORDER.
+//   2nd #2 Our Shenanigan was algo's #2 at 23.6%. Cleanest forward exacta of the day after R5.
+//   3rd not posted at scrape time.
+// R9 OFFICIAL (8-5-4): #8 Lagynos (Asmussen/J.Ortiz) WON at 6/5. ALGO TOP-1 HIT (had #8 at 38.1%).
+//   POOL-DISPARITY FLAG FAILED for first time today — the flag predicted #8 wouldn't win
+//   (W-P +12pt gap), and #8 won. Flag now 4-for-5 (80%). HYPOTHESIS: flag doesn't generalize
+//   to stakes races with top connections; morning fires were maiden/claiming chalks. Don't ship.
+//   But the flag's secondary signals were 2-for-2: #5 P-pool over (predicted board) finished 2nd,
+//   #4 SHOW-pool 4× spike (predicted board) finished 3rd. The smart-money board call is robust;
+//   the chalk-doesn't-win primary call may need segmenting.
+// R10 OFFICIAL (9-8-2-1 super): #9 Maximum Bourbon (Prat/D'Amato) WON at $3.92. Algo had #9 at #2 (19.7%).
+//   POOL-DISPARITY FLAG FAILED AGAIN (2nd consecutive stakes miss). Flag 4-for-6 (67%).
+//   2nd #8 Bourbon Bash (Asmussen/Rosario, 13/1) was algo's #5 at 9.6%. 3rd #2 Built was algo's #1.
+//   Algo's 4-horse super box `2-9-6-1` MISSED — needed #8 in 4th. Algo's 5-horse super box would
+//   have hit. Lesson: in stakes races with deep fields, expand super box to top-5 (chaos coverage).
+// R11 OFFICIAL (5-8-6-3 super): #5 Cy Fair (Irad/Weaver) WON at $3.98. ALGO TOP-4 IN EXACT FORWARD ORDER.
+//   #5 → #8 → #6 → #3 — matches algo's pre-race ranking 1→2→3→4 perfectly. Super 5-8-6-3 paid $2.41/$0.10.
+//   POOL-DISPARITY FLAG FAILED FOR 3RD CONSECUTIVE STAKES TEST. Flag fired hardest of day on #5 (+14.9
+//   W-P at 22 MTP, +15.8 at 11 MTP) — and #5 won. Stakes-segmentation hypothesis now N=3 same direction.
+//   Smart-money board on #7 Midnight Martini (-5.0 W-P) MISSED — #7 not in top 4.
+//   Algo top-1 today: 5/10 = 50% (TIED with chalk's 50% — no top-1 edge today). Forward exacta: 3 (R5, R8, R11).
+//   $1 EX BOX top-2 theoretical ROI: +222.7% (driven entirely by R5's $56 outlier; -25% without R5).
 export const CONFIRMED_RESULTS: ResultsMap = {
   1: ["4", "5", "1", "2", "6"],
   2: ["2", "3", "5"],
@@ -44,6 +68,10 @@ export const CONFIRMED_RESULTS: ResultsMap = {
   5: ["3", "12", "6", "5", "13"],
   6: ["4", "6", "5", "8"],
   7: ["1", "7", "5", "4"],
+  8: ["6", "2"],
+  9: ["8", "5", "4"],
+  10: ["9", "8", "2", "1"],
+  11: ["5", "8", "6", "3"],
 };
 
 export function loadResults(): ResultsMap {

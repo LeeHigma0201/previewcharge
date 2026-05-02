@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "track": "Churchill Downs",
+    "date": "2026-04-30",
+    "weekday": "Thursday",
+    "source": "TwinSpires.com (live scrape, MacBook session 2026-04-30 PM)",
+    "notes": "R6 was the UAE President Cup G1 — Arabian-only — explicitly skipped by process_card.py."
+  },
+  "1": {
+    "finish": ["4", "5", "1"],
+    "winner": "Star's Image",
+    "win_paid": "$8.62",
+    "place_paid": "$5.14",
+    "show_paid": "$3.10",
+    "exacta": {"runners": "4-5", "payout": "$78.46"},
+    "trifecta": {"runners": "4-5-1", "payout_50c": "$47.57"},
+    "superfecta": {"runners": "4-5-1-2", "payout_10c": "$36.81"},
+    "super_high_5": {"runners": "4-5-1-2-6", "payout_1": "$970.00"}
+  },
+  "2": {
+    "finish": ["2", "3", "5"],
+    "winner": "She'z the Law",
+    "win_paid": "$6.24",
+    "double": {"runners": "4-2", "payout_1": "$24.83"}
+  },
+  "3": {
+    "finish": ["2", "4", "3", "1", "9"],
+    "winner": "Fresh Out",
+    "win_paid": "$15.06",
+    "place_paid": "$7.30",
+    "show_paid": "$4.90",
+    "trifecta": {"runners": "2-4-3", "payout_50c": "$145.90"},
+    "superfecta": {"runners": "2-4-3-1", "payout_10c": "$187.94"},
+    "double": {"runners": "2-2", "payout_1": "$31.04"},
+    "pick3": {"runners": "4-2-2", "payout_50c": "$85.58"}
+  },
+  "4": {
+    "finish": ["12", "11", "3", "10", "8"],
+    "winner": "Breaking Hearts",
+    "win_paid": "$14.90",
+    "place_paid": "$7.16",
+    "show_paid": "$4.22",
+    "trifecta": {"runners": "12-11-3", "payout_50c": "$104.06"},
+    "superfecta": {"runners": "12-11-3-10", "payout_10c": "$229.68"},
+    "double": {"runners": "2-12", "payout_1": "$52.12"},
+    "pick3": {"runners": "2-2-12", "payout_50c": "$160.84"}
+  },
+  "5": {
+    "finish": ["3", "12", "6", "5", "13"],
+    "winner": "Jinxzi",
+    "win_paid": "$12.78",
+    "place_paid": "$6.28",
+    "show_paid": "$4.02",
+    "trifecta": {"runners": "3-12-6", "payout_50c": "$122.54"},
+    "superfecta": {"runners": "3-12-6-5", "payout_10c": "$184.58"},
+    "double": {"runners": "12-3", "payout_1": "$56.36"},
+    "pick3": {"runners": "2-12-3", "payout_50c": "$138.71"},
+    "pick4": {"runners": "2-2-12-3", "payout_50c": "$1166.95"},
+    "pick5": {"runners": "4-2-2-12-3", "payout_50c": "$7554.67"},
+    "_algo_note": "FIRST top-1 + clean forward exacta hit. Algo had #3 #1, #12 #2."
+  },
+  "6": {
+    "_skipped": true,
+    "_reason": "UAE President Cup G1 — Arabian-only race. Thoroughbred algo skips.",
+    "finish_for_record": ["4", "6", "5"],
+    "winner": "Diamond Gem Aa",
+    "win_paid": "$3.56",
+    "place_paid": "$2.60",
+    "show_paid": "$2.20",
+    "trifecta": {"runners": "4-6-5", "payout_50c": "$7.86"}
+  },
+  "7": {
+    "finish": ["1", "7", "5"],
+    "winner": "Honfleur",
+    "win_paid": "$4.12",
+    "place_paid": "$2.68",
+    "show_paid": "$2.16",
+    "trifecta": {"runners": "1-7-5", "payout_50c": "$16.54"},
+    "superfecta": {"runners": "1-7-5-4", "payout_10c": "$9.65"},
+    "_algo_note": "TOP-1 HIT. Algo had #1 Honfleur at 30.6%. Trifecta box 1-4-5 LOST (came in 1-7-5) — under-spread missed #7 Vow to Resiliency (algo's #4 at 10%)."
+  },
+  "8": {
+    "finish": ["6", "2"],
+    "winner": "Jensco",
+    "win_paid": "$4.16",
+    "place_paid": "$2.56",
+    "_partial": true,
+    "_partial_reason": "Show payouts + 3rd place not yet posted at scrape time.",
+    "_algo_note": "TOP-1 + EXACTA IN ORDER. Algo top 2: #6 (32.2%), #2 (23.6%). Cleanest forward call after R5."
+  },
+  "9": {
+    "finish": ["8", "5", "4"],
+    "winner": "Lagynos",
+    "win_paid": "$4.54",
+    "place_paid": "$2.84",
+    "show_paid": "$2.26",
+    "exacta": {"runners": "8-5", "payout": "$25.12"},
+    "trifecta": {"runners": "8-5-4", "payout_50c": "$16.71"},
+    "superfecta": {"runners": "8-5-4-2", "payout_10c": "$25.82"},
+    "_algo_note": "ALGO TOP-1 HIT. Algo had #8 Lagynos at 38.1%. Pool-disparity flag fired against #8 (+12pt W-P gap) — and FAILED. First flag miss in 5 chances. Hypothesis: flag may not generalize to stakes races with top connections (Asmussen/J.Ortiz). N=1 — log not ship.",
+    "_signal_outcomes": {
+      "chalk_doubt": "FAILED (predicted #8 lose, #8 won)",
+      "smart_money_board": "HIT (predicted #5 board, #5 was 2nd)",
+      "show_pool_spike": "HIT (predicted #4 board, #4 was 3rd)"
+    }
+  },
+  "11": {
+    "finish": ["5", "8", "6", "3"],
+    "winner": "Cy Fair",
+    "win_paid": "$3.98",
+    "place_paid": "$2.40",
+    "show_paid": "$2.10",
+    "trifecta": {"runners": "5-8-6", "payout_50c": "$4.75"},
+    "superfecta": {"runners": "5-8-6-3", "payout_10c": "$2.41"},
+    "super_high_5": {"runners": "5-8-6-3-9", "payout_1": "$80.09"},
+    "double": {"runners": "9-5", "payout_1": "$3.75"},
+    "pick3": {"runners": "8-9-5", "payout_50c": "$5.31"},
+    "_algo_note": "ALGO TOP-4 IN EXACT FORWARD ORDER. Cleanest call of the day. #5 Cy Fair → #8 Slay the Day → #6 Hen Party → #3 Final Accord matches the algo's pre-race ranking 1→2→3→4. Trifecta and Superfecta hit straight from algo's top picks.",
+    "_signal_outcomes": {
+      "chalk_doubt": "FAILED for 3rd consecutive stakes test (#5 won despite +14.9 W-P at 22 MTP, +15.8 at 11 MTP). Stakes-segmentation hypothesis now N=3 same direction.",
+      "smart_money_board_on_7": "MISSED (#7 Midnight Martini didn't make top 4)",
+      "compound_smart_money_on_6": "HIT (#6 Hen Party showed -3.7 W-P + -4.3 W-S compound smart-board, finished 3rd as predicted)"
+    },
+    "_chalk_doubt_record_after_R11": "4 hits / 3 misses = 57% — flag is now barely above coin flip. The stakes failures (R9, R10, R11) systematically erode the morning's claiming/maiden record."
+  },
+  "10": {
+    "finish": ["9", "8", "2", "1"],
+    "winner": "Maximum Bourbon",
+    "win_paid": "$3.92",
+    "place_paid": "$2.76",
+    "show_paid": "$2.24",
+    "exacta_inferred": {"runners": "9-8", "_note": "exacta payout not on results page yet, derived from trifecta"},
+    "trifecta": {"runners": "9-8-2", "payout_50c": "$27.68"},
+    "superfecta": {"runners": "9-8-2-1", "payout_10c": "$19.55"},
+    "super_high_5": {"runners": "9-8-2-1-4", "payout_1": "$611.42"},
+    "double": {"runners": "8-9", "payout_1": "$7.18"},
+    "pick3": {"runners": "6-8-9", "payout_50c": "$6.75"},
+    "_algo_note": "ALGO TOP-2 HIT. Algo had #9 Maximum Bourbon (Prat/D'Amato) at #2 (19.7%). Algo's #1 #2 Built finished 3rd. Pool-disparity flag fired against #9 (+5.2 W-P + +7.3 W-S compound) — FAILED again (2nd consecutive stakes miss).",
+    "_signal_outcomes": {
+      "chalk_doubt": "FAILED (predicted #9 lose, #9 won) — 2nd consecutive stakes failure",
+      "smart_money_board_on_6": "MIXED (#6 Back Em Up faded out of board)"
+    },
+    "_super_box_lesson": "Algo's recommended 4-horse super box `2-9-6-1` MISSED — required #8 Bourbon Bash (algo's #5) in 4th. The 5-horse super box `2-9-6-1-8` would have hit. In stakes-grade fields with multiple top-tier connections, expand super coverage to algo top-5."
+  },
+  "_summary": {
+    "races_run": 10,
+    "races_scored_by_algo": 9,
+    "algo_top1_hits": ["R5", "R7", "R8", "R9"],
+    "algo_top1_rate": "4/9 = 44%",
+    "algo_top2_hits_last_5": ["R5", "R7", "R8", "R9", "R10"],
+    "algo_top2_rate_recent": "5/5 = 100% in last 5 algo-scored races",
+    "algo_top3_hits": ["R1", "R2", "R3", "R4", "R5", "R7", "R8", "R10"],
+    "algo_top3_rate": "8/9 = 88.9%",
+    "exacta_in_order_hits": ["R5", "R8"],
+    "pool_disparity_flag_record": "4 hits / 2 misses = 67%",
+    "_flag_segmentation_finding": "Flag = 4/4 in claiming/maiden/allowance, 0/2 in stakes. Use as overlay only, never as override.",
+    "smart_money_board_record": "2 hits / 0 miss",
+    "show_pool_spike_record": "1 hit / 0 miss (N=1)"
+  }
+}
