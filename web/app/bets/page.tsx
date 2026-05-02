@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CD_2026_05_02 as TODAYS_CARD, CD_2026_05_02_DATE as TODAYS_DATE } from "../lib/cd-2026-05-02";
 import HorseGPT from "../components/HorseGPT";
 import { computeExoticsAnalytic, conditionalNextProbs, getRaceProbs, type RaceExoticRecs, type RaceProbs } from "../lib/bet-sheet";
-import type { StaticRace } from "../lib/keeneland-apr18";
+import type { StaticRace } from "../lib/static-types";
 import {
   allRacePicks,
   computeMultiRaceRec,

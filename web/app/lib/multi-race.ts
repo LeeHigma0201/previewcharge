@@ -3,7 +3,7 @@
 // recommendations for Pick 3/4/5/6.
 
 import type { HorseEntry, RaceInfo } from "./types";
-import type { StaticRace, StaticHorse } from "./keeneland-apr18";
+import type { StaticRace, StaticHorse } from "./static-types";
 import { CD_2026_04_30 as TODAYS_CARD } from "./cd-2026-04-30";
 
 function staticToEntries(race: StaticRace): { horses: HorseEntry[]; raceInfo: RaceInfo } {

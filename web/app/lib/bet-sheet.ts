@@ -4,7 +4,7 @@
 // combo probabilities via iterative conditional probabilities (Harville).
 
 import type { BetStrategy, ExoticCombo } from "./types";
-import type { StaticRace } from "./keeneland-apr18";
+import type { StaticRace } from "./static-types";
 import { pickForRace } from "./multi-race";
 
 const TAKEOUT = 0.22;

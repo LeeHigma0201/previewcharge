@@ -2362,13 +2362,13 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "LOW",
-      "totalCost": 0.6,
+      "totalCost": 3.0,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 11,3,8 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 11,3,8 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         }
       ],
@@ -2462,20 +2462,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 8,4,1 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 8,4,1 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 8 / 4,1,9,6 / 4,1,9,6 / 4,1,9,6 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 8 / 4,1,9,6 / 4,1,9,6 / 4,1,9,6 / 4,1,9,6 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -2576,20 +2576,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 12,6,5 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 12,6,5 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 12 / 6,5,10,9,1 / 6,5,10,9,1 / 6,5,10,9,1 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 12 / 6,5,10,9 / 6,5,10,9 / 6,5,10,9 / 6,5,10,9 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -2696,20 +2696,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 4,5,2 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 4,5,2 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 4 / 5,2,1,6 / 5,2,1,6 / 5,2,1,6 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: LONE_SPEED; TOP_LAYOFF. Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 4 / 5,2,1,6 / 5,2,1,6 / 5,2,1,6 / 5,2,1,6 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: LONE_SPEED; TOP_LAYOFF. Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -2796,13 +2796,13 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "LOW",
-      "totalCost": 0.6,
+      "totalCost": 3.0,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 3,9,7 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 3,9,7 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         }
       ],
@@ -2903,20 +2903,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 2,4,6 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 2,4,6 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 2 / 4,6,10,11 / 4,6,10,11 / 4,6,10,11 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 2 / 4,6,10,11 / 4,6,10,11 / 4,6,10,11 / 4,6,10,11 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: OVERLAY_CLOSER. Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -3023,20 +3023,20 @@
       "edgeTier": "PARTIAL_EDGE",
       "isDerby": false,
       "confidence": "HIGH",
-      "totalCost": 1.1,
+      "totalCost": 4.4,
       "plays": [
         {
           "structure": "Exacta forward",
-          "ticket": "EX 2/3 $0.50",
-          "cost": 0.5,
+          "ticket": "EX 2/3 $2.00",
+          "cost": 2.0,
           "rationale": "Forward the divergence \u2014 don't pay box premium for the public-supported leg.",
           "confidence": "MEDIUM"
         },
         {
-          "structure": "Superfecta wheel",
-          "ticket": "SUPER 2-3-8,5,4/8,5,4 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Small super wheel under the forward exacta.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 2 / 3,8,5,4 / 3,8,5,4 / 3,8,5,4 / 3,8,5,4 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Small super wheel under the forward exacta. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -3130,20 +3130,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 1,6,2 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 1,6,2 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 1 / 6,2,7,8 / 6,2,7,8 / 6,2,7,8 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: PP_OVERLAY. Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 1 / 6,2,7,8 / 6,2,7,8 / 6,2,7,8 / 6,2,7,8 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: PP_OVERLAY. Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -3244,13 +3244,13 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "LOW",
-      "totalCost": 0.6,
+      "totalCost": 3.0,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 4,12,8 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 4,12,8 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         }
       ],
@@ -3344,20 +3344,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 6,2,1 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 6,2,1 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 6 / 2,1,7,5 / 2,1,7,5 / 2,1,7,5 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: TOP_LAYOFF. Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 6 / 2,1,7,5 / 2,1,7,5 / 2,1,7,5 / 2,1,7,5 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: TOP_LAYOFF. Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -3458,20 +3458,20 @@
       "edgeTier": "PARTIAL_EDGE",
       "isDerby": false,
       "confidence": "HIGH",
-      "totalCost": 1.1,
+      "totalCost": 4.4,
       "plays": [
         {
           "structure": "Exacta forward",
-          "ticket": "EX 6/4 $0.50",
-          "cost": 0.5,
+          "ticket": "EX 6/4 $2.00",
+          "cost": 2.0,
           "rationale": "Forward the divergence \u2014 don't pay box premium for the public-supported leg.",
           "confidence": "MEDIUM"
         },
         {
-          "structure": "Superfecta wheel",
-          "ticket": "SUPER 6-4-9,10,3/9,10,3 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Small super wheel under the forward exacta.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 6 / 4,9,10,3 / 4,9,10,3 / 4,9,10,3 / 4,9,10,3 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Small super wheel under the forward exacta. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -3572,7 +3572,7 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": true,
       "confidence": "HIGH",
-      "totalCost": 15.6,
+      "totalCost": 19.6,
       "plays": [
         {
           "structure": "Superfecta 3-key wheel",
@@ -3583,8 +3583,8 @@
         },
         {
           "structure": "Trifecta key",
-          "ticket": "TRI KEY 1 / 6,18,12,9,8 / 6,18,12,9,8 @ $0.10",
-          "cost": 2.0,
+          "ticket": "TRI KEY 1 / 6,18,12,9 / 6,18,12,9 @ $0.50",
+          "cost": 6.0,
           "rationale": "Backup trifecta keying #1 over top-5.",
           "confidence": "MEDIUM"
         },
@@ -3693,20 +3693,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 10,8,11 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 10,8,11 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 10 / 8,11,1,5 / 8,11,1,5 / 8,11,1,5 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: . Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 10 / 8,11,1,5 / 8,11,1,5 / 8,11,1,5 / 8,11,1,5 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: . Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -3807,20 +3807,20 @@
       "edgeTier": "CHALK_MATCH",
       "isDerby": false,
       "confidence": "MEDIUM",
-      "totalCost": 6.6,
+      "totalCost": 5.4,
       "plays": [
         {
           "structure": "Trifecta box (saver)",
-          "ticket": "TRI BOX 8,3,7 @ $0.10",
-          "cost": 0.6,
-          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Tiny saver; if chalk holds you cash, if upset you lose less than 1 win bet.",
+          "ticket": "TRI BOX 8,3,7 @ $0.50",
+          "cost": 3.0,
+          "rationale": "Chalk match \u2014 algo top-3 = market top-3. Saver: $0.50 trifecta box of algo top-3.",
           "confidence": "LOW"
         },
         {
-          "structure": "Superfecta angle (upset coverage)",
-          "ticket": "SUPER 8 / 3,7,5,9,13 / 3,7,5,9,13 / 3,7,5,9,13 @ $0.10",
-          "cost": 6.0,
-          "rationale": "Angle flag: LONE_SPEED; PP_OVERLAY; PP_OVERLAY. Wheel angle horses underneath top algo pick.",
+          "structure": "Hi-5 part-wheel ($0.10 min)",
+          "ticket": "HI5 8 / 3,7,5,9 / 3,7,5,9 / 3,7,5,9 / 3,7,5,9 @ $0.10",
+          "cost": 2.4,
+          "rationale": "Angle flag: LONE_SPEED; PP_OVERLAY; PP_OVERLAY. Wheel angle horses underneath top algo pick. [Hi-5 $0.10 \u2014 cheaper than $1 super, covers 5-deep finish]",
           "confidence": "MEDIUM"
         }
       ],
@@ -3928,7 +3928,7 @@
       ]
     }
   ],
-  "exoticV3Total": 72.4,
+  "exoticV3Total": 80.6,
   "exoticV3Chains": [
     {
       "type": "pick3",
@@ -7277,12 +7277,12 @@
   },
   "smartDerby": {
     "super": {
-      "structure": "Anti-Public Anchor Super (key data-proven, fade trap chalk on top)",
+      "structure": "Superfecta key ($1 base)",
       "keys_pos1": "12,9",
       "keys_pos2_4": "12,9,1,6,18,8",
-      "ticket": "SUPER 12,9 / 12,9,1,6,18,8 / 12,9,1,6,18,8 / 12,9,1,6,18,8 @ $0.10",
-      "cost": 12.0,
-      "combos": 120,
+      "ticket": "SUPER 12 / 9,1,6 / same / same @ $1.00",
+      "cost": 24.0,
+      "combos": 24,
       "hitProb": 0.06745,
       "expectedReturn": 112.98,
       "expectedROIPct": 841.5,
@@ -7297,7 +7297,8 @@
         "15",
         "5",
         "17"
-      ]
+      ],
+      "unit": 1.0
     },
     "place": {
       "structure": "Place bet on top public overlay",
@@ -7306,7 +7307,30 @@
       "cost": 2.0,
       "rationale": "Best-priced PUBLIC_OVERLAY in the field. Place bet returns capital if hits 1st OR 2nd."
     },
-    "totalCost": 14.0
+    "totalCost": 26.0,
+    "hi5_options": {
+      "1key_cheap": {
+        "structure": "Hi-5 single-key part-wheel ($0.10)",
+        "ticket": "HI5 12 / 9,1,6,18 / same / same / same @ $0.10",
+        "cost": 2.4,
+        "combos": 24,
+        "note": "1 key + 4 underneath, 24 combos at $0.10 = $2.40 (cheap chaos coverage)"
+      },
+      "2keys_better": {
+        "structure": "Hi-5 anti-public part-wheel ($0.10)",
+        "ticket": "HI5 12,9 / 12,9,1,6,18 / same / same / same @ $0.10",
+        "cost": 4.8,
+        "combos": 48,
+        "note": "2 keys (#12,9) \u00d7 5-horse wheel for 2nd-5th, 48 combos at $0.10 = $4.80"
+      }
+    },
+    "recommendedTicket": {
+      "structure": "Hi-5 anti-public part-wheel ($0.10)",
+      "ticket": "HI5 12,9 / 12,9,1,6,18 / same / same / same @ $0.10",
+      "cost": 4.8,
+      "combos": 48,
+      "note": "2 keys (#12,9) \u00d7 5-horse wheel for 2nd-5th, 48 combos at $0.10 = $4.80"
+    }
   },
   "algorithmPipeline": {
     "steps": [

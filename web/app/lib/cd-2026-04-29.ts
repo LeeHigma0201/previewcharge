@@ -3,7 +3,7 @@
 // Data source: BRIS Ultimate PPs PDF (parsed via scripts/parse_bris_pdf.py).
 // Track bias uses CD spring-meet defaults (cd-context.ts CD_DEFAULT_BIASES).
 
-import type { StaticRace, StaticHorse } from "./keeneland-apr18";
+import type { StaticRace, StaticHorse } from "./static-types";
 
 const h = (
   program: string, name: string, ml: number, style: string,
