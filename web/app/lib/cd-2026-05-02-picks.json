@@ -2377,84 +2377,126 @@
         {
           "program": "11",
           "name": "Powershift",
-          "p1": 0.2523,
-          "p2": 0.188,
-          "p3": 0.2614,
-          "p4": 0.2866,
-          "itm": 0.7018,
+          "p1": 0.2909,
+          "p2": 0.2125,
+          "p3": 0.3205,
+          "p4": 0.3699,
+          "itm": 0.8239,
           "mlOdds": 0.196587379260457
         },
         {
           "program": "3",
           "name": "Silent Way",
-          "p1": 0.2077,
-          "p2": 0.1734,
-          "p3": 0.2362,
-          "p4": 0.2649,
-          "itm": 0.6174,
+          "p1": 0.2205,
+          "p2": 0.1932,
+          "p3": 0.28,
+          "p4": 0.3346,
+          "itm": 0.6937,
           "mlOdds": 0.1572699034083656
         },
         {
           "program": "8",
           "name": "Bourbon Dream",
-          "p1": 0.1467,
-          "p2": 0.1429,
-          "p3": 0.1942,
-          "p4": 0.2284,
-          "itm": 0.4838,
+          "p1": 0.1521,
+          "p2": 0.1579,
+          "p3": 0.2284,
+          "p4": 0.2892,
+          "itm": 0.5384,
           "mlOdds": 0.13105825284030467
         },
         {
           "program": "6",
           "name": "Cromwell",
-          "p1": 0.1256,
-          "p2": 0.1294,
-          "p3": 0.1768,
-          "p4": 0.213,
-          "itm": 0.4318,
+          "p1": 0.1323,
+          "p2": 0.1446,
+          "p3": 0.2101,
+          "p4": 0.2727,
+          "itm": 0.487,
           "mlOdds": 0.11233564529168971
-        },
-        {
-          "program": "10",
-          "name": "Midnight Playboy",
-          "p1": 0.0505,
-          "p2": 0.0672,
-          "p3": 0.0984,
-          "p4": 0.1328,
-          "itm": 0.2161,
-          "mlOdds": 0.04914684481511425
         },
         {
           "program": "1",
           "name": "Bhatia",
-          "p1": 0.0493,
-          "p2": 0.066,
-          "p3": 0.0969,
-          "p4": 0.1257,
-          "itm": 0.2122,
+          "p1": 0.054,
+          "p2": 0.0762,
+          "p3": 0.118,
+          "p4": 0.1725,
+          "itm": 0.2482,
           "mlOdds": 0.04914684481511425
         },
         {
           "program": "5",
           "name": "Get Them Roses",
-          "p1": 0.0493,
-          "p2": 0.066,
-          "p3": 0.0953,
-          "p4": 0.1257,
-          "itm": 0.2106,
+          "p1": 0.0528,
+          "p2": 0.0749,
+          "p3": 0.1162,
+          "p4": 0.1615,
+          "itm": 0.2439,
+          "mlOdds": 0.04914684481511425
+        },
+        {
+          "program": "10",
+          "name": "Midnight Playboy",
+          "p1": 0.0524,
+          "p2": 0.0745,
+          "p3": 0.1134,
+          "p4": 0.1609,
+          "itm": 0.2402,
           "mlOdds": 0.04914684481511425
         },
         {
           "program": "4",
           "name": "Ingleborough",
-          "p1": 0.0434,
-          "p2": 0.0599,
-          "p3": 0.0877,
-          "p4": 0.1173,
-          "itm": 0.1911,
+          "p1": 0.045,
+          "p2": 0.0663,
+          "p3": 0.1027,
+          "p4": 0.148,
+          "itm": 0.2141,
           "mlOdds": 0.0374452150972299
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "11": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.045,
+            "reason": "CD meet trainer: Todd A. Pletcher 22% YTD"
+          }
+        ],
+        "3": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ],
+        "1": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.056,
+            "reason": "CD meet jockey: Luis Saez 20% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 2,
@@ -2491,84 +2533,153 @@
         {
           "program": "8",
           "name": "Taptastic",
-          "p1": 0.2052,
-          "p2": 0.1567,
-          "p3": 0.1993,
-          "p4": 0.2114,
-          "itm": 0.5612,
+          "p1": 0.2272,
+          "p2": 0.1819,
+          "p3": 0.2559,
+          "p4": 0.2982,
+          "itm": 0.665,
           "mlOdds": 0.19497403205096098
-        },
-        {
-          "program": "4",
-          "name": "Memory",
-          "p1": 0.1341,
-          "p2": 0.1232,
-          "p3": 0.1558,
-          "p4": 0.174,
-          "itm": 0.4132,
-          "mlOdds": 0.14179929603706254
         },
         {
           "program": "1",
           "name": "Out of the Woods",
-          "p1": 0.1221,
-          "p2": 0.116,
-          "p3": 0.1472,
-          "p4": 0.1663,
-          "itm": 0.3853,
+          "p1": 0.1779,
+          "p2": 0.1613,
+          "p3": 0.2239,
+          "p4": 0.2697,
+          "itm": 0.5632,
           "mlOdds": 0.11141373260054913
         },
         {
-          "program": "9",
-          "name": "Our Moneyman",
-          "p1": 0.1081,
-          "p2": 0.1069,
-          "p3": 0.1365,
-          "p4": 0.1567,
-          "itm": 0.3515,
-          "mlOdds": 0.11141373260054913
+          "program": "4",
+          "name": "Memory",
+          "p1": 0.1471,
+          "p2": 0.1444,
+          "p3": 0.2005,
+          "p4": 0.2483,
+          "itm": 0.4919,
+          "mlOdds": 0.14179929603706254
         },
         {
           "program": "6",
           "name": "Make My Day",
-          "p1": 0.1021,
-          "p2": 0.1028,
-          "p3": 0.1317,
-          "p4": 0.1523,
-          "itm": 0.3366,
+          "p1": 0.1144,
+          "p2": 0.1228,
+          "p3": 0.172,
+          "p4": 0.2211,
+          "itm": 0.4091,
           "mlOdds": 0.08665512535598265
+        },
+        {
+          "program": "9",
+          "name": "Our Moneyman",
+          "p1": 0.1098,
+          "p2": 0.1194,
+          "p3": 0.1676,
+          "p4": 0.2167,
+          "itm": 0.3967,
+          "mlOdds": 0.11141373260054913
         },
         {
           "program": "2",
           "name": "Sovereign Law",
-          "p1": 0.0851,
-          "p2": 0.0905,
-          "p3": 0.1173,
-          "p4": 0.1358,
-          "itm": 0.2929,
+          "p1": 0.0899,
+          "p2": 0.1039,
+          "p3": 0.1476,
+          "p4": 0.1892,
+          "itm": 0.3414,
           "mlOdds": 0.08665512535598265
         },
         {
           "program": "11",
           "name": "Lincoln's Law",
-          "p1": 0.0791,
-          "p2": 0.0859,
-          "p3": 0.1108,
-          "p4": 0.1305,
-          "itm": 0.2757,
+          "p1": 0.0829,
+          "p2": 0.0981,
+          "p3": 0.138,
+          "p4": 0.181,
+          "itm": 0.3189,
           "mlOdds": 0.07089964801853127
         },
         {
           "program": "7",
           "name": "Very Connected",
-          "p1": 0.0501,
-          "p2": 0.0612,
-          "p3": 0.0823,
-          "p4": 0.1014,
-          "itm": 0.1935,
+          "p1": 0.0509,
+          "p2": 0.0683,
+          "p3": 0.1005,
+          "p4": 0.1383,
+          "itm": 0.2196,
           "mlOdds": 0.059992009861834145
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "8": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Steven M. Asmussen 18% YTD"
+          }
+        ],
+        "4": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "1": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.15,
+            "reason": "CD rail master: John R. Velazquez on post 1 with E-style \u2014 historical 22% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          },
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.2,
+            "reason": "CD pattern: dirt_route post-1 style-E historical advantage"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.056,
+            "reason": "CD meet jockey: Luis Saez 20% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.045,
+            "reason": "CD meet trainer: Todd A. Pletcher 22% YTD"
+          }
+        ],
+        "2": [
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          }
+        ],
+        "11": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 3,
@@ -2611,84 +2722,160 @@
         {
           "program": "12",
           "name": "Praetor",
-          "p1": 0.214,
-          "p2": 0.1562,
-          "p3": 0.1945,
-          "p4": 0.2002,
-          "itm": 0.5647,
+          "p1": 0.2535,
+          "p2": 0.1935,
+          "p3": 0.2786,
+          "p4": 0.3243,
+          "itm": 0.7255,
           "mlOdds": 0.19454057752525153
         },
         {
           "program": "6",
           "name": "Who Dey",
-          "p1": 0.143,
-          "p2": 0.1254,
-          "p3": 0.1545,
-          "p4": 0.1663,
-          "itm": 0.4228,
+          "p1": 0.1678,
+          "p2": 0.1591,
+          "p3": 0.2231,
+          "p4": 0.2747,
+          "itm": 0.5501,
           "mlOdds": 0.14148405638200112
         },
         {
           "program": "5",
           "name": "John Hancock",
-          "p1": 0.131,
-          "p2": 0.1186,
-          "p3": 0.1465,
-          "p4": 0.1595,
-          "itm": 0.3962,
+          "p1": 0.1636,
+          "p2": 0.1568,
+          "p3": 0.2198,
+          "p4": 0.2717,
+          "itm": 0.5402,
           "mlOdds": 0.11116604430014372
         },
         {
           "program": "10",
           "name": "Vibe",
-          "p1": 0.109,
-          "p2": 0.1051,
-          "p3": 0.1309,
-          "p4": 0.1458,
-          "itm": 0.345,
+          "p1": 0.1357,
+          "p2": 0.1399,
+          "p3": 0.1968,
+          "p4": 0.2503,
+          "itm": 0.4724,
           "mlOdds": 0.11116604430014372
         },
         {
           "program": "9",
           "name": "Keewaydin",
-          "p1": 0.081,
-          "p2": 0.0854,
-          "p3": 0.1085,
-          "p4": 0.1253,
-          "itm": 0.2749,
+          "p1": 0.0914,
+          "p2": 0.107,
+          "p3": 0.1537,
+          "p4": 0.2066,
+          "itm": 0.3521,
           "mlOdds": 0.08646247890011179
-        },
-        {
-          "program": "14",
-          "name": "Bullard",
-          "p1": 0.052,
-          "p2": 0.0615,
-          "p3": 0.0815,
-          "p4": 0.0961,
-          "itm": 0.195,
-          "mlOdds": 0.05985863923853893
         },
         {
           "program": "2",
           "name": "Vamos Carlitos",
-          "p1": 0.05,
-          "p2": 0.0597,
-          "p3": 0.0784,
-          "p4": 0.0941,
-          "itm": 0.1882,
+          "p1": 0.0697,
+          "p2": 0.0879,
+          "p3": 0.129,
+          "p4": 0.1712,
+          "itm": 0.2866,
           "mlOdds": 0.04863514438131288
+        },
+        {
+          "program": "14",
+          "name": "Bullard",
+          "p1": 0.061,
+          "p2": 0.0797,
+          "p3": 0.1163,
+          "p4": 0.1592,
+          "itm": 0.257,
+          "mlOdds": 0.05985863923853893
         },
         {
           "program": "4",
           "name": "Comport",
-          "p1": 0.05,
-          "p2": 0.0597,
-          "p3": 0.0784,
-          "p4": 0.0941,
-          "itm": 0.1882,
+          "p1": 0.0573,
+          "p2": 0.0761,
+          "p3": 0.1116,
+          "p4": 0.1538,
+          "itm": 0.245,
           "mlOdds": 0.04863514438131288
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "12": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Chad C. Brown 18% YTD"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: Brian J. Hernandez Jr. 18% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          }
+        ],
+        "10": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.056,
+            "reason": "CD meet jockey: Luis Saez 20% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.045,
+            "reason": "CD meet trainer: Todd A. Pletcher 22% YTD"
+          }
+        ],
+        "14": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          }
+        ],
+        "2": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.0875,
+            "reason": "CD rail master: Tyler Gaffalione on post 2 with EP-style \u2014 historical 17% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          },
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.1,
+            "reason": "CD pattern: dirt_route post-2 style-EP historical advantage"
+          }
+        ],
+        "4": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 4,
@@ -2731,64 +2918,123 @@
         {
           "program": "4",
           "name": "Ways and Means",
-          "p1": 0.3227,
-          "p2": 0.2418,
-          "p3": 0.4058,
-          "p4": 0.5225,
-          "itm": 0.9702,
+          "p1": 0.3167,
+          "p2": 0.2408,
+          "p3": 0.4023,
+          "p4": 0.5198,
+          "itm": 0.9598,
           "mlOdds": 0.29809528725545864
         },
         {
           "program": "5",
           "name": "Splendora",
-          "p1": 0.2527,
-          "p2": 0.2281,
-          "p3": 0.3648,
-          "p4": 0.4875,
-          "itm": 0.8456,
+          "p1": 0.2573,
+          "p2": 0.2291,
+          "p3": 0.3674,
+          "p4": 0.49,
+          "itm": 0.8537,
           "mlOdds": 0.2583492489547308
         },
         {
           "program": "2",
           "name": "Haulin Ice",
-          "p1": 0.1618,
-          "p2": 0.1821,
-          "p3": 0.2896,
-          "p4": 0.4203,
-          "itm": 0.6336,
+          "p1": 0.1601,
+          "p2": 0.1806,
+          "p3": 0.2874,
+          "p4": 0.4186,
+          "itm": 0.6281,
           "mlOdds": 0.1550095493728385
         },
         {
           "program": "1",
           "name": "Usha",
-          "p1": 0.1299,
-          "p2": 0.1585,
-          "p3": 0.2537,
-          "p4": 0.3851,
-          "itm": 0.542,
+          "p1": 0.1356,
+          "p2": 0.1627,
+          "p3": 0.2601,
+          "p4": 0.3921,
+          "itm": 0.5585,
           "mlOdds": 0.14091777215712592
         },
         {
           "program": "6",
           "name": "R Disaster",
-          "p1": 0.1009,
-          "p2": 0.1334,
-          "p3": 0.2162,
-          "p4": 0.3422,
-          "itm": 0.4505,
+          "p1": 0.0981,
+          "p2": 0.1306,
+          "p3": 0.212,
+          "p4": 0.3372,
+          "itm": 0.4408,
           "mlOdds": 0.11072110669488464
         },
         {
           "program": "3",
           "name": "Autumn Evening",
-          "p1": 0.032,
-          "p2": 0.0562,
-          "p3": 0.1014,
-          "p4": 0.1704,
-          "itm": 0.1895,
+          "p1": 0.0321,
+          "p2": 0.0563,
+          "p3": 0.1015,
+          "p4": 0.1706,
+          "itm": 0.1898,
           "mlOdds": 0.03690703556496155
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "4": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Chad C. Brown 18% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "2": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.05,
+            "reason": "Generic rail-and-early bonus (post 2, style EP)"
+          }
+        ],
+        "1": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.05,
+            "reason": "Generic rail-and-early bonus (post 1, style EP)"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ],
+        "3": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 5,
@@ -2818,84 +3064,126 @@
         {
           "program": "3",
           "name": "My Boy Prince",
-          "p1": 0.3193,
-          "p2": 0.2069,
-          "p3": 0.3024,
-          "p4": 0.3223,
-          "itm": 0.8286,
+          "p1": 0.3281,
+          "p2": 0.2177,
+          "p3": 0.3338,
+          "p4": 0.3726,
+          "itm": 0.8797,
           "mlOdds": 0.22821979819762875
         },
         {
           "program": "9",
           "name": "Litigation",
-          "p1": 0.1892,
-          "p2": 0.172,
-          "p3": 0.2323,
-          "p4": 0.262,
-          "itm": 0.5935,
+          "p1": 0.2036,
+          "p2": 0.1874,
+          "p3": 0.265,
+          "p4": 0.3126,
+          "itm": 0.656,
           "mlOdds": 0.19969232342292514
         },
         {
           "program": "7",
           "name": "Yellow Card",
-          "p1": 0.1221,
-          "p2": 0.1318,
-          "p3": 0.1803,
-          "p4": 0.2163,
-          "itm": 0.4342,
+          "p1": 0.1265,
+          "p2": 0.1413,
+          "p3": 0.2024,
+          "p4": 0.2566,
+          "itm": 0.4702,
           "mlOdds": 0.1452307806712183
         },
         {
           "program": "10",
           "name": "Joe Shiesty",
-          "p1": 0.0951,
-          "p2": 0.111,
-          "p3": 0.1541,
-          "p4": 0.1921,
-          "itm": 0.3603,
+          "p1": 0.0962,
+          "p2": 0.1172,
+          "p3": 0.1705,
+          "p4": 0.2262,
+          "itm": 0.3839,
           "mlOdds": 0.11410989909881437
         },
         {
           "program": "5",
           "name": "Possiblemente",
-          "p1": 0.0721,
-          "p2": 0.0909,
-          "p3": 0.129,
-          "p4": 0.1667,
-          "itm": 0.2919,
+          "p1": 0.0729,
+          "p2": 0.096,
+          "p3": 0.1427,
+          "p4": 0.1966,
+          "itm": 0.3116,
           "mlOdds": 0.07261539033560915
         },
         {
           "program": "8",
           "name": "Mondogetsbuckets",
-          "p1": 0.0661,
-          "p2": 0.0853,
-          "p3": 0.1219,
-          "p4": 0.1531,
-          "itm": 0.2732,
+          "p1": 0.069,
+          "p2": 0.0921,
+          "p3": 0.1376,
+          "p4": 0.1823,
+          "itm": 0.2987,
           "mlOdds": 0.08875214374352229
         },
         {
           "program": "1",
           "name": "Wendelssohn",
-          "p1": 0.0511,
-          "p2": 0.0702,
-          "p3": 0.1012,
-          "p4": 0.1328,
-          "itm": 0.2224,
+          "p1": 0.0591,
+          "p2": 0.0821,
+          "p3": 0.1219,
+          "p4": 0.1675,
+          "itm": 0.2631,
           "mlOdds": 0.049923080855731286
         },
         {
           "program": "6",
           "name": "Its Bourbon Thirty",
-          "p1": 0.044,
-          "p2": 0.0627,
-          "p3": 0.0919,
-          "p4": 0.1225,
-          "itm": 0.1987,
+          "p1": 0.0445,
+          "p2": 0.0662,
+          "p3": 0.1013,
+          "p4": 0.1433,
+          "itm": 0.212,
           "mlOdds": 0.049923080855731286
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "3": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ],
+        "9": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          }
+        ],
+        "7": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          }
+        ],
+        "8": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ],
+        "1": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.1,
+            "reason": "CD rail master: Brian J. Hernandez Jr. on post 1 with EP-style \u2014 historical 18% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: Brian J. Hernandez Jr. 18% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 6,
@@ -2938,84 +3226,141 @@
         {
           "program": "2",
           "name": "Dragoon Guard",
-          "p1": 0.242,
-          "p2": 0.1819,
-          "p3": 0.2476,
-          "p4": 0.2697,
-          "itm": 0.6714,
+          "p1": 0.3263,
+          "p2": 0.22,
+          "p3": 0.3411,
+          "p4": 0.3879,
+          "itm": 0.8874,
           "mlOdds": 0.19480033713524808
         },
         {
           "program": "4",
           "name": "Be You",
-          "p1": 0.186,
-          "p2": 0.161,
-          "p3": 0.2147,
-          "p4": 0.2414,
-          "itm": 0.5618,
+          "p1": 0.1904,
+          "p2": 0.1828,
+          "p3": 0.2619,
+          "p4": 0.3187,
+          "itm": 0.635,
           "mlOdds": 0.17315585523133162
         },
         {
           "program": "6",
           "name": "Tour Player",
-          "p1": 0.17,
-          "p2": 0.1532,
-          "p3": 0.2041,
-          "p4": 0.2322,
-          "itm": 0.5273,
+          "p1": 0.164,
+          "p2": 0.168,
+          "p3": 0.2411,
+          "p4": 0.3003,
+          "itm": 0.573,
           "mlOdds": 0.15584026970819848
         },
         {
           "program": "10",
           "name": "Capital Idea",
-          "p1": 0.111,
-          "p2": 0.1171,
-          "p3": 0.1577,
-          "p4": 0.1907,
-          "itm": 0.3858,
+          "p1": 0.1046,
+          "p2": 0.1254,
+          "p3": 0.1834,
+          "p4": 0.2466,
+          "itm": 0.4134,
           "mlOdds": 0.12986689142349872
         },
         {
           "program": "11",
           "name": "Moonlight",
-          "p1": 0.077,
-          "p2": 0.0905,
-          "p3": 0.1248,
-          "p4": 0.1582,
-          "itm": 0.2924,
+          "p1": 0.0737,
+          "p2": 0.0976,
+          "p3": 0.1464,
+          "p4": 0.2063,
+          "itm": 0.3177,
           "mlOdds": 0.08657792761566581
         },
         {
           "program": "7",
           "name": "Will Take It",
-          "p1": 0.069,
-          "p2": 0.0835,
-          "p3": 0.1163,
-          "p4": 0.1436,
-          "itm": 0.2688,
+          "p1": 0.0676,
+          "p2": 0.0916,
+          "p3": 0.1384,
+          "p4": 0.1872,
+          "itm": 0.2976,
           "mlOdds": 0.08657792761566581
         },
         {
           "program": "1",
           "name": "Brotha Keny",
-          "p1": 0.047,
-          "p2": 0.0626,
-          "p3": 0.0891,
-          "p4": 0.1163,
-          "itm": 0.1987,
+          "p1": 0.0443,
+          "p2": 0.0665,
+          "p3": 0.1029,
+          "p4": 0.1483,
+          "itm": 0.2137,
           "mlOdds": 0.04870008428381202
         },
         {
           "program": "3",
           "name": "Banjo Chris",
-          "p1": 0.031,
-          "p2": 0.0454,
-          "p3": 0.068,
-          "p4": 0.0925,
-          "itm": 0.1444,
+          "p1": 0.0292,
+          "p2": 0.0481,
+          "p3": 0.0785,
+          "p4": 0.118,
+          "itm": 0.1558,
           "mlOdds": 0.037104826120999634
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "2": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.125,
+            "reason": "CD rail master: Irad Ortiz Jr. on post 2 with E-style \u2014 historical 20% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          },
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.15,
+            "reason": "CD pattern: dirt_route post-2 style-E historical advantage"
+          }
+        ],
+        "4": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.045,
+            "reason": "CD meet trainer: Todd A. Pletcher 22% YTD"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          }
+        ],
+        "11": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ],
+        "7": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: Brian J. Hernandez Jr. 18% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 7,
@@ -3045,84 +3390,148 @@
         {
           "program": "2",
           "name": "Sweet Rebecca",
-          "p1": 0.278,
-          "p2": 0.1965,
-          "p3": 0.2797,
-          "p4": 0.309,
-          "itm": 0.7542,
+          "p1": 0.3009,
+          "p2": 0.2078,
+          "p3": 0.3084,
+          "p4": 0.3467,
+          "itm": 0.8171,
           "mlOdds": 0.2217474456830752
         },
         {
           "program": "3",
           "name": "Portfolio Duration",
-          "p1": 0.182,
-          "p2": 0.1645,
-          "p3": 0.2242,
-          "p4": 0.2604,
-          "itm": 0.5707,
+          "p1": 0.1842,
+          "p2": 0.1719,
+          "p3": 0.2404,
+          "p4": 0.287,
+          "itm": 0.5966,
           "mlOdds": 0.15522321197815264
         },
         {
           "program": "8",
           "name": "Pin Up Betty",
-          "p1": 0.133,
-          "p2": 0.1364,
-          "p3": 0.187,
-          "p4": 0.227,
-          "itm": 0.4564,
+          "p1": 0.1347,
+          "p2": 0.1426,
+          "p3": 0.2008,
+          "p4": 0.2512,
+          "itm": 0.4781,
           "mlOdds": 0.17247023553128069
         },
         {
           "program": "5",
           "name": "Classic Q",
-          "p1": 0.095,
-          "p2": 0.1086,
-          "p3": 0.1517,
-          "p4": 0.1934,
-          "itm": 0.3553,
+          "p1": 0.0953,
+          "p2": 0.1128,
+          "p3": 0.162,
+          "p4": 0.2137,
+          "itm": 0.3701,
           "mlOdds": 0.1108737228415376
         },
         {
           "program": "4",
           "name": "Temptable",
-          "p1": 0.091,
-          "p2": 0.1054,
-          "p3": 0.1476,
-          "p4": 0.1893,
-          "itm": 0.344,
+          "p1": 0.0878,
+          "p2": 0.1064,
+          "p3": 0.1537,
+          "p4": 0.2051,
+          "itm": 0.3479,
+          "mlOdds": 0.08623511776564034
+        },
+        {
+          "program": "9",
+          "name": "Maggie Go",
+          "p1": 0.0718,
+          "p2": 0.092,
+          "p3": 0.135,
+          "p4": 0.177,
+          "itm": 0.2987,
           "mlOdds": 0.08623511776564034
         },
         {
           "program": "7",
           "name": "Movin' On Up",
-          "p1": 0.066,
-          "p2": 0.0835,
-          "p3": 0.12,
-          "p4": 0.1538,
-          "itm": 0.2694,
+          "p1": 0.0647,
+          "p2": 0.0852,
+          "p3": 0.1238,
+          "p4": 0.1672,
+          "itm": 0.2736,
           "mlOdds": 0.05970123537621255
-        },
-        {
-          "program": "9",
-          "name": "Maggie Go",
-          "p1": 0.065,
-          "p2": 0.0825,
-          "p3": 0.1167,
-          "p4": 0.1525,
-          "itm": 0.2643,
-          "mlOdds": 0.08623511776564034
         },
         {
           "program": "1",
           "name": "Italian Soiree",
-          "p1": 0.063,
-          "p2": 0.0806,
-          "p3": 0.1144,
-          "p4": 0.1499,
-          "itm": 0.258,
+          "p1": 0.0608,
+          "p2": 0.0813,
+          "p3": 0.1188,
+          "p4": 0.1615,
+          "itm": 0.2609,
           "mlOdds": 0.07055600544461484
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "2": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.0875,
+            "reason": "CD rail master: Tyler Gaffalione on post 2 with EP-style \u2014 historical 17% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ],
+        "3": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Chad C. Brown 18% YTD"
+          }
+        ],
+        "8": [
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.05,
+            "reason": "CD pattern: turf_route post-8 style-S historical advantage"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          }
+        ],
+        "7": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ],
+        "9": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Chad C. Brown 18% YTD"
+          },
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.05,
+            "reason": "CD pattern: turf_route post-9 style-S historical advantage"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 8,
@@ -3159,84 +3568,153 @@
         {
           "program": "1",
           "name": "Englishman",
-          "p1": 0.225,
-          "p2": 0.1745,
-          "p3": 0.2321,
-          "p4": 0.2509,
-          "itm": 0.6316,
+          "p1": 0.282,
+          "p2": 0.2121,
+          "p3": 0.3194,
+          "p4": 0.3743,
+          "itm": 0.8134,
           "mlOdds": 0.19564186423946914
         },
         {
           "program": "6",
           "name": "Crude Velocity",
-          "p1": 0.224,
-          "p2": 0.1741,
-          "p3": 0.2316,
-          "p4": 0.2504,
-          "itm": 0.6297,
+          "p1": 0.2278,
+          "p2": 0.1969,
+          "p3": 0.2877,
+          "p4": 0.3465,
+          "itm": 0.7124,
           "mlOdds": 0.2235907019879647
         },
         {
           "program": "2",
           "name": "Trouble Calling",
-          "p1": 0.141,
-          "p2": 0.1353,
-          "p3": 0.1781,
-          "p4": 0.2041,
-          "itm": 0.4544,
+          "p1": 0.1743,
+          "p2": 0.1719,
+          "p3": 0.2492,
+          "p4": 0.3122,
+          "itm": 0.5954,
           "mlOdds": 0.13042790949297942
         },
         {
           "program": "7",
           "name": "Crown the Buckeye",
-          "p1": 0.109,
-          "p2": 0.1143,
-          "p3": 0.152,
-          "p4": 0.1805,
-          "itm": 0.3753,
+          "p1": 0.1067,
+          "p2": 0.1258,
+          "p3": 0.1852,
+          "p4": 0.2517,
+          "itm": 0.4177,
           "mlOdds": 0.11179535099398236
         },
         {
           "program": "8",
           "name": "Creole Chrome",
-          "p1": 0.086,
-          "p2": 0.0969,
-          "p3": 0.1307,
-          "p4": 0.1601,
-          "itm": 0.3136,
+          "p1": 0.0875,
+          "p2": 0.1094,
+          "p3": 0.1631,
+          "p4": 0.2277,
+          "itm": 0.36,
           "mlOdds": 0.08695193966198628
         },
         {
           "program": "10",
           "name": "Great White",
-          "p1": 0.052,
-          "p2": 0.0668,
-          "p3": 0.0942,
-          "p4": 0.1176,
-          "itm": 0.213,
+          "p1": 0.0497,
+          "p2": 0.0719,
+          "p3": 0.1126,
+          "p4": 0.1589,
+          "itm": 0.2343,
           "mlOdds": 0.06019749668906743
         },
         {
           "program": "5",
           "name": "Stop the Car",
-          "p1": 0.037,
-          "p2": 0.0515,
-          "p3": 0.0744,
-          "p4": 0.0976,
-          "itm": 0.1629,
+          "p1": 0.0365,
+          "p2": 0.0567,
+          "p3": 0.0904,
+          "p4": 0.1341,
+          "itm": 0.1836,
           "mlOdds": 0.03726511699799412
         },
         {
           "program": "11",
           "name": "One More Freud",
-          "p1": 0.037,
-          "p2": 0.0515,
-          "p3": 0.0744,
-          "p4": 0.0976,
-          "itm": 0.1629,
+          "p1": 0.0354,
+          "p2": 0.0553,
+          "p3": 0.0885,
+          "p4": 0.1318,
+          "itm": 0.1793,
           "mlOdds": 0.048910466059867284
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "1": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.075,
+            "reason": "CD rail master: Jose L. Ortiz on post 1 with E-style \u2014 historical 16% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          },
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.2,
+            "reason": "CD pattern: dirt_route post-1 style-E historical advantage"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.008,
+            "reason": "CD meet jockey: Florent Geroux 14% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "2": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.1125,
+            "reason": "CD rail master: Luis Saez on post 2 with EP-style \u2014 historical 19% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.056,
+            "reason": "CD meet jockey: Luis Saez 20% YTD"
+          },
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.1,
+            "reason": "CD pattern: dirt_route post-2 style-EP historical advantage"
+          }
+        ],
+        "7": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          }
+        ],
+        "8": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 9,
@@ -3259,84 +3737,147 @@
         {
           "program": "4",
           "name": "Stark Contrast",
-          "p1": 0.187,
-          "p2": 0.1427,
-          "p3": 0.1734,
-          "p4": 0.1786,
-          "itm": 0.5031,
+          "p1": 0.2285,
+          "p2": 0.1816,
+          "p3": 0.2546,
+          "p4": 0.294,
+          "itm": 0.6647,
           "mlOdds": 0.1568588024912545
         },
         {
           "program": "12",
           "name": "Remember Mamba",
-          "p1": 0.148,
-          "p2": 0.125,
-          "p3": 0.1515,
-          "p4": 0.1601,
-          "itm": 0.4245,
+          "p1": 0.1795,
+          "p2": 0.1615,
+          "p3": 0.2232,
+          "p4": 0.2662,
+          "itm": 0.5642,
           "mlOdds": 0.1425989113556859
         },
         {
           "program": "8",
           "name": "Greenwich Village",
-          "p1": 0.107,
-          "p2": 0.1014,
-          "p3": 0.1245,
-          "p4": 0.1369,
-          "itm": 0.3329,
+          "p1": 0.1347,
+          "p2": 0.1362,
+          "p3": 0.1888,
+          "p4": 0.2348,
+          "itm": 0.4597,
           "mlOdds": 0.11204200177946748
         },
         {
           "program": "7",
           "name": "Alpyland",
-          "p1": 0.102,
-          "p2": 0.0982,
-          "p3": 0.1208,
-          "p4": 0.1336,
-          "itm": 0.321,
+          "p1": 0.1227,
+          "p2": 0.1282,
+          "p3": 0.1783,
+          "p4": 0.2249,
+          "itm": 0.4292,
           "mlOdds": 0.08714377916180804
         },
         {
           "program": "5",
           "name": "Blackout Time",
-          "p1": 0.074,
-          "p2": 0.0782,
-          "p3": 0.0986,
-          "p4": 0.1134,
-          "itm": 0.2508,
+          "p1": 0.0933,
+          "p2": 0.1063,
+          "p3": 0.1501,
+          "p4": 0.1968,
+          "itm": 0.3497,
           "mlOdds": 0.07129945567784295
         },
         {
           "program": "14",
           "name": "Final Score",
-          "p1": 0.07,
-          "p2": 0.0751,
-          "p3": 0.0951,
-          "p4": 0.1078,
-          "itm": 0.2402,
+          "p1": 0.0929,
+          "p2": 0.106,
+          "p3": 0.1497,
+          "p4": 0.1901,
+          "itm": 0.3486,
           "mlOdds": 0.08714377916180804
         },
         {
           "program": "10",
           "name": "Vasy",
-          "p1": 0.065,
-          "p2": 0.0711,
-          "p3": 0.0897,
-          "p4": 0.1035,
-          "itm": 0.2258,
+          "p1": 0.0807,
+          "p2": 0.0958,
+          "p3": 0.1347,
+          "p4": 0.176,
+          "itm": 0.3112,
           "mlOdds": 0.07129945567784295
         },
         {
           "program": "9",
           "name": "Honey Dutch",
-          "p1": 0.055,
-          "p2": 0.0628,
-          "p3": 0.0805,
-          "p4": 0.0944,
-          "itm": 0.1983,
+          "p1": 0.0677,
+          "p2": 0.0844,
+          "p3": 0.1202,
+          "p4": 0.1598,
+          "itm": 0.2724,
           "mlOdds": 0.06033030865048249
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "4": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          }
+        ],
+        "12": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ],
+        "8": [
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "7": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.008,
+            "reason": "CD meet jockey: Javier Castellano 14% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.056,
+            "reason": "CD meet jockey: Luis Saez 20% YTD"
+          }
+        ],
+        "14": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.045,
+            "reason": "CD meet trainer: Todd A. Pletcher 22% YTD"
+          }
+        ],
+        "10": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          }
+        ],
+        "9": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 10,
@@ -3374,83 +3915,157 @@
           "program": "6",
           "name": "Knightsbridge",
           "p1": 0.2977,
-          "p2": 0.1998,
-          "p3": 0.2835,
-          "p4": 0.3021,
-          "itm": 0.7811,
+          "p2": 0.2157,
+          "p3": 0.3288,
+          "p4": 0.384,
+          "itm": 0.8422,
           "mlOdds": 0.2768015568656631
         },
         {
           "program": "2",
           "name": "Cornucopian",
-          "p1": 0.1958,
-          "p2": 0.1709,
-          "p3": 0.2288,
-          "p4": 0.2549,
-          "itm": 0.5954,
+          "p1": 0.2169,
+          "p2": 0.1936,
+          "p3": 0.2817,
+          "p4": 0.3424,
+          "itm": 0.6922,
           "mlOdds": 0.1722320798275237
         },
         {
           "program": "1",
           "name": "Disco Time",
-          "p1": 0.1319,
-          "p2": 0.1354,
-          "p3": 0.1822,
-          "p4": 0.214,
-          "itm": 0.4495,
+          "p1": 0.1641,
+          "p2": 0.1668,
+          "p3": 0.2419,
+          "p4": 0.3066,
+          "itm": 0.5728,
           "mlOdds": 0.11072062274626523
         },
         {
           "program": "7",
           "name": "Imagination",
-          "p1": 0.0969,
-          "p2": 0.1099,
-          "p3": 0.1504,
-          "p4": 0.1845,
-          "itm": 0.3572,
+          "p1": 0.1047,
+          "p2": 0.1247,
+          "p3": 0.1838,
+          "p4": 0.2505,
+          "itm": 0.4132,
           "mlOdds": 0.11072062274626523
         },
         {
           "program": "5",
           "name": "Disruptor",
-          "p1": 0.0919,
-          "p2": 0.1059,
-          "p3": 0.1454,
-          "p4": 0.1797,
-          "itm": 0.3432,
+          "p1": 0.1022,
+          "p2": 0.1226,
+          "p3": 0.181,
+          "p4": 0.2475,
+          "itm": 0.4058,
           "mlOdds": 0.08611603991376185
         },
         {
           "program": "11",
           "name": "Point Dume",
           "p1": 0.043,
-          "p2": 0.0601,
-          "p3": 0.0885,
-          "p4": 0.1147,
-          "itm": 0.1917,
+          "p2": 0.0646,
+          "p3": 0.1029,
+          "p4": 0.1474,
+          "itm": 0.2105,
           "mlOdds": 0.04844027245149104
         },
         {
           "program": "10",
           "name": "Banishing",
-          "p1": 0.037,
-          "p2": 0.0536,
-          "p3": 0.079,
-          "p4": 0.1056,
-          "itm": 0.1696,
+          "p1": 0.0382,
+          "p2": 0.059,
+          "p3": 0.0935,
+          "p4": 0.1381,
+          "itm": 0.1906,
           "mlOdds": 0.05961879686337359
         },
         {
           "program": "4",
           "name": "Hall of Fame",
-          "p1": 0.032,
-          "p2": 0.0478,
-          "p3": 0.0719,
-          "p4": 0.0975,
-          "itm": 0.1517,
+          "p1": 0.0333,
+          "p2": 0.053,
+          "p3": 0.0856,
+          "p4": 0.1281,
+          "itm": 0.1719,
           "mlOdds": 0.03690687424875508
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "2": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.05,
+            "reason": "Generic rail-and-early bonus (post 2, style EP)"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "1": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.15,
+            "reason": "CD rail master: John R. Velazquez on post 1 with EP-style \u2014 historical 22% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          }
+        ],
+        "7": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.045,
+            "reason": "CD meet trainer: Todd A. Pletcher 22% YTD"
+          }
+        ],
+        "10": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ],
+        "4": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Steven M. Asmussen 18% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 11,
@@ -3487,84 +4102,136 @@
         {
           "program": "6",
           "name": "Rhetorical",
-          "p1": 0.2507,
-          "p2": 0.1838,
-          "p3": 0.2513,
-          "p4": 0.2733,
-          "itm": 0.6858,
+          "p1": 0.2714,
+          "p2": 0.1999,
+          "p3": 0.2904,
+          "p4": 0.3301,
+          "itm": 0.7617,
           "mlOdds": 0.2245980126858865
         },
         {
           "program": "4",
           "name": "Program Trading",
-          "p1": 0.1838,
-          "p2": 0.1597,
-          "p3": 0.2129,
-          "p4": 0.24,
-          "itm": 0.5565,
+          "p1": 0.1978,
+          "p2": 0.1759,
+          "p3": 0.2468,
+          "p4": 0.2919,
+          "itm": 0.6205,
           "mlOdds": 0.15721860888012057
         },
         {
           "program": "9",
           "name": "Test Score",
-          "p1": 0.1419,
-          "p2": 0.1373,
-          "p3": 0.1834,
-          "p4": 0.214,
-          "itm": 0.4626,
+          "p1": 0.1444,
+          "p2": 0.1469,
+          "p3": 0.2065,
+          "p4": 0.2558,
+          "itm": 0.4978,
           "mlOdds": 0.17468734320013393
         },
         {
           "program": "10",
           "name": "Make Me King",
-          "p1": 0.0919,
-          "p2": 0.1027,
-          "p3": 0.1402,
-          "p4": 0.174,
-          "itm": 0.3348,
+          "p1": 0.095,
+          "p2": 0.1111,
+          "p3": 0.1594,
+          "p4": 0.2106,
+          "itm": 0.3655,
           "mlOdds": 0.11229900634294325
         },
         {
           "program": "3",
           "name": "Asbury Park",
-          "p1": 0.0799,
-          "p2": 0.0929,
-          "p3": 0.1282,
-          "p4": 0.162,
-          "itm": 0.301,
+          "p1": 0.0853,
+          "p2": 0.1029,
+          "p3": 0.1488,
+          "p4": 0.1995,
+          "itm": 0.337,
           "mlOdds": 0.08734367160006697
-        },
-        {
-          "program": "7",
-          "name": "Gold Phoenix",
-          "p1": 0.0659,
-          "p2": 0.0807,
-          "p3": 0.1132,
-          "p4": 0.1411,
-          "itm": 0.2598,
-          "mlOdds": 0.07146300403641843
         },
         {
           "program": "1",
           "name": "Corruption",
-          "p1": 0.0659,
-          "p2": 0.0807,
-          "p3": 0.1114,
-          "p4": 0.1411,
-          "itm": 0.258,
+          "p1": 0.0802,
+          "p2": 0.0984,
+          "p3": 0.1429,
+          "p4": 0.1856,
+          "itm": 0.3216,
           "mlOdds": 0.049130815275037674
+        },
+        {
+          "program": "7",
+          "name": "Gold Phoenix",
+          "p1": 0.067,
+          "p2": 0.0863,
+          "p3": 0.125,
+          "p4": 0.1682,
+          "itm": 0.2783,
+          "mlOdds": 0.07146300403641843
         },
         {
           "program": "5",
           "name": "Mercante",
-          "p1": 0.0579,
-          "p2": 0.0733,
-          "p3": 0.1024,
-          "p4": 0.1314,
-          "itm": 0.2336,
+          "p1": 0.0589,
+          "p2": 0.0784,
+          "p3": 0.1149,
+          "p4": 0.1566,
+          "itm": 0.2522,
           "mlOdds": 0.06046869572312329
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          }
+        ],
+        "4": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Chad C. Brown 18% YTD"
+          }
+        ],
+        "10": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ],
+        "3": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Chad C. Brown 18% YTD"
+          }
+        ],
+        "1": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.15,
+            "reason": "CD rail master: John R. Velazquez on post 1 with EP-style \u2014 historical 22% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 12,
@@ -3608,84 +4275,153 @@
         {
           "program": "1",
           "name": "Renegade",
-          "p1": 0.167,
-          "p2": 0.1203,
-          "p3": 0.1315,
-          "p4": 0.1249,
-          "itm": 0.4187,
+          "p1": 0.2557,
+          "p2": 0.1952,
+          "p3": 0.2818,
+          "p4": 0.3271,
+          "itm": 0.7327,
           "mlOdds": 0.14821677247305398
         },
         {
           "program": "6",
           "name": "Commandment",
-          "p1": 0.122,
-          "p2": 0.0992,
-          "p3": 0.109,
-          "p4": 0.107,
-          "itm": 0.3302,
+          "p1": 0.1845,
+          "p2": 0.1687,
+          "p3": 0.2373,
+          "p4": 0.2876,
+          "itm": 0.5904,
           "mlOdds": 0.10586912319503855
         },
         {
           "program": "18",
           "name": "Further Ado",
-          "p1": 0.111,
-          "p2": 0.0932,
-          "p3": 0.1028,
-          "p4": 0.102,
-          "itm": 0.3071,
+          "p1": 0.1653,
+          "p2": 0.1586,
+          "p3": 0.223,
+          "p4": 0.2747,
+          "itm": 0.5469,
           "mlOdds": 0.10586912319503855
         },
         {
           "program": "12",
           "name": "Chief Wallabee",
-          "p1": 0.09,
-          "p2": 0.0807,
-          "p3": 0.0902,
-          "p4": 0.0917,
-          "itm": 0.2609,
+          "p1": 0.1239,
+          "p2": 0.1325,
+          "p3": 0.1878,
+          "p4": 0.2419,
+          "itm": 0.4442,
           "mlOdds": 0.08234265137391887
         },
         {
           "program": "9",
           "name": "The Puma",
-          "p1": 0.059,
-          "p2": 0.0594,
-          "p3": 0.0689,
-          "p4": 0.0734,
-          "itm": 0.1873,
+          "p1": 0.0819,
+          "p2": 0.0995,
+          "p3": 0.1444,
+          "p4": 0.1969,
+          "itm": 0.3258,
           "mlOdds": 0.06737126021502453
-        },
-        {
-          "program": "8",
-          "name": "So Happy",
-          "p1": 0.048,
-          "p2": 0.0509,
-          "p3": 0.0603,
-          "p4": 0.0645,
-          "itm": 0.1591,
-          "mlOdds": 0.04631774139782936
         },
         {
           "program": "15",
           "name": "Emerging Market",
-          "p1": 0.047,
-          "p2": 0.05,
-          "p3": 0.0589,
-          "p4": 0.0638,
-          "itm": 0.156,
+          "p1": 0.0679,
+          "p2": 0.0868,
+          "p3": 0.1279,
+          "p4": 0.1703,
+          "itm": 0.2826,
+          "mlOdds": 0.04631774139782936
+        },
+        {
+          "program": "8",
+          "name": "So Happy",
+          "p1": 0.0661,
+          "p2": 0.085,
+          "p3": 0.1234,
+          "p4": 0.1677,
+          "itm": 0.2745,
           "mlOdds": 0.04631774139782936
         },
         {
           "program": "20",
           "name": "Fulleffort",
-          "p1": 0.037,
-          "p2": 0.0417,
-          "p3": 0.0504,
-          "p4": 0.0559,
-          "itm": 0.1291,
+          "p1": 0.0547,
+          "p2": 0.0738,
+          "p3": 0.1091,
+          "p4": 0.1511,
+          "itm": 0.2376,
           "mlOdds": 0.03528970773167951
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "1": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.045,
+            "reason": "CD meet trainer: Todd A. Pletcher 22% YTD"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.056,
+            "reason": "CD meet jockey: Luis Saez 20% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          }
+        ],
+        "18": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          }
+        ],
+        "9": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.008,
+            "reason": "CD meet jockey: Javier Castellano 14% YTD"
+          }
+        ],
+        "15": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Chad C. Brown 18% YTD"
+          }
+        ],
+        "20": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 13,
@@ -3722,84 +4458,146 @@
         {
           "program": "10",
           "name": "Buetane",
-          "p1": 0.212,
-          "p2": 0.1668,
-          "p3": 0.2206,
-          "p4": 0.24,
-          "itm": 0.5994,
+          "p1": 0.2424,
+          "p2": 0.1919,
+          "p3": 0.2766,
+          "p4": 0.3247,
+          "itm": 0.711,
           "mlOdds": 0.22250940394262353
         },
         {
           "program": "8",
           "name": "Gilded Bandit",
-          "p1": 0.186,
-          "p2": 0.1563,
-          "p3": 0.2052,
-          "p4": 0.2268,
-          "itm": 0.5475,
+          "p1": 0.1895,
+          "p2": 0.1714,
+          "p3": 0.2426,
+          "p4": 0.2945,
+          "itm": 0.6035,
           "mlOdds": 0.1946957284497956
         },
         {
           "program": "11",
           "name": "Noble Affair",
-          "p1": 0.171,
-          "p2": 0.1493,
-          "p3": 0.1956,
-          "p4": 0.2186,
-          "itm": 0.5159,
+          "p1": 0.1814,
+          "p2": 0.1675,
+          "p3": 0.2367,
+          "p4": 0.2893,
+          "itm": 0.5856,
           "mlOdds": 0.14159689341803317
+        },
+        {
+          "program": "2",
+          "name": "Heartily",
+          "p1": 0.1128,
+          "p2": 0.1248,
+          "p3": 0.1781,
+          "p4": 0.2342,
+          "itm": 0.4157,
+          "mlOdds": 0.05990637798455249
         },
         {
           "program": "1",
           "name": "Small Town",
-          "p1": 0.092,
-          "p2": 0.1,
-          "p3": 0.134,
-          "p4": 0.163,
-          "itm": 0.3259,
+          "p1": 0.096,
+          "p2": 0.1116,
+          "p3": 0.1607,
+          "p4": 0.2162,
+          "itm": 0.3683,
           "mlOdds": 0.08653143486657582
         },
         {
           "program": "5",
           "name": "Hulkamania",
-          "p1": 0.081,
-          "p2": 0.0913,
-          "p3": 0.1235,
-          "p4": 0.1526,
-          "itm": 0.2958,
+          "p1": 0.0852,
+          "p2": 0.1025,
+          "p3": 0.1489,
+          "p4": 0.1948,
+          "itm": 0.3365,
           "mlOdds": 0.08653143486657582
-        },
-        {
-          "program": "2",
-          "name": "Heartily",
-          "p1": 0.073,
-          "p2": 0.0847,
-          "p3": 0.1154,
-          "p4": 0.1398,
-          "itm": 0.2731,
-          "mlOdds": 0.05990637798455249
         },
         {
           "program": "4",
           "name": "Ring Curl",
-          "p1": 0.048,
-          "p2": 0.0619,
-          "p3": 0.0866,
-          "p4": 0.111,
-          "itm": 0.1965,
+          "p1": 0.0489,
+          "p2": 0.0679,
+          "p3": 0.102,
+          "p4": 0.1436,
+          "itm": 0.2188,
           "mlOdds": 0.0486739321124489
         },
         {
           "program": "6",
           "name": "Cruisin Chuck",
-          "p1": 0.043,
-          "p2": 0.0569,
-          "p3": 0.0806,
-          "p4": 0.1045,
-          "itm": 0.1805,
+          "p1": 0.0438,
+          "p2": 0.0624,
+          "p3": 0.0949,
+          "p4": 0.1351,
+          "itm": 0.2012,
           "mlOdds": 0.0486739321124489
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "10": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "11": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Steven M. Asmussen 18% YTD"
+          }
+        ],
+        "1": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ],
+        "2": [
+          {
+            "code": "RAIL_MASTER",
+            "multiplier": 1.15,
+            "reason": "CD rail master: John R. Velazquez on post 2 with E-style \u2014 historical 22% win rate from post 1-2"
+          },
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.015,
+            "reason": "CD meet trainer: Wesley A. Ward 16% YTD"
+          },
+          {
+            "code": "DIST_PATTERN",
+            "multiplier": 1.25,
+            "reason": "CD pattern: dirt_sprint post-2 style-E historical advantage"
+          }
+        ]
+      }
     },
     {
       "raceNumber": 14,
@@ -3846,86 +4644,152 @@
       ],
       "positionProbs": [
         {
-          "program": "8",
-          "name": "Find No Fault",
-          "p1": 0.1411,
-          "p2": 0.1189,
-          "p3": 0.1419,
-          "p4": 0.1495,
-          "itm": 0.402,
-          "mlOdds": 0.14340383958569966
-        },
-        {
           "program": "3",
           "name": "Interrogator",
-          "p1": 0.1341,
-          "p2": 0.1152,
-          "p3": 0.1376,
-          "p4": 0.1459,
-          "itm": 0.387,
+          "p1": 0.1764,
+          "p2": 0.1568,
+          "p3": 0.2141,
+          "p4": 0.2537,
+          "itm": 0.5473,
           "mlOdds": 0.112674445388764
+        },
+        {
+          "program": "8",
+          "name": "Find No Fault",
+          "p1": 0.1756,
+          "p2": 0.1565,
+          "p3": 0.2135,
+          "p4": 0.2532,
+          "itm": 0.5456,
+          "mlOdds": 0.14340383958569966
         },
         {
           "program": "7",
           "name": "Act Of Parliament",
-          "p1": 0.1191,
-          "p2": 0.1067,
-          "p3": 0.1281,
-          "p4": 0.1377,
-          "itm": 0.354,
+          "p1": 0.1578,
+          "p2": 0.1472,
+          "p3": 0.2008,
+          "p4": 0.2417,
+          "itm": 0.5057,
           "mlOdds": 0.112674445388764
         },
         {
           "program": "5",
           "name": "Don's Winner",
-          "p1": 0.0911,
-          "p2": 0.0889,
-          "p3": 0.1085,
-          "p4": 0.1205,
-          "itm": 0.2885,
+          "p1": 0.1116,
+          "p2": 0.1181,
+          "p3": 0.1629,
+          "p4": 0.2061,
+          "itm": 0.3926,
           "mlOdds": 0.08763567974681645
         },
         {
           "program": "9",
           "name": "Big Jake",
-          "p1": 0.0781,
-          "p2": 0.0797,
-          "p3": 0.0984,
-          "p4": 0.1113,
-          "itm": 0.2561,
+          "p1": 0.1018,
+          "p2": 0.1109,
+          "p3": 0.1537,
+          "p4": 0.197,
+          "itm": 0.3663,
           "mlOdds": 0.08763567974681645
         },
         {
           "program": "1",
           "name": "Boylston",
-          "p1": 0.0771,
-          "p2": 0.0789,
-          "p3": 0.0976,
-          "p4": 0.1089,
-          "itm": 0.2536,
+          "p1": 0.0967,
+          "p2": 0.107,
+          "p3": 0.1489,
+          "p4": 0.1869,
+          "itm": 0.3526,
           "mlOdds": 0.07170191979284983
         },
         {
           "program": "14",
           "name": "Brave Pilot",
-          "p1": 0.0751,
-          "p2": 0.0774,
-          "p3": 0.0952,
-          "p4": 0.1073,
-          "itm": 0.2477,
+          "p1": 0.0906,
+          "p2": 0.1022,
+          "p3": 0.141,
+          "p4": 0.1802,
+          "itm": 0.3338,
           "mlOdds": 0.08763567974681645
         },
         {
           "program": "6",
           "name": "Prize Pick",
-          "p1": 0.0731,
-          "p2": 0.0759,
-          "p3": 0.0936,
-          "p4": 0.1058,
-          "itm": 0.2426,
+          "p1": 0.0896,
+          "p2": 0.1014,
+          "p3": 0.14,
+          "p4": 0.1791,
+          "itm": 0.3309,
           "mlOdds": 0.06067085520933447
         }
-      ]
+      ],
+      "historianAdjustments": {
+        "8": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.032,
+            "reason": "CD meet jockey: Tyler Gaffalione 17% YTD"
+          }
+        ],
+        "3": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.064,
+            "reason": "CD meet jockey: Irad Ortiz Jr. 21% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.025,
+            "reason": "CD meet trainer: Steven M. Asmussen 18% YTD"
+          }
+        ],
+        "7": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.056,
+            "reason": "CD meet jockey: Luis Saez 20% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet trainer: Brad H. Cox 21% YTD"
+          }
+        ],
+        "5": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Jose L. Ortiz 15% YTD"
+          }
+        ],
+        "9": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.024,
+            "reason": "CD meet jockey: Flavien Prat 16% YTD"
+          },
+          {
+            "code": "TRAINER_MEET",
+            "multiplier": 1.055,
+            "reason": "CD meet trainer: Bob Baffert 24% YTD"
+          }
+        ],
+        "1": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.04,
+            "reason": "CD meet jockey: John R. Velazquez 18% YTD"
+          }
+        ],
+        "6": [
+          {
+            "code": "JOCKEY_MEET",
+            "multiplier": 1.016,
+            "reason": "CD meet jockey: Joel Rosario 15% YTD"
+          }
+        ]
+      }
     }
   ],
   "exoticV3Total": 80.6,
