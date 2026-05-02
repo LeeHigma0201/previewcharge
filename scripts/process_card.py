@@ -238,7 +238,11 @@ def _ability_factors(horses: list, race: dict) -> list[float]:
     return out
 
 
-def _pool_disparity_factor(h: dict, live_odds_rank: int | None = None) -> tuple[float, float]:
+def _pool_disparity_factor(
+    h: dict,
+    live_odds_rank: int | None = None,
+    race: dict | None = None,
+) -> tuple[float, float]:
     """Pool-disparity factor with DUAL-MODE handling (Tweak A, after R4).
 
     The W%-P% gap means different things at different price tiers:
@@ -246,10 +250,20 @@ def _pool_disparity_factor(h: dict, live_odds_rank: int | None = None) -> tuple[
       - Live odds 5/1-12/1 + W%-P% < -3: SHARP WIN-BET → mild bonus ×1.05
       - Any tier + W%-P% > +1.5: SMART BOARD MONEY → mild bonus ×1.05
 
+    STAKES-SEGMENTATION GUARD (locked 2026-04-30 after R9/R10/R11 N=3 same-direction
+    failure on stakes-grade chalks with top-tier connections):
+      Chalk-doubt flag was 4/4 in claiming/maiden/allowance but 0/3 in stakes
+      with top-tier J+T (Lagynos Asmussen/J.Ortiz, Maximum Bourbon D'Amato/Prat,
+      Cy Fair Weaver/Irad — all chalks, all WON despite +12-15pt W-P gap).
+      So when race is stakes (purse > $100K) AND chalk's trainer is tier-listed
+      AND chalk's jockey is tier-listed → SKIP the chalk-doubt penalty entirely.
+      Smart-money board (gap > 1.5) and mid-price sharp (5/1-12/1) bonuses still apply.
+
     Validation:
-      Chalk-doubt (4/4 today): R1 BFL, R2 SV, R3 Spotted, R4 Theoretical — all flagged, all lost.
-      Mid-price W>>P (R4 #11 Plot, 7/1, W11/P7/S5): finished 2nd. Earlier we penalized him; this dual-mode bonuses him.
-      Smart board (R4 #4 Lexico W10/P15/S18): board signal not validated R4 (4th in photo) — keep mild only.
+      Chalk-doubt morning 4-for-4 (claiming/maiden): R1 BFL, R2 SV, R3 Spotted, R4 Theoretical.
+      Stakes 0-for-3 (R9/R10/R11) — all top-tier J+T combos.
+      Mid-price W>>P (R4 #11 Plot, 7/1): finished 2nd, dual-mode bonus correct.
+      Smart board (R5 #12, R9 #5): 2-for-2 on board predictions.
 
     Returns (gap_in_pct_points, multiplier).
     """
@@ -272,6 +286,12 @@ def _pool_disparity_factor(h: dict, live_odds_rank: int | None = None) -> tuple[
         # an absolute price threshold (live odds <= 3.0 = chalk territory).
         is_chalk = (live_odds_rank is not None and live_odds_rank <= 3) or (live <= 3.0)
         if is_chalk:
+            # Stakes-segmentation guard: don't penalize tier-J+T chalks in stakes
+            if race is not None and (race.get("purse") or 0) > 100000:
+                trainer = (h.get("trainer") or "").lower().strip()
+                jockey = (h.get("jockey") or "").lower().strip()
+                if trainer in TIER_TRAINERS and jockey in TIER_JOCKEYS:
+                    return (gap, 1.0)
             penalty = max(0.7, 1.0 + 0.05 * gap)  # -10% → 0.5 → clamp 0.7
             return (gap, penalty)
         # Mid-priced (5/1-12/1) horse with win-only sharp money → mild bonus
@@ -370,8 +390,8 @@ def score_horses(horses: list, race: dict, today_override: bool = False) -> list
         adj_bias = 1.0 + (bias_factor - 1.0) * (1.0 - sharp_pull)
         adj_ability = 1.0 + (ab - 1.0) * (1.0 - sharp_pull)
 
-        # Pool disparity (4-for-4 today on chalk-doubt; new dual-mode for mid-price)
-        pool_gap, pool_factor = _pool_disparity_factor(h, live_rank.get(idx))
+        # Pool disparity (dual-mode + stakes-segmentation guard)
+        pool_gap, pool_factor = _pool_disparity_factor(h, live_rank.get(idx), race)
         # TwinSpires Expert E rank bonus (validated R3)
         expert_factor = _expert_E_factor(h)
 
@@ -422,6 +442,16 @@ def plackett_luce_pair(scored: list, k: int = 4) -> dict:
 
 def best_exotic_strategy(scored: list, race_type: str) -> dict:
     """Recommend an exotic bet structure based on score concentration.
+
+    LOCKED RULE (2026-04-30 review):
+      - Default tri/super always include algo TOP-4 (not top-3). R7 lost 1-4-5
+        tri box because #7 Vow (algo's #4) hit 2nd. Adding the 4th horse covers
+        the boundary case at $9 marginal cost.
+      - STAKES races (race_type contains 'STK' or 'Stakes' or known stakes name)
+        favor TOP-5 SUPER BOX for chaos coverage. R10 lost 4-horse super
+        2-9-6-1 because #8 (algo's #5) hit 2nd; top-5 super would have hit.
+        20-horse Derby gets the deepest coverage.
+
     Returns the PRIMARY rec; alt structures are returned in `alternates`."""
     n = len(scored)
     if n < 4:
@@ -433,6 +463,9 @@ def best_exotic_strategy(scored: list, race_type: str) -> dict:
     top4 = sum(s["score"] for s in scored[:4])
     top5 = sum(s["score"] for s in scored[:5]) if n >= 5 else top4
 
+    rt = (race_type or "").lower()
+    is_stakes = ("stk" in rt) or ("stakes" in rt) or ("derby" in rt) or ("oaks" in rt) or ("classic" in rt)
+
     # Always offer a cheap exacta box as a baseline alternate
     ex_box_3 = {
         "structure": "Exacta 3-horse box",
@@ -442,16 +475,38 @@ def best_exotic_strategy(scored: list, race_type: str) -> dict:
         "hit_prob_est": top3 * 0.7,
     }
 
+    # STAKES OVERRIDE: deep field + chaos pace pressure → top-5 super
+    if is_stakes and n >= 5:
+        p5 = scored[4]['program']
+        return {
+            "structure": "Superfecta 5-horse box (stakes chaos coverage)",
+            "tickets": [f"{scored[0]['program']}-{scored[1]['program']}-{scored[2]['program']}-{scored[3]['program']}-{p5} BOX"],
+            "unit_cost": 0.10,
+            "total_cost": 12.0,
+            "hit_prob_est": top5 * 0.50,
+            "rationale": f"Stakes race with {n}-horse field. Top 5 cover {top5:.0%}. R10 lost 4-horse super to algo's #5 — top-5 box catches the boundary case.",
+            "alternates": [
+                ex_box_3,
+                {
+                    "structure": "Trifecta 4-horse box (cheaper alt)",
+                    "tickets": [f"{scored[0]['program']}-{scored[1]['program']}-{scored[2]['program']}-{scored[3]['program']} BOX"],
+                    "unit_cost": 0.50,
+                    "total_cost": 12.0,
+                    "hit_prob_est": top4 * 0.55,
+                },
+            ],
+        }
+
     # Decision rules — choose primary
     if top_score >= 0.34:
-        # Dominant horse — key wheel beats a box
+        # Dominant horse — key wheel beats a box. Wheel already covers top 4.
         primary = {
-            "structure": "Trifecta key 1st OVER top 3",
+            "structure": "Trifecta key 1st OVER top 4 / top 4",
             "tickets": [f"{scored[0]['program']} / {scored[1]['program']},{scored[2]['program']},{scored[3]['program']} / {scored[1]['program']},{scored[2]['program']},{scored[3]['program']}"],
             "unit_cost": 0.50,
             "total_cost": 3.0,  # 1×3×2 = 6 valid combos × $0.50
             "hit_prob_est": top_score * (top4 - top_score) / max(0.01, 1 - top_score),
-            "rationale": f"#{scored[0]['program']} {scored[0]['name']} dominates at {top_score:.0%}. Single on top, spread under.",
+            "rationale": f"#{scored[0]['program']} {scored[0]['name']} dominates at {top_score:.0%}. Single on top, spread under top-4.",
             "alternates": [ex_box_3],
         }
     elif top4 >= 0.78:
@@ -465,14 +520,24 @@ def best_exotic_strategy(scored: list, race_type: str) -> dict:
             "alternates": [ex_box_3],
         }
     elif top3 >= 0.62:
+        # Locked rule: always include algo top-4 (was top-3 — R7 boundary case fix)
         primary = {
-            "structure": "Trifecta 3-horse box",
-            "tickets": [f"{scored[0]['program']}-{scored[1]['program']}-{scored[2]['program']} BOX"],
+            "structure": "Trifecta 4-horse box",
+            "tickets": [f"{scored[0]['program']}-{scored[1]['program']}-{scored[2]['program']}-{scored[3]['program']} BOX"],
             "unit_cost": 0.50,
-            "total_cost": 3.0,
-            "hit_prob_est": top3 * 0.55,
-            "rationale": f"Top 3 cover {top3:.0%} — tri box at $0.50.",
-            "alternates": [ex_box_3],
+            "total_cost": 12.0,
+            "hit_prob_est": top4 * 0.55,
+            "rationale": f"Top 3 cover {top3:.0%}, top 4 = {top4:.0%}. Tri 4-box catches R7-style boundary cases.",
+            "alternates": [
+                ex_box_3,
+                {
+                    "structure": "Trifecta 3-horse box (cheaper, narrower)",
+                    "tickets": [f"{scored[0]['program']}-{scored[1]['program']}-{scored[2]['program']} BOX"],
+                    "unit_cost": 0.50,
+                    "total_cost": 3.0,
+                    "hit_prob_est": top3 * 0.55,
+                },
+            ],
         }
     else:
         # Wide-open race — top 5 super box
