@@ -2,7 +2,7 @@
  * Churchill Downs Spring Meet Context
  * Added: 2026-04-25
  *
- * Mirrors keeneland-apr18.ts pattern but for CD Spring meet (late Apr - Derby Day May 3).
+ * Mirrors static-types.ts pattern but for CD Spring meet (late Apr - Derby Day May 3).
  * Track-specific adjustments for the algo's Stage 1 ability scoring and Stage 2 MC sims.
  *
  * KEY CD SPRING FACTS:

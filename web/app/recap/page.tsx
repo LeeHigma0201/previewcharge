@@ -172,7 +172,7 @@ export default function Recap() {
             <p className="text-xs text-gray-400">Keeneland 2026-04-18 — picks, actuals, learnings, algo changes</p>
           </div>
           <div className="flex gap-2 text-xs">
-            <Link href="/bets" className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Bet Sheet →</Link>
+            <Link href="/today" className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Today&apos;s Card →</Link>
           </div>
         </div>
       </header>

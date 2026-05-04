@@ -1,0 +1,15 @@
+race,race_type,structure,tickets,unit_cost,total_cost,hit_prob_est_pct,rationale
+1,Mdn120k,PASS (CHALK MATCH),,0,0,,Algo top-2 (11-3) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+2,OC 125000n1x,PASS (CHALK MATCH),,0,0,,Algo top-2 (8-4) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+3,OC 80000n2x,PASS (CHALK MATCH),,0,0,,Algo top-2 (12-6) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+4,DctyDst-G1,PASS (CHALK MATCH),,0,0,,Algo top-2 (4-5) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+5,TurfSprt-G2,PASS (CHALK MATCH),,0,0,,Algo top-2 (3-9) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+6,KnicksGoL200K,PASS (CHALK MATCH),,0,0,,Algo top-2 (2-4) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+7,DstfTfMl-G2,Superfecta 5-horse box (chaos play),2-3-8-5-4 BOX,0.1,12.0,35.1,PARTIAL EDGE (1 of algo top-2 not in market top-2): Wide-open. Top 5 = 78%. Chaos super box.
+8,PDayMile-G2,PASS (CHALK MATCH),,0,0,,Algo top-2 (1-6) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+9,AmerTurf-G1,PASS (CHALK MATCH),,0,0,,Algo top-2 (4-12) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+10,CD-G1,PASS (CHALK MATCH),,0,0,,Algo top-2 (6-2) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+11,TurfClsc-G1 1„Mile(T) 4&up,Superfecta 5-horse box (chaos play),6-4-9-10-3 BOX,0.1,12.0,33.7,PARTIAL EDGE (1 of algo top-2 not in market top-2): Wide-open. Top 5 = 75%. Chaos super box.
+12,KyDerby-G1,PASS (CHALK MATCH),,0,0,,Algo top-2 (1-6) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+13,OC 125000n1x,PASS (CHALK MATCH),,0,0,,Algo top-2 (10-8) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
+14,Mdn120k,PASS (CHALK MATCH),,0,0,,Algo top-2 (8-3) = market top-2. Paying 22% takeout on a market chalk box is negative-EV in expectation.
