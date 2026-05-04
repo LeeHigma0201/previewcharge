@@ -29,8 +29,7 @@ export default function Home() {
             <Tile label="v1 strict" value={`${(tierCounts.FULL_EDGE ?? 0) + (tierCounts.PARTIAL_EDGE ?? 0)}/14`} accent="zinc" />
           </div>
           <div className="flex gap-3">
-            <Link href="/today" className="flex-1 text-center px-4 py-3 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold">Today's Card →</Link>
-            <Link href="/bets" className="flex-1 text-center px-4 py-3 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-bold">Bet Sheet →</Link>
+            <Link href="/today" className="flex-1 text-center px-4 py-3 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold">Today&apos;s Card →</Link>
           </div>
         </div>
 
