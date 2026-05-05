@@ -209,3 +209,69 @@ PR #8 also has the CLAUDE.md rewrite (commit `ff8eb1b`).
 ## TL;DR for the next session
 
 > 16 hours from Derby post. The Beyer-100+ club is the algo top-3 lock: **Further Ado #18, Commandment #6, So Happy #8**. The chalk **Renegade #1** has double historical headwind. Use top-5 super box for chaos coverage. Don't fade chalk on flags in stakes. Spawn Wave 2 (per-race pace) for the rest of the card. Live data goes into the Pools / Results / Bets / Scorecard tabs as the day progresses.
+
+---
+
+## POST-RACE UPDATE (2026-05-03 — Derby ran yesterday)
+
+**Derby R12 result:** **Golden Tempo #19 won at 23-1** (Jose Ortiz / Cherie DeVaux — first woman trainer to win Derby ever). Last-to-first closer rally; winning time 2:02.27, fast track. Top-5: 19-1-22-12-7. Super High 5 paid $1,777,720.
+
+**The Beyer-100 thesis went 0-for-the-money.** Further Ado 11th, Commandment 7th, So Happy off-board. Renegade #1 chalk hit 2nd (post 1 curse held on the win, not on the board). Chief Wallabee #12 (in our extended top-5) hit 4th.
+
+**The load-bearing miss:** We logged Jose Ortiz's 5-for-13 hot streak from Oaks Day in `jockey-stats.json`. We named DeVaux as "would be first woman to win if hits." We did not weight either signal into algo top-3. **Cataloguing ≠ weighting.**
+
+### Files added for post-race accounting (commit `e1a4adb`)
+- `results.json` — official finishes + payouts for all 14 races (R12 cross-checked against Wikipedia Derby article)
+- `backtest.md` — race-by-race actual vs algo top-3, theoretical ROI, temporal-contamination disclosure
+- `SCORECARD.md` — top-line metrics, locked-rule re-validation, ship items
+- `POST_RACE_LESSONS.md` — durable lessons + 5 ship items for next race day
+
+### Honest 14-race scoreboard
+- Algo top-1 hit: **3/14 = 21.4%** (R1, R9, R11)
+- Algo top-3 hit: **8/14 = 57.1%**
+- ML chalk top-1: **3/14 = 21.4%** — TIED with algo (no top-1 edge demonstrated)
+- $1 EX BOX top-2 theoretical ROI: **−27.3%**
+- Algo == market top-2 in 12 of 14 races (CHALK_MATCH framework correctly told us to PASS)
+
+### Disclosure on this branch's PACE_PROJECTIONS.md
+The Wave 2 per-race pace agents I dispatched committed at 2026-05-02 19:32 ET — AFTER R4-R11 had already run. Several agents reported actual outcomes that I stripped, but the algo top-3 rankings may be reverse-engineered from actuals. **PACE_PROJECTIONS.md is NOT a clean pre-race prediction document.** The clean pre-race picks used in the backtest come from the parallel race-day session (`claude/thirsty-aryabhata-291678` commit `568dd62`, timestamp 09:37 ET). DERBY_INTEL.md (R12 picks) IS clean pre-race — committed 2026-05-01.
+
+### Top 5 ship items before next race day (Preakness May 16)
+1. **`jockey_streak_z` feature** — load-bearing missed signal (Jose Ortiz Oaks → Derby). Code template in POST_RACE_LESSONS.md.
+2. **Top-7 super for fields ≥18** — top-5 super missed Golden Tempo + Renegade + Ocelli.
+3. **Closer + stamina-sire bonus in HOT pace projections** — would have flagged T O Elvis R10 + Golden Tempo R12.
+4. **Decouple win-prob from board-prob** — AE-maiden in chaos field can be board candidate (Ocelli 3rd Derby) without being a win bet.
+5. **Re-run May 2 raw-entries through patched `process_card.py`** to validate stakes-segmentation guard + top-4 rule against this card.
+
+### What this branch (PR #8) currently has
+
+```
+data/cd-2026-05-02/
+├── DERBY_INTEL.md (May 1, clean pre-race)
+├── HANDOFF.md (this file, now updated post-race)
+├── PACE_PROJECTIONS.md (May 2 19:32 — temporally contaminated, see disclosure)
+├── POST_RACE_LESSONS.md (May 3, durable)
+├── SCORECARD.md (May 3)
+├── backtest.md (May 3)
+├── derby-horses-1-12.json (May 1, clean)
+├── derby-horses-13-24.json (May 1, clean)
+├── jockey-stats.json (May 1, clean — Jose Ortiz hot streak captured here)
+├── pace-R{4-10,5-7-11,6-8,9}.json (May 2 19:30 — temporally contaminated)
+├── raw-entries.json (May 1, clean — full 14-race CD card)
+├── results.json (May 3, official)
+├── sheet-url.txt
+├── track-bias-derby-trends.json (May 1, clean)
+└── trainer-stats.json (May 1, clean)
+```
+
+### Code shipped on this branch (PR #8 commits)
+- `ff8eb1b` CLAUDE.md rewrite (full v3.14 architecture)
+- `93accf4` Derby Day data foundation + sheet
+- `2d9caec` HANDOFF.md
+- `c5f0329` Stakes-segmentation guard + top-4 / top-5 super in best_exotic_strategy
+- `c09caa8` Wave 2 pace projections (temporally contaminated — see disclosure)
+- `e1a4adb` Post-race results + backtest + scorecard
+
+### TL;DR for THIS session's continuation
+
+> Derby ran yesterday, Golden Tempo 23-1 won. Backtest committed honestly: algo top-1 was tied with chalk (3/14 each), $1 EX BOX top-2 lost 27%. **The next code change is `jockey_streak_z`** — we had the signal in our intel files and didn't weight it. Preakness is May 16 (~2 weeks). Top priority before then: ship the streak-z feature + top-7 super for big fields + decouple win-prob from board-prob.
