@@ -4,13 +4,15 @@
 
 ## Top-line numbers
 
+_(Corrected after auto-backtest validation; original hand count had 2 errors — see backtest.md.)_
+
 | Metric | Value | Apr 30 baseline |
 |---|---|---|
 | Algo top-1 hit rate | 3/14 (21.4%) | 44% |
 | Algo top-3 hit rate | 8/14 (57.1%) | 89% |
-| ML chalk top-1 (control) | 3/14 (21.4%) | 50% |
-| **Algo edge over chalk top-1** | **0.0%** (tied) | -6 pts |
-| Forward exacta algo top-2 | 3/14 (21.4%) | 27% |
+| ML chalk top-1 (control) | 4/14 (28.6%) | 50% |
+| **Algo edge over chalk top-1** | **−7.2 pts** (chalk slightly better) | -6 pts |
+| Forward exacta algo top-2 (in order) | 2/14 (14.3%) | 27% |
 | $1 EX BOX top-2 theoretical ROI | **−27.3%** | +222.7% (R5 outlier) |
 | Algo top-2 == market top-2 (CHALK_MATCH) | 12/14 races | n/a |
 

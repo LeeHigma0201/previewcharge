@@ -36,13 +36,15 @@ The DERBY_INTEL.md (R12 picks: Further Ado, Commandment, So Happy) was committed
 
 ## Aggregate hit rates
 
+_(Numbers below corrected after auto-backtest validation in commit shipping `scripts/run_backtest.py`. Hand-counted on May 3 had 2 errors: ML chalk count was 4 not 3, and forward-exacta count was 2 not 3.)_
+
 | Metric | Result | Notes |
 |---|---|---|
 | Algo top-1 hit | **3/14 = 21.4%** | R1, R9, R11 |
 | Algo top-3 hit (winner ∈ top-3) | **8/14 = 57.1%** | R1, R2, R5, R6, R8, R9, R11, R13 |
-| ML chalk top-1 hit (control) | **3/14 = 21.4%** | R1, R9, R11 — **identical to algo** |
+| ML chalk top-1 hit (control) | **4/14 = 28.6%** | R1, R8, R9, R11 — **chalk slightly beat algo on this card** |
 | Algo top-1 == ML chalk top-1 | 12/14 races | Confirms CHALK_MATCH framework |
-| Forward exacta of algo top-2 | **3/14 = 21.4%** | R1 (11-3), R8 (6-1 inverted), R9 (4-12) |
+| Forward exacta of algo top-2 (in order) | **2/14 = 14.3%** | R1 (11-3), R9 (4-12). R8 6-1 was reverse order — would hit BOX but not forward |
 | Stakes-only top-1 hit (R4-R12) | **2/9 = 22.2%** | R9, R11 |
 | Stakes-only top-3 hit (R4-R12) | **5/9 = 55.6%** | R5, R6, R8, R9, R11 |
 
