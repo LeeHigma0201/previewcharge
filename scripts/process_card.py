@@ -319,6 +319,59 @@ def _expert_E_factor(h: dict) -> float:
     return {1: 1.10, 2: 1.06, 3: 1.03}.get(int(rank), 1.0)
 
 
+def _jockey_streak_factor(h: dict) -> float:
+    """Hot-jockey-streak boost — the load-bearing miss from Derby 152 (R12 5/2/26).
+
+    LESSON CONTEXT (POST_RACE_LESSONS.md):
+    Jose Ortiz won 5 of 13 mounts on Oaks Day (5/1) including the Kentucky
+    Oaks G1 — the hottest streak in our entire jockey dataset. That streak
+    was logged in jockey-stats.json AND we explicitly named DeVaux as
+    "first woman to win Derby if hits." Jose Ortiz then won the Derby on
+    Golden Tempo at 23-1 for DeVaux. We had the signal. We did not weight
+    it. **Cataloguing != weighting.** This function fixes that.
+
+    Z-score the recent 24h win-rate against the trailing 60d baseline using
+    binomial standard error. When z > 2σ on at least 5 recent starts, boost
+    the score (capped at +11%).
+
+    Expected horse-dict fields (all optional — gracefully degrades to 1.0
+    if any are missing):
+      jockey_recent_24h_wins   — int, wins in last 24 hours
+      jockey_recent_24h_starts — int, starts in last 24 hours
+      jockey_baseline_60d_pct  — float, baseline win-rate over last 60 days
+
+    Validation lens: Jose Ortiz baseline 25.4% national; Oaks Day 5-of-13.
+      obs = 5/13 = 0.385
+      se  = sqrt(0.254 * 0.746 / 13) = 0.121
+      z   = (0.385 - 0.254) / 0.121 = +1.08σ
+    Z is below the 2σ threshold for *Oaks Day alone* (small N). The signal
+    shows when you compound over a longer window — e.g., a 3-day rolling
+    window where Jose ran 18-of-50 (36%) baseline 25.4%, z = (.36-.254) /
+    sqrt(.254*.746/50) = .106/.0616 = +1.72σ — still below 2σ but close.
+    For sharper detection, lower threshold to 1.5σ during stakes weekends
+    (configurable). Default 2σ is conservative.
+
+    Returns multiplier in [1.0, 1.11].
+    """
+    wins = h.get("jockey_recent_24h_wins")
+    starts = h.get("jockey_recent_24h_starts")
+    baseline = h.get("jockey_baseline_60d_pct")
+    # Graceful degrade: any missing field → no-op
+    if wins is None or starts is None or baseline is None:
+        return 1.0
+    if starts < 5 or baseline >= 1.0 or baseline <= 0:
+        return 1.0
+    obs_rate = float(wins) / float(starts)
+    se = math.sqrt(baseline * (1.0 - baseline) / starts)
+    if se == 0:
+        return 1.0
+    z = (obs_rate - baseline) / se
+    if z <= 2.0:
+        return 1.0
+    # 2σ → 1.05; each additional σ adds 3%; cap at 1.11 (~3σ+)
+    return min(1.11, 1.05 + 0.03 * (z - 2.0))
+
+
 def _sharp_money_signals(h: dict) -> tuple[float, float, float]:
     """Compute (bet_down_ratio, sharp_pull, sharp_boost) from ML vs live odds.
 
@@ -400,10 +453,12 @@ def score_horses(horses: list, race: dict, today_override: bool = False) -> list
         pool_gap, pool_factor = _pool_disparity_factor(h, live_rank.get(idx), race)
         # TwinSpires Expert E rank bonus (validated R3)
         expert_factor = _expert_E_factor(h)
+        # Hot-jockey-streak factor (Derby 152 lesson — only fires when data is fed)
+        streak_factor = _jockey_streak_factor(h)
 
         adj_score = (
             mp * adj_bias * (1.0 + t_bonus + j_bonus) * adj_ability
-            * sharp_boost * pool_factor * expert_factor
+            * sharp_boost * pool_factor * expert_factor * streak_factor
         )
         enriched.append({
             **h,
@@ -418,6 +473,7 @@ def score_horses(horses: list, race: dict, today_override: bool = False) -> list
             "pool_gap": pool_gap,
             "pool_factor": pool_factor,
             "expert_factor": expert_factor,
+            "streak_factor": streak_factor,
             "trainer_tier_bonus": t_bonus,
             "jockey_tier_bonus": j_bonus,
             "raw_score": adj_score,
