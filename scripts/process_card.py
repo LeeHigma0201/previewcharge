@@ -97,12 +97,18 @@ TIER_TRAINERS = {
     "george r. arnold ii": 0.03, "rusty arnold": 0.03,
     "eddie kenneally": 0.03,
     "philip a. bauer": 0.03, "philip bauer": 0.03,
-    "philip damato": 0.03,
+    "philip damato": 0.03, "philip d'amato": 0.03,
     "thomas drury jr.": 0.03, "thomas drury": 0.03,
     "lauren robson": 0.03,
     # Added after R2 audit on 4-30 — Foley won R2 with She'z the Law (15/1 ML → 1.6 live).
     # Handoff doc explicitly flagged this gap.
     "gregory d. foley": 0.04, "greg foley": 0.04,
+    # Added 2026-05-03 in stakes-segmentation guard validation (test_stakes_segmentation_guard.py):
+    # — Weaver trained R11 Apr 30 winner Cy Fair (chalk-doubt fired, won) — load-bearing for
+    #   the stakes-guard test case
+    # — Hess Jr. trained R8 Apr 30 winner Jensco — flagged in CD_2026_04_30_DAILY_REPORT.md
+    "george weaver": 0.04,
+    "robert b. hess jr.": 0.03, "robert hess jr.": 0.03, "bob hess jr.": 0.03,
 }
 TIER_JOCKEYS = {
     "irad ortiz, jr.": 0.05, "irad ortiz jr.": 0.05, "irad ortiz": 0.05,
