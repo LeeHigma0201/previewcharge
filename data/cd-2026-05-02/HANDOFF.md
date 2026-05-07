@@ -229,7 +229,7 @@ PR #8 also has the CLAUDE.md rewrite (commit `ff8eb1b`).
 ### Honest 14-race scoreboard
 - Algo top-1 hit: **3/14 = 21.4%** (R1, R9, R11)
 - Algo top-3 hit: **8/14 = 57.1%**
-- ML chalk top-1: **3/14 = 21.4%** — TIED with algo (no top-1 edge demonstrated)
+- ML chalk top-1: **4/14 = 28.6%** — chalk slightly BEAT algo (-7.2pt edge); corrected after run_backtest.py validation in commit `71309d4`
 - $1 EX BOX top-2 theoretical ROI: **−27.3%**
 - Algo == market top-2 in 12 of 14 races (CHALK_MATCH framework correctly told us to PASS)
 

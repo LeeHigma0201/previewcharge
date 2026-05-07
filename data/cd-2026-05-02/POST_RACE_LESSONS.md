@@ -126,12 +126,14 @@ The 4th algo pick was the missing tri horse in nearly half the races. **The "alw
 |---|---|---|---|
 | Algo top-1 hit rate | 4/9 = 44% | 3/14 = 21% | 7/23 = 30.4% |
 | Algo top-3 hit rate | 8/9 = 89% | 8/14 = 57% | 16/23 = 69.6% |
-| ML chalk top-1 (control) | 5/10 = 50% | 3/14 = 21% | 8/24 = 33.3% |
-| **Algo edge over chalk top-1** | -6 pts | 0 pts | **-3 pts** |
-| Forward exacta in algo top-2 | 3/11 | 3/14 | 6/25 = 24% |
+| ML chalk top-1 (control) | 5/10 = 50% | **4/14 = 29%** ¹ | 9/24 = 37.5% |
+| **Algo edge over chalk top-1** | -6 pts | **-7.2 pts** | **-7.1 pts** |
+| Forward exacta in algo top-2 (in order) | 3/11 | **2/14 = 14%** ¹ | 5/25 = 20% |
 | $1 EX BOX top-2 ROI | +222.7% (R5 outlier) | -27.3% | +98% combined / -12% if exclude R5 |
 
-**The $1 EX BOX top-2 strategy:** if you bet it consistently for 25 races, you'd be +$30 on the books — but the entire +EV comes from one race (Apr 30 R5 Jinxzi #3-#12 paid $56). Without that single outlier you're net -$12 across 24 races. **N=2 days remains too small to claim edge over the market**, and the algo's top-1 picking is empirically tied with ML chalk.
+¹ Corrected after `scripts/run_backtest.py` validation in commit `71309d4`. Hand count had R8 chalk wrong (Crude Velocity #6 at 5/2 was the actual ML chalk, not Englishman #1 at 3.0); R8 forward exacta was 6-1 vs algo top-2 1-6 = reverse order, hits BOX but not forward.
+
+**The $1 EX BOX top-2 strategy:** if you bet it consistently for 25 races, you'd be +$30 on the books — but the entire +EV comes from one race (Apr 30 R5 Jinxzi #3-#12 paid $56). Without that single outlier you're net -$12 across 24 races. **N=2 days remains too small to claim edge over the market**, and the algo's top-1 picking is empirically **trailing** ML chalk by 7 points (after correction).
 
 The 30-card validation in [ALGO_THESIS.md](../../docs/ALGO_THESIS.md) remains the right framing. We have 28 cards to go before claiming or disproving edge.
 
