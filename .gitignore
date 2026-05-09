@@ -36,6 +36,7 @@ credentials.json
 !/data/analysis/
 /data/analysis/*
 !/data/analysis/*.json
+!/data/analysis/*.md
 # Card-day folders (cd-YYYY-MM-DD): allow CSV + MD analysis artifacts to be
 # committed so the PR shows the picks snapshot at deploy time. Raw scraped JSON
 # stays ignored (regeneratable; may contain third-party data we shouldn't redist).
@@ -46,6 +47,14 @@ credentials.json
 !/data/cd-*/results.json
 !/data/cd-*/algo-perf-summary.json
 !/data/cd-*/r*-pool-snapshot.json
+# Derby Day intel files (per-entity agent-derived data + sheet pointer)
+!/data/cd-*/raw-entries.json
+!/data/cd-*/derby-horses-*.json
+!/data/cd-*/jockey-stats.json
+!/data/cd-*/trainer-stats.json
+!/data/cd-*/track-bias-*.json
+!/data/cd-*/pace-*.json
+!/data/cd-*/sheet-url.txt
 
 # Model artifacts
 artifacts/

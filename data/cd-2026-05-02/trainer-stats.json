@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "scraped_at": "2026-05-02T03:55:00Z",
+    "purpose": "Per-trainer Derby record + 2026 prep performance for algo tier_trainer adjustment + Derby angle context"
+  },
+  "key_findings": {
+    "scratches_in_2026_field": [
+      "Silent Tactic (Casse) — bruised right front foot, Apr 29, vet scratch — pointing to Preakness",
+      "Right to Party (McPeek) — right front lameness, Apr 30, vet scratch — McPeek disputed",
+      "Fulleffort (Cox) — surface concern (turf horse), Apr 30 — never raced on dirt"
+    ],
+    "ae_draw_ins": ["Great White (Ennis)", "Ocelli (Beckman)", "Robusta (O'Neill)"],
+    "no_derby_starter_in_field": ["Asmussen", "Casse", "McPeek", "Walsh", "Maker", "Romans", "Wilkes", "Sharp", "Joseph", "D'Amato", "McCarthy", "Ward"],
+    "field_highlights": {
+      "chief_wallabee_first_time_blinkers": "Mott working sharp in blinkers at CD — positive signal, not concern",
+      "emerging_market_only_3rd_start": "Last Derby winner in 3rd career start was Leonatus 1883",
+      "incredibolt_2_for_2_at_cd": "Riley Mott's Incredibolt — track specialist angle (won Virginia Derby + Street Sense at CD)",
+      "father_vs_son": "Bill Mott (Chief Wallabee) vs Riley Mott (Albus + Incredibolt) — same race",
+      "devaux_first_ever_derby_start": "Cherie DeVaux with Golden Tempo — would be first woman trainer to win Derby",
+      "baffert_post_suspension": "First full Derby back since 2021 Medina Spirit ban — no new violations 2025-26; horses tend to be overpriced early, collapse to shorter prices by post",
+      "cox_two_horses": "Commandment + Further Ado, both 6-1 ML; Cox 1-for-12 (Mandaloun 2021 via DQ)"
+    }
+  },
+  "trainers": [
+    {"name": "Todd A. Pletcher", "derby_lifetime": {"starts": 65, "wins": 2, "win_pct": 0.031, "best": "Super Saver 2010, Always Dreaming 2017"}, "derby_2026": [{"horse": "Renegade", "post": 1, "ml": "4-1", "jockey": "Irad Ortiz Jr.", "preps": ["Sam F. Davis G3 1st", "Arkansas Derby G1 1st by 4L"]}], "flag": "Pletcher favorites historically OVERBET — Fierceness 15th in 2024 as chalk"},
+    {"name": "Bob Baffert", "derby_lifetime": {"starts": 34, "wins": 6, "win_pct": 0.176, "best": "Silver Charm 1997, Real Quiet 1998, War Emblem 2002, American Pharoah 2015, Justify 2018, Authentic 2020"}, "derby_2026": [{"horse": "Litmus Test", "post": 4, "ml": "30-1", "jockey": "M. Garcia"}, {"horse": "Potente", "post": 14, "ml": "20-1", "jockey": "Juan Hernandez (Derby debut)", "preps": ["San Felipe G2 1st", "Santa Anita Derby G1 2nd"]}], "flag": "Post-suspension scrutiny; horses overpriced early then collapse late"},
+    {"name": "Brad H. Cox", "derby_lifetime": {"starts": 12, "wins": 1, "win_pct": 0.083, "best": "Mandaloun 2021 via DQ"}, "derby_2026": [{"horse": "Commandment", "post": 6, "ml": "6-1", "jockey": "Luis Saez", "preps": ["Florida Derby G1 1st", "Fountain of Youth G2 1st"]}, {"horse": "Further Ado", "post": 18, "ml": "6-1", "jockey": "John Velazquez", "preps": ["Blue Grass G1 1st by 11L (106 Beyer field-best)", "Tampa Bay Derby G3 2nd"]}], "flag": "Field-best Beyer (Further Ado 106). Home track. Two horses both 6-1"},
+    {"name": "Chad C. Brown", "derby_lifetime": {"starts": 9, "wins": 0, "win_pct": 0.0, "best": "Good Magic 2018 2nd, Sierra Leone 2024 2nd"}, "derby_2026": [{"horse": "Emerging Market", "post": 15, "ml": "15-1", "jockey": "Flavien Prat", "preps": ["Louisiana Derby G2 1st (117 HRN)"], "career_starts": 2}], "flag": "Won 2026 Oaks day before with Always a Runner. Emerging Market only 3rd career start (last winner in 3rd was 1883)"},
+    {"name": "William I. Mott", "derby_lifetime": {"starts": 15, "wins": 2, "win_pct": 0.133, "best": "Country House 2019 (DQ), Sovereignty 2025"}, "derby_2026": [{"horse": "Chief Wallabee", "post": 12, "ml": "8-1", "jockey": "Junior Alvarado (rode Sovereignty 2025)", "preps": ["FOY 2nd", "FL Derby 3rd"]}], "flag": "FIRST-TIME BLINKERS — sharp workouts; defending champ jockey aboard"},
+    {"name": "Cherie DeVaux", "derby_lifetime": {"starts": 1, "wins": 0, "best": "First-ever Derby starter"}, "derby_2026": [{"horse": "Golden Tempo", "post": 19, "ml": "30-1", "jockey": "Jose Ortiz (5-for-13 Oaks Day)", "preps": ["Lecomte G3 1st", "Risen Star G2 3rd", "Louisiana Derby G2 3rd"]}], "flag": "First woman to win Derby if hits. Closer profile. Untested away from Fair Grounds"},
+    {"name": "Riley Mott", "derby_lifetime": {"starts": 2, "wins": 0, "best": "First-ever Derby starters"}, "derby_2026": [{"horse": "Albus", "post": 2, "ml": "30-1", "jockey": "Manny Franco", "preps": ["Wood Memorial G2 1st"]}, {"horse": "Incredibolt", "post": 11, "ml": "20-1", "jockey": "Jaime Torres", "preps": ["Virginia Derby 1st", "Street Sense S 1st at CD"], "cd_record": "2-for-2"}], "flag": "Bill Mott's son. Incredibolt 2-for-2 at CD — track specialist angle"},
+    {"name": "Doug F. O'Neill", "derby_lifetime": {"starts": 14, "wins": 2, "win_pct": 0.143, "best": "I'll Have Another 2012, Nyquist 2016"}, "derby_2026": [{"horse": "Pavlovian", "post": 16, "ml": "30-1", "jockey": "Edwin Maldonado", "career_starts": 10}, {"horse": "Robusta", "post": 20, "ml": "50-1", "jockey": "Jaramillo (drew in from AE23)"}], "flag": "Pavlovian most-experienced horse in field (10 starts). Sire Pavel progeny avg 6.1f — stamina concern at 1¼"},
+    {"name": "Kenneth G. McPeek", "derby_lifetime": {"starts": null, "wins": 0, "best": "2024 Oaks-Derby double w/ Mystik Dan"}, "derby_2026": [{"horse": "Right to Party", "status": "SCRATCHED Apr 30 — vet right-front lameness", "trainer_disputed": true}]},
+    {"name": "Mark E. Casse", "derby_lifetime": {"starts": 11, "wins": 0, "best": "Classic Empire 2017 4th"}, "derby_2026": [{"horse": "Silent Tactic", "status": "SCRATCHED Apr 29 — bruised right front foot; pointing Preakness"}]},
+    {"name": "Steven M. Asmussen", "derby_lifetime": {"starts": 25, "wins": 0, "best": "Lookin At Lee 2017 2nd, Nehro 2011 2nd, Epicenter 2023 2nd"}, "derby_2026": [], "flag": "10,000+ wins all-time leader. Signature gap in HoF resume. NO Derby starter in 2026"}
+  ]
+}

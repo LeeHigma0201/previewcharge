@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "races": [6, 8],
+    "scraped_at": "2026-05-02T~01:55Z",
+    "WARNING": "Agent reported race outcomes that have NOT happened. Outcomes STRIPPED. Pace/style/PP figs retained as PROJECTIONS."
+  },
+  "R6": {
+    "race_name": "Knicks Go Overnight S.",
+    "post_et": "1:53 PM",
+    "distance": "1M",
+    "surface": "Dirt FAST",
+    "purse": 200000,
+    "field_size": 11,
+    "running_styles": {
+      "1_Brotha_Keny": "P (fig 112)",
+      "2_Dragoon_Guard": "S (fig 125 — HIGHEST raw — Cox/Irad)",
+      "3_Banjo_Chris": "EP (fig 123)",
+      "4_Be_You": "P (Pletcher/Velazquez; fig 126 at 7F)",
+      "5_Prince_of_Power": "E (fig 107 — pace fodder)",
+      "6_Tour_Player": "EP (fig 123; CD specialist 6-for-12 lifetime; Prat/Beckman)",
+      "7_Will_Take_It": "S (fig 101)",
+      "8_Bernin_Hot": "C (fig 60 — out of class)",
+      "9_Scotland": "E (fig 121 — LONE confirmed pace; Mott/Saez; Forego-type sprinter stretching to 1M)",
+      "10_Capital_Idea": "S (fig 112; Mott/Alvarado)",
+      "11_Moonlight": "C (Cherokee Mile winner at CD; 3-for-5 at CD; Block/J.Ortiz)"
+    },
+    "pace_scenario": {
+      "type": "MODERATE-TO-HOT — lone-speed pressure",
+      "lone_speed": "Scotland (PP9) — only confirmed E in field but stretching from sprint distance",
+      "key": "If Scotland sets honest pace, EP/P stalkers get full pace help. Tour Player (EP, CD specialist) and Be You (Pletcher/Velazquez) are positioned to track and pounce"
+    },
+    "best_fig_in_field": "Be You 126 (7F sprint) / Dragoon Guard 125 (CD 9F)",
+    "algo_top3_projection": [
+      {"saddle": "6", "horse": "Tour Player", "ml": "4/1", "style": "EP", "fig": 123, "rationale": "Top combo: high HRN fig + CD specialist (6-for-12) + EP style fits 1M bias + Prat/Beckman live"},
+      {"saddle": "2", "horse": "Dragoon Guard", "ml": "3/1", "style": "S", "fig": 125, "rationale": "Highest CD-specific Beyer; Brad Cox + Irad; stalker fits CD route bias; chalk justified; STAKES GUARD ACTIVE"},
+      {"saddle": "4", "horse": "Be You", "ml": "7/2", "style": "P", "fig": 126, "rationale": "Pletcher/Velazquez; 126 fig at 7F (Toboggan); presser style; only risk is stretch-out to 1M"}
+    ],
+    "fade": "Scotland 20/1 — pure E stretching from sprint; pace fodder",
+    "value_alt": "Moonlight 8/1 — Cherokee Mile winner at CD; 3-for-5 at this track; Block/J.Ortiz HOT 5-for-13 Oaks Day"
+  },
+  "R8": {
+    "race_name": "Pat Day Mile S. G2",
+    "post_et": "3:23 PM",
+    "distance": "1M",
+    "surface": "Dirt FAST",
+    "purse": 750000,
+    "field_size": 12,
+    "running_styles": {
+      "1_Englishman": "E (DeVaux/J.Ortiz; gate-to-wire 2-for-2 by 7+L; Fair Grounds 6F in 1:08.76 — best 3yo time since 1991; rail post)",
+      "2_Trouble_Calling": "P (Foley/Saez; Lafayette S winner)",
+      "3_Work": "C (fig 84 — class par fail)",
+      "4_Secured_Freedom": "S (Yakteen/Velazquez; Practical Joke colt cutting back)",
+      "5_Stop_the_Car": "S (Walsh/Gaffalione; Maximum Security colt)",
+      "6_Crude_Velocity": "EP (BAFFERT/GEROUX with BLINKERS OFF; Beau Liam colt; Baffert calls 'freaky'; HIGHEST FIG 141 HRN)",
+      "7_Crown_the_Buckeye": "EP (Maker/Prat; set pace in Lecomte then faded)",
+      "8_Creole_Chrome": "EP (Sharp/Irad; Volatile colt turning back from Blue Grass)",
+      "9_Lockstocknpharoah": "C (Drury Jr.; flat dirt debut)",
+      "10_Great_White": "S (Ennis/Achard; also drew into Derby AE — secondary target here)",
+      "11_One_More_Freud": "P (Hess Jr./J.Hernandez; Tonalist colt; Saratoga maiden by 14.5L; 2026 debut here; Hess won R8 4/30)",
+      "12_Baytown_Dreamer": "C (fig 93 — pace filler)"
+    },
+    "pace_scenario": {
+      "type": "HOT — Englishman wire vs Crude Velocity press",
+      "lone_speed": "Englishman (PP1, rail) — true wire-to-wire with Crude Velocity pressing from 6 post",
+      "key": "Two E/EP horses likely duel hot for 3yo at 1M (par ~46s). Pace collapse opens for stalkers (Stop the Car, Secured Freedom) but pure closers may not get enough ground"
+    },
+    "best_fig_in_field": "Crude Velocity 141 HRN — highest 3yo in field by wide margin",
+    "algo_top3_projection": [
+      {"saddle": "6", "horse": "Crude Velocity", "ml": "5/2", "style": "EP", "fig": 141, "rationale": "BEST FIG IN FIELD; Baffert/Geroux; BLINKERS OFF = tactical flexibility; can press lone speed and outkick. Baffert 'freaky' colt"},
+      {"saddle": "1", "horse": "Englishman", "ml": "3/1", "style": "E", "fig": 135, "rationale": "Gate-to-wire 2-for-2 by 7+L; rail post maximizes lone speed; only risk is Crude Velocity pressing him down. J.Ortiz HOT 5-for-13"},
+      {"saddle": "5", "horse": "Stop the Car", "ml": "20/1", "style": "S", "fig": 111, "rationale": "Stalker at 20/1 in hot-pace setup is +EV; Walsh/Gaffalione; Maximum Security breeding suits 1M dirt"}
+    ],
+    "fade": "Crown the Buckeye + Creole Chrome — both EP pressers in projected hot pace",
+    "live_longshot": "One More Freud 15/1 — Hess won R8 same race 4/30 with Jensco; pattern repeat possible"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "races": [5, 7, 11],
+    "scraped_at": "2026-05-02T~01:50Z",
+    "WARNING": "Agent reported race outcomes that have NOT happened. Outcomes STRIPPED. Pace/style/PP figs retained as PROJECTIONS."
+  },
+  "R5": {
+    "race_name": "Twin Spires Turf Sprint S.",
+    "post_et": "1:12 PM",
+    "distance": "5.5F",
+    "surface": "Turf FIRM",
+    "purse": 600000,
+    "field_size": 10,
+    "running_styles": {
+      "1_Wendelssohn": "EP",
+      "2_Bear_River": "P",
+      "3_My_Boy_Prince": "P (best fig 113 — Tampa Turf Dash)",
+      "4_Full_Disclosure": "E",
+      "5_Possiblemente": "E",
+      "6_Its_Bourbon_Thirty": "EP",
+      "7_Yellow_Card": "S",
+      "8_Mondogetsbuckets": "EP",
+      "9_Litigation": "P/S",
+      "10_Joe_Shiesty": "E/EP"
+    },
+    "pace_scenario": {
+      "type": "HOT — three-way speed duel projected",
+      "lone_speed": null,
+      "key": "Joe Shiesty (E), Possiblemente (E), Mondogetsbuckets (EP) all want front. Hot pace + dead CD inner rail = closer setup (32% closer win rate confirmed for firm CD turf sprint per TrackBias data)"
+    },
+    "best_fig_in_field": "My Boy Prince 113 (Tampa Turf Dash)",
+    "algo_top3_projection": [
+      {"saddle": "7", "horse": "Yellow Card", "ml": "9/2", "style": "S", "fig": 111, "rationale": "Closer benefits most from hot pace; 2x graded placings 2026 (Shakertown G2 2nd 105, Clocker's Corner 1st 111); Prat aboard"},
+      {"saddle": "9", "horse": "Litigation", "ml": "3/1", "style": "P/S", "fig": 105, "rationale": "Irad/Lynch; stalker-closer benefits from speed duel; less positional risk than pure closer"},
+      {"saddle": "10", "horse": "Joe Shiesty", "ml": "6/1", "style": "E/EP", "fig": 105, "rationale": "Widest draw; if pace collapses rivals may save ground; G2-tested; value play"}
+    ],
+    "fade": "My Boy Prince 5/2 chalk — best raw fig but presser in hot pace = downgrade"
+  },
+  "R7": {
+    "race_name": "Longines Churchill Distaff Turf Mile S. G1",
+    "post_et": "2:38 PM",
+    "distance": "1M",
+    "surface": "Turf FIRM",
+    "purse": 1000000,
+    "field_size": 9,
+    "running_styles": {
+      "1_Italian_Soiree": "EP",
+      "2_Sweet_Rebecca": "EP",
+      "3_Portfolio_Duration_GB": "P",
+      "4_Temptable_GB": "P",
+      "5_Classic_Q": "P/S (fig 119 Wild Applause Saratoga)",
+      "6_Vina_Arana_IRE": "P",
+      "7_Movin_On_Up": "EP",
+      "8_Pin_Up_Betty": "P/S (fig 125 — HIGHEST IN FIELD)",
+      "9_Maggie_Go_ARG": "S/C"
+    },
+    "pace_scenario": {
+      "type": "MODERATE/contested",
+      "lone_speed": null,
+      "key": "Sweet Rebecca + Italian Soiree + Movin' On Up press early; no true lone speed; moderate pace + dead rail favors stalkers"
+    },
+    "best_fig_in_field": "Pin Up Betty 125 (Mint Julep G3 at CD)",
+    "algo_top3_projection": [
+      {"saddle": "5", "horse": "Classic Q", "ml": "6/1", "style": "P/S", "fig": 119, "rationale": "Best recent turf-mile fig; Casse/Velazquez; stalker-closer fits moderate pace + dead rail; 2x CD turf wins"},
+      {"saddle": "8", "horse": "Pin Up Betty", "ml": "7/2", "style": "P/S", "fig": 125, "rationale": "Highest raw fig; Constitution filly on firm CD turf; Maker; J.Hernandez handles traffic"},
+      {"saddle": "3", "horse": "Portfolio Duration GB", "ml": "4/1", "style": "P", "fig": 115, "rationale": "Chad Brown EU turf import; Brown's first-US-start specialty; Prat aboard; presser style safer if pace moderates"}
+    ],
+    "fade": "Sweet Rebecca 5/2 chalk — EP at risk if contested early; recent fig 112 lags top closers by 7+ pts"
+  },
+  "R11": {
+    "race_name": "Old Forester Bourbon Turf Classic S. G2",
+    "post_et": "5:39 PM",
+    "distance": "1 1/8M",
+    "surface": "Turf FIRM",
+    "purse": 1500000,
+    "field_size": 10,
+    "running_styles": {
+      "1_Corruption": "P/S (fig 126 — live longshot)",
+      "2_Dashman": "P",
+      "3_Asbury_Park_GB": "EP",
+      "4_Program_Trading_GB": "EP",
+      "5_Mercante": "P",
+      "6_Rhetorical": "P/EP (fig 134 — DOMINANT)",
+      "7_Gold_Phoenix_IRE": "P/S",
+      "8_Astronomer": "S",
+      "9_Test_Score": "P/S",
+      "10_Make_Me_King_FR": "P (fig 130)"
+    },
+    "pace_scenario": {
+      "type": "MODERATE — possible lone-control by Rhetorical",
+      "lone_speed": "Rhetorical (PP6) — controls from stalking position once Asbury Park / Program Trading sort out early",
+      "key": "Pace expected moderate-to-slow at 9F; premium on horse that can press and kick. Closer bias from dead rail less pronounced at route distance"
+    },
+    "best_fig_in_field": "Rhetorical 134 — 4+ points clear of nearest rival",
+    "algo_top3_projection": [
+      {"saddle": "6", "horse": "Rhetorical", "ml": "5/2", "style": "P/EP", "fig": 134, "rationale": "DOMINANT figure 134 — clear of field by 4+. Walden/Irad. Wins by pressing moderate pace + kicking clear. Chalk JUSTIFIED. Stakes guard ACTIVE — don't fade on pool flags"},
+      {"saddle": "10", "horse": "Make Me King FR", "ml": "6/1", "style": "P", "fig": 130, "rationale": "2nd-best fig 130. EU 8-10F horse; Al Jehani ships fresh; J.Ortiz HOT 5-for-13 Oaks Day; presser at 9F suits"},
+      {"saddle": "9", "horse": "Test Score", "ml": "7/2", "style": "P/S", "fig": 120, "rationale": "Graham Motion turf router; Franco; consistent 115-120 fig range; benefits if Asbury Park/Program Trading duel"}
+    ],
+    "longshot_alert": "Corruption 15/1 (Casse/Velazquez) — stalker w/ fig 126; live price if Rhetorical gets compromised"
+  }
+}
