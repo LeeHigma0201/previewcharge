@@ -1,15 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { KEENELAND_APR18_2026, KEE_APR18_DATE } from "../lib/keeneland-apr18";
+import { SA_APR26_2026 as CARD, SA_APR26_DATE as CARD_DATE } from "../lib/sa-2026-04-26";
 import { computeExoticsAnalytic, type RaceExoticRecs } from "../lib/bet-sheet";
-import {
-  allRacePicks,
-  computeMultiRaceRec,
-  MULTI_RACE_BETS,
-  type MultiRaceRec,
-} from "../lib/multi-race";
 import {
   loadResults,
   setRaceFinish,
@@ -29,14 +22,9 @@ export default function BetSheet() {
   }, []);
 
   const allRecs = useMemo<RaceExoticRecs[]>(
-    () => KEENELAND_APR18_2026.map(computeExoticsAnalytic),
+    () => CARD.map(computeExoticsAnalytic),
     [],
   );
-
-  const multiRecs = useMemo<MultiRaceRec[]>(() => {
-    const picks = allRacePicks();
-    return MULTI_RACE_BETS.map((b) => computeMultiRaceRec(b, picks));
-  }, []);
 
   async function fetchLiveResults() {
     setFetching(true);
@@ -76,7 +64,7 @@ export default function BetSheet() {
 
   const filledCount = Object.keys(results).length;
   const nextRace = useMemo(() => {
-    return KEENELAND_APR18_2026.find((r) => !results[r.raceNumber]);
+    return CARD.find((r) => !results[r.raceNumber]);
   }, [results]);
 
   return (
@@ -87,7 +75,7 @@ export default function BetSheet() {
           <div className="min-w-0">
             <h1 className="text-lg font-black truncate">HorseGPT &middot; Bet Sheet</h1>
             <p className="text-xs text-gray-400">
-              Keeneland {KEE_APR18_DATE} &middot; {filledCount}/11 done
+              {CARD_DATE} &middot; {filledCount}/{CARD.length} done
               {nextRace && <span> &middot; next R{nextRace.raceNumber} {nextRace.postTime}</span>}
             </p>
           </div>
@@ -154,21 +142,9 @@ export default function BetSheet() {
           );
         })()}
 
-        <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
-          <p className="text-xs text-gray-500">All races below. Next is highlighted above.</p>
-          <div className="flex items-center gap-3">
-            <Link href="/recap" className="text-xs text-indigo-400 hover:underline">
-              Day recap →
-            </Link>
-            <Link href="/" className="text-xs text-blue-400 hover:underline">
-              Full simulator →
-            </Link>
-          </div>
-        </div>
-
         {/* Race cards */}
         <div className="space-y-3">
-          {KEENELAND_APR18_2026.map((race) => {
+          {CARD.map((race) => {
             const recs = allRecs.find((r) => r.raceNumber === race.raceNumber);
             if (!recs) return null;
             const finish = results[race.raceNumber];
@@ -191,14 +167,6 @@ export default function BetSheet() {
             );
           })}
         </div>
-
-        {/* Multi-race plays */}
-        <div className="mt-6">
-          <h2 className="text-lg font-black mb-2 text-indigo-300">Multi-Race Plays</h2>
-          <div className="grid grid-cols-1 gap-2">
-            {multiRecs.map((r) => <MultiRaceCardLite key={r.bet.id} rec={r} results={results} />)}
-          </div>
-        </div>
       </div>
     </main>
   );
@@ -207,7 +175,7 @@ export default function BetSheet() {
 // ───────────────────────────── components ─────────────────────────────
 
 function RaceCard({ race, recs, finish, isNext, onLogFinish, onClearFinish }: {
-  race: (typeof KEENELAND_APR18_2026)[number];
+  race: (typeof CARD)[number];
   recs: RaceExoticRecs;
   finish?: string[];
   isNext: boolean;
@@ -282,11 +250,103 @@ function RaceCard({ race, recs, finish, isNext, onLogFinish, onClearFinish }: {
       {/* Horse legend — prevents program# mapping errors from deceiving silently */}
       {!done && <HorseLegend recs={recs} />}
 
+      {/* Per-horse W/P/S sim — full picture */}
+      {!done && <HorseSimTable recs={recs} />}
+
+      {/* Smart part-wheel super — high coverage, low cost */}
+      {!done && recs.partWheel.validCombos > 0 && (
+        <PartWheelRow pw={recs.partWheel} />
+      )}
+
       {/* Tickets */}
       <div className={`space-y-1.5 ${done ? "opacity-50" : ""}`}>
         <TicketRow label="SUPER" s={recs.superfecta} />
         <TicketRow label="TRI"   s={recs.trifecta} />
         <TicketRow label="EXACTA" s={recs.exacta} />
+      </div>
+    </div>
+  );
+}
+
+// Part-wheel super: A,B,C / D,E,F,G / H,I,J,K / L,M,N,O,P at $0.10 unit
+function PartWheelRow({ pw }: { pw: import("../lib/bet-sheet").PartWheel }) {
+  const hitPct = (pw.hitProbability * 100).toFixed(0);
+  return (
+    <div className="mb-2 rounded-lg border-2 border-emerald-700 bg-emerald-950/30 p-2">
+      <div className="flex items-baseline justify-between gap-2 mb-1">
+        <div className="flex items-baseline gap-2">
+          <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-black text-[10px] font-black uppercase">
+            Super Part-Wheel
+          </span>
+          <span className="text-[10px] text-emerald-300">${pw.unitCost.toFixed(2)} unit</span>
+        </div>
+        <div className="text-right">
+          <div className="text-base font-black text-white">${pw.totalCost.toFixed(2)}</div>
+          <div className="text-[10px] text-gray-400">{pw.validCombos} combos · hit {hitPct}%</div>
+        </div>
+      </div>
+      <div className="font-mono text-sm text-emerald-100 select-all break-all">
+        {pw.slotPrograms.map((slot, i) => (
+          <span key={i}>
+            {i > 0 && <span className="text-gray-500"> / </span>}
+            <span>{slot.join(",")}</span>
+          </span>
+        ))}
+      </div>
+      <div className="text-[10px] text-gray-400 mt-1">
+        Slot 1 (top by win) / Slot 2 (top by place) / Slot 3 (top by show) / Slot 4 (spreader). Copy → TwinSpires.
+      </div>
+    </div>
+  );
+}
+
+// Per-horse Win / Place / Show with overlay highlighting.
+// "Overlay" = model thinks horse is undervalued vs morning line — these are the BETS.
+function HorseSimTable({ recs }: { recs: RaceExoticRecs }) {
+  const horses = recs.horses;
+  if (!horses?.length) return null;
+  return (
+    <div className="mb-2 rounded border border-gray-800 bg-black/40 overflow-hidden">
+      <div className="grid grid-cols-[28px_1fr_42px_44px_44px_44px_56px] gap-1 px-2 py-1 text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-800">
+        <div>#</div>
+        <div>Horse</div>
+        <div className="text-right">ML</div>
+        <div className="text-right">Win</div>
+        <div className="text-right">Plc</div>
+        <div className="text-right">Show</div>
+        <div className="text-right">Edge</div>
+      </div>
+      {horses.map((h) => {
+        const edgeColor = h.isOverlay
+          ? "text-emerald-400"
+          : h.overlay >= 1.05
+            ? "text-emerald-300/70"
+            : h.overlay >= 0.85
+              ? "text-gray-400"
+              : "text-rose-400/80";
+        const rowBg = h.isOverlay ? "bg-emerald-950/40" : h.rank === 1 ? "bg-amber-950/30" : "";
+        return (
+          <div
+            key={h.program}
+            className={`grid grid-cols-[28px_1fr_42px_44px_44px_44px_56px] gap-1 px-2 py-1 text-xs font-mono items-center border-b border-gray-900 last:border-0 ${rowBg}`}
+          >
+            <div className="font-black text-white">#{h.program}</div>
+            <div className="truncate">
+              <span className="text-gray-200">{h.name}</span>
+              <span className="text-gray-600 ml-1 text-[10px]">{h.style}</span>
+              {h.isOverlay && <span className="ml-1 text-[9px] font-bold text-emerald-400">★</span>}
+              {h.rank === 1 && !h.isOverlay && <span className="ml-1 text-[9px] font-bold text-amber-400">TOP</span>}
+            </div>
+            <div className="text-right text-gray-400">{h.mlOdds.toFixed(1)}</div>
+            <div className="text-right text-white font-bold">{h.modelWinPct.toFixed(0)}%</div>
+            <div className="text-right text-gray-300">{h.modelPlacePct.toFixed(0)}%</div>
+            <div className="text-right text-gray-400">{h.modelShowPct.toFixed(0)}%</div>
+            <div className={`text-right font-bold ${edgeColor}`}>{(h.overlay).toFixed(2)}×</div>
+          </div>
+        );
+      })}
+      <div className="px-2 py-1 text-[10px] text-gray-500 border-t border-gray-800">
+        ★ = model overlay (undervalued vs ML — bet candidate). TOP = highest model win.
       </div>
     </div>
   );
@@ -366,35 +426,3 @@ function BigBetRow({ label, s }: { label: string; s: BetStrategy }) {
   );
 }
 
-function MultiRaceCardLite({ rec, results }: { rec: MultiRaceRec; results: ResultsMap }) {
-  const bet = rec.bet;
-  const aliveLegs = bet.legs.filter((leg) => {
-    const actual = results[leg];
-    if (!actual || actual.length === 0) return true;
-    const legRec = rec.legs.find((l) => l.race === leg);
-    if (!legRec) return true;
-    return actual[0] === legRec.primary || actual[0] === legRec.backup;
-  });
-  const alive = aliveLegs.length === bet.legs.length;
-  const hasAnyResult = bet.legs.some((leg) => results[leg]);
-  const borderColor = hasAnyResult
-    ? alive ? "border-emerald-500" : "border-red-500"
-    : "border-indigo-500/50";
-  return (
-    <div className={`p-3 rounded border-2 ${borderColor} bg-gray-900`}>
-      <div className="flex items-baseline justify-between mb-1 gap-2 text-sm">
-        <span className="font-black text-indigo-300">{bet.label}</span>
-        <span className="text-xs text-gray-500 font-mono">R{bet.legs.join(" · R")}</span>
-      </div>
-      <div className="text-xs space-y-1">
-        <div className="font-mono text-gray-300 break-words">{rec.singleTicket}</div>
-        <div className="text-gray-500">
-          Single ${rec.singleCost.toFixed(2)} &middot; hit {rec.singleHitPct.toFixed(2)}%
-          {rec.coverageCost > rec.singleCost && (
-            <span> &middot; coverage ${rec.coverageCost.toFixed(2)}</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}

@@ -36,6 +36,13 @@ credentials.json
 !/data/analysis/
 /data/analysis/*
 !/data/analysis/*.json
+# Card-day folders (cd-YYYY-MM-DD): allow CSV + MD analysis artifacts to be
+# committed so the PR shows the picks snapshot at deploy time. Raw scraped JSON
+# stays ignored (regeneratable; may contain third-party data we shouldn't redist).
+!/data/cd-*/
+/data/cd-*/*
+!/data/cd-*/*.csv
+!/data/cd-*/*.md
 
 # Model artifacts
 artifacts/
